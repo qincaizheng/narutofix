@@ -45,13 +45,11 @@ public class onKeyEvent {
         return entity.getEntityData().hasKey(targetLockOnEntityId);
     }
 
+    @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void onGuiOpen(GuiOpenEvent event){
         if (event.getGui() instanceof GuiInventory && !(event.getGui() instanceof CustomGuiContainer)){
-            event.setCanceled(true);
-            Minecraft.getMinecraft().player.openGui(NarutoFix.instance,1,Minecraft.getMinecraft().player.world,0,0,0);
-
-
+            event.setGui(new CustomGuiContainer(event.getGui().mc.player));
         }
     }
 
