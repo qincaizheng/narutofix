@@ -1,13 +1,11 @@
 buildscript {
     repositories {
-        jcenter()
-        maven { url = "https://files.minecraftforge.net/maven" }
-        maven { url = "https://maven.minecraftforge.net" }
-        maven { url = 'https://repo.spongepowered.org/maven' }
         mavenCentral()
+        maven { url = "https://files.minecraftforge.net/maven" }
+        maven { url = 'https://repo.spongepowered.org/maven' }        
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath files('forgegradle/ForgeGradle-2.3.8.jar')
         classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
 //        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
     }
@@ -16,12 +14,12 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 //apply plugin: 'net.minecraftforge.gradle'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-apply plugin: 'idea'
+apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = "0.1.0"
-group = "com.qdd.narutofix" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "Narutofix"
+version = mod_version
+group = mod_group
+archivesBaseName = mod_id
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {
@@ -29,17 +27,13 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.2-14.23.5.2847"
-
-    runDir = "run"
-
-    mappings = "snapshot_20180814"
-    String resolved_core_config = "mixins.Narutofix.json"
+    version = "${minecraft_version}-${forge_version}"
+    runDir = 'run'
+    mappings = mappings_version
+    makeObfSourceJar = true
+    String resolved_core_config = mod_mixin_configs.replace('${mod_id}', mod_id)
     clientRunArgs.addAll('--tweakClass', 'org.spongepowered.asm.launch.MixinTweaker', '--mixin', resolved_core_config)
     serverRunArgs.addAll('--tweakClass', 'org.spongepowered.asm.launch.MixinTweaker', '--mixin', resolved_core_config)
-
-    makeObfSourceJar = true
-    
    }
 repositories {
     maven {
@@ -66,40 +60,38 @@ dependencies {
 }
 
 processResources {
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+    inputs.property 'version', project.version
+    inputs.property 'mcversion', project.minecraft.version
 
-    // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
 
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'mod_id': mod_id, 'mod_name': mod_name, 'version': project.version,
+                'mcversion': project.minecraft.version, 'mod_description': mod_description,
+                'mod_author': mod_author
     }
 
-    // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
 }
-sourceSets {
-    main {
-        refMap = "refmap.Narutofix.json"
-    }
-}
-jar {
-    from(configurations.embed.collect {
-        it.isDirectory() ? it : zipTree(it)
-    }) {
-        exclude 'LICENSE.txt', 'META-INF/MANIFSET.MF', 'META-INF/maven/**', 'META-INF/*.RSA', 'META-INF/*.SF'
-    }
+// sourceSets {
+//     main {
+//         refMap = "refmap.Narutofix.json"
+//     }
+// }
+// jar {
+//     from(configurations.embed.collect {
+//         it.isDirectory() ? it : zipTree(it)
+//     }) {
+//         exclude 'LICENSE.txt', 'META-INF/MANIFSET.MF', 'META-INF/maven/**', 'META-INF/*.RSA', 'META-INF/*.SF'
+//     }
 
-    manifest.attributes(
-            'ForceLoadAsMod': 'true',
-            'FMLCorePluginContainsFMLMod': 'true',
-            'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-            'TweakOrder': '0',
-            'MixinConfigs': "mixins.Narutofix.json"
-    )
-}
+//     manifest.attributes(
+//             'ForceLoadAsMod': 'true',
+//             'FMLCorePluginContainsFMLMod': 'true',
+//             'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+//             'TweakOrder': '0',
+//             'MixinConfigs': "mixins.Narutofix.json"
+//     )
+// }
