@@ -49,7 +49,7 @@ public class onKeyEvent {
     @SubscribeEvent
     public static void onGuiOpen(GuiOpenEvent event){
         if (event.getGui() instanceof GuiInventory && !(event.getGui() instanceof CustomGuiContainer)){
-            event.setGui(new CustomGuiContainer(event.getGui().mc.player));
+            event.setGui(new CustomGuiContainer(Minecraft.getMinecraft().player));
         }
     }
 
