@@ -23,7 +23,7 @@ public class mixinProcedureSpecialJutsuOnKeyPressed {
         ItemStack helmet = ItemStack.EMPTY;
         if (entity instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) entity;
-            for (int i=3;i<5;i++){
+            for (int i=3;i<player.inventory.armorInventory.size();i++){
                 if (player.inventory.armorInventory.get(i).getItem() instanceof ItemSharingan.Base){
                     helmet = player.inventory.armorInventory.get(i);
                 }

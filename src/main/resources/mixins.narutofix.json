@@ -3,8 +3,10 @@
   "package": "com.qdd.narutofix.mixin",
   "refmap": "refmap.Narutofix.json",
   "mixins": [
+    "mixinInventoryPlayer",
     "mixinItemSharingan",
-    "mixinPlayerHook"
+    "mixinPlayerHook",
+    "mixinProcedureSpecialJutsuOnKeyPressed"
   ],
   "client": [
   ],

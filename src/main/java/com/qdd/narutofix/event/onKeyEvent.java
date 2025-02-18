@@ -3,12 +3,16 @@ package com.qdd.narutofix.event;
 import com.qdd.narutofix.NarutoFix;
 import com.qdd.narutofix.gui.CustomContainer;
 import com.qdd.narutofix.gui.CustomGuiContainer;
+import com.qdd.narutofix.network.PacketOpenCustomInventory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.command.CommandGameMode;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.IThreadListener;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -18,6 +22,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import com.qdd.narutofix.keybind.KeyLoader;
 import net.narutomod.procedure.ProcedureSync;
+
+import static com.qdd.narutofix.NarutoFix.PACKET_HANDLER;
 
 @Mod.EventBusSubscriber(modid = "narutofix")
 public class onKeyEvent {
@@ -48,8 +54,9 @@ public class onKeyEvent {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void onGuiOpen(GuiOpenEvent event){
-        if (event.getGui() instanceof GuiInventory && !(event.getGui() instanceof CustomGuiContainer)){
-            event.setGui(new CustomGuiContainer(Minecraft.getMinecraft().player));
+        if (event.getGui() instanceof GuiInventory && !(event.getGui() instanceof CustomGuiContainer) && !(Minecraft.getMinecraft().playerController.isInCreativeMode())){
+            event.setCanceled(true);
+            PACKET_HANDLER.sendToServer(new PacketOpenCustomInventory());
         }
     }
 

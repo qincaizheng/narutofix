@@ -11,19 +11,15 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(ItemSharingan.class)
 public class mixinItemSharingan {
-
-    @Final
-    @Shadow public static Item helmet;
-
     /**
      * @author qdd
      * @reason 123
      */
-    @Overwrite
+    @Overwrite(remap = false)
     public static boolean wearingAny(EntityLivingBase entity) {
         if (entity instanceof EntityPlayer){
             EntityPlayer Player = (EntityPlayer) entity;
-            for(int i=3;i<5;i++){
+            for(int i=3;i<Player.inventory.armorInventory.size();i++){
                 if(Player.inventory.armorInventory.get(i).getItem() instanceof ItemSharingan.Base) {
                     return true;
                 }
@@ -36,13 +32,13 @@ public class mixinItemSharingan {
      * @author qdd
      * @reason 123
      */
-    @Overwrite
+    @Overwrite(remap = false)
     public static boolean isWearingMangekyo(EntityLivingBase entity) {
         if (entity instanceof EntityPlayer){
             EntityPlayer Player = (EntityPlayer) entity;
-            for(int i=3;i<5;i++){
+            for(int i=3;i<Player.inventory.armorInventory.size();i++){
                 Item item = Player.inventory.armorInventory.get(i).getItem();
-                if(item instanceof ItemSharingan.Base && item!=helmet) {
+                if(item instanceof ItemSharingan.Base && item!=ItemSharingan.helmet) {
                     return true;
                 }
             }

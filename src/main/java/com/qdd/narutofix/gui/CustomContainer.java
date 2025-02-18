@@ -1,6 +1,7 @@
 package com.qdd.narutofix.gui;
 
 
+import com.google.common.collect.Lists;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
@@ -8,8 +9,10 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.narutomod.item.ItemDojutsu;
 import net.narutomod.item.ItemSharingan;
 import javax.annotation.Nullable;
 
@@ -25,6 +28,9 @@ public class CustomContainer extends Container
 
     public CustomContainer(InventoryPlayer playerInventory, boolean localWorld, EntityPlayer playerIn)
     {
+//        super(playerInventory,localWorld,playerIn);
+//        super.inventorySlots.clear();
+//        super.inventoryItemStacks.clear();
         this.isLocalWorld = localWorld;
         this.player = playerIn;
         this.addSlotToContainer(new SlotCrafting(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154, 28));
@@ -46,6 +52,7 @@ public class CustomContainer extends Container
                  * Returns the maximum stack size for a given slot (usually the same as getInventoryStackLimit(), but 1
                  * in the case of armor slots)
                  */
+                @Override
                 public int getSlotStackLimit()
                 {
                     return 1;
@@ -54,6 +61,7 @@ public class CustomContainer extends Container
                  * Check if the stack is allowed to be placed in this slot, used for armor slots as well as furnace
                  * fuel.
                  */
+                @Override
                 public boolean isItemValid(ItemStack stack)
                 {
                     return stack.getItem().isValidArmor(stack, entityequipmentslot, player);
@@ -61,26 +69,27 @@ public class CustomContainer extends Container
                 /**
                  * Return whether this slot's stack can be taken from this slot.
                  */
+                @Override
                 public boolean canTakeStack(EntityPlayer playerIn)
                 {
                     ItemStack itemstack = this.getStack();
                     return !itemstack.isEmpty() && !playerIn.isCreative() && EnchantmentHelper.hasBindingCurse(itemstack) ? false : super.canTakeStack(playerIn);
                 }
-                @Nullable
-                @SideOnly(Side.CLIENT)
+                @Override
                 public String getSlotTexture()
                 {
                     return ItemArmor.EMPTY_SLOT_NAMES[entityequipmentslot.getIndex()];
                 }
             });
         }
-        for (int i = 0; i < 2; ++i){
+        for (int n = 0; n < 2; ++n){
             final EntityEquipmentSlot entityequipmentslot = VALID_EQUIPMENT_SLOTS[0];
-            this.addSlotToContainer(new Slot(playerInventory, 40 + (1 - i), -2 + i * 18, -18){
+            this.addSlotToContainer(new Slot(playerInventory, 40 + (1 - n), -2 + n * 18, -17){
                 /**
                  * Returns the maximum stack size for a given slot (usually the same as getInventoryStackLimit(), but 1
                  * in the case of armor slots)
                  */
+                @Override
                 public int getSlotStackLimit()
                 {
                     return 1;
@@ -89,20 +98,21 @@ public class CustomContainer extends Container
                  * Check if the stack is allowed to be placed in this slot, used for armor slots as well as furnace
                  * fuel.
                  */
+                @Override
                 public boolean isItemValid(ItemStack stack)
                 {
-                    return stack.getItem().isValidArmor(stack, entityequipmentslot, player) && stack.getItem() instanceof ItemSharingan.Base;
+                    return stack.getItem().isValidArmor(stack, entityequipmentslot, player) && stack.getItem() instanceof ItemSharingan.Base && ((ItemSharingan.Base) stack.getItem()).isOwner(stack, player);
                 }
                 /**
                  * Return whether this slot's stack can be taken from this slot.
                  */
+                @Override
                 public boolean canTakeStack(EntityPlayer playerIn)
                 {
                     ItemStack itemstack = this.getStack();
                     return !itemstack.isEmpty() && !playerIn.isCreative() && EnchantmentHelper.hasBindingCurse(itemstack) ? false : super.canTakeStack(playerIn);
                 }
-                @Nullable
-                @SideOnly(Side.CLIENT)
+                @Override
                 public String getSlotTexture()
                 {
                     return ItemArmor.EMPTY_SLOT_NAMES[entityequipmentslot.getIndex()];
@@ -125,18 +135,24 @@ public class CustomContainer extends Container
 
         this.addSlotToContainer(new Slot(playerInventory, 42, 77, 62)
         {
-            @Nullable
-            @SideOnly(Side.CLIENT)
+            @Override
+            public boolean isItemValid(ItemStack stack)
+            {
+                return super.isItemValid(stack);
+            }
+            @Override
             public String getSlotTexture()
             {
                 return "minecraft:items/empty_armor_slot_shield";
             }
         });
+        this.onCraftMatrixChanged(this.craftMatrix);
     }
 
     /**
      * Callback for when the crafting matrix is changed.
      */
+    @Override
     public void onCraftMatrixChanged(IInventory inventoryIn)
     {
         this.slotChangedCraftingGrid(this.player.world, this.player, this.craftMatrix, this.craftResult);
@@ -145,6 +161,7 @@ public class CustomContainer extends Container
     /**
      * Called when the container is closed.
      */
+    @Override
     public void onContainerClosed(EntityPlayer playerIn)
     {
         super.onContainerClosed(playerIn);
@@ -159,6 +176,7 @@ public class CustomContainer extends Container
     /**
      * Determines whether supplied player can use this container
      */
+    @Override
     public boolean canInteractWith(EntityPlayer playerIn)
     {
         return true;
@@ -168,10 +186,12 @@ public class CustomContainer extends Container
      * Handle when the stack in slot {@code index} is shift-clicked. Normally this moves the stack between the player
      * inventory and the other inventory(s).
      */
+    @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
     {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
+        System.out.println(this.inventorySlots.size());
 
         if (slot != null && slot.getHasStack())
         {
@@ -195,7 +215,14 @@ public class CustomContainer extends Container
                     return ItemStack.EMPTY;
                 }
             }
-            else if (index >= 5 && index < 11)
+            else if (index >= 5 && index < 9)
+            {
+                if (!this.mergeItemStack(itemstack1, 11, 47, false))
+                {
+                    return ItemStack.EMPTY;
+                }
+            }
+            else if (index >= 9 && index < 11)
             {
                 if (!this.mergeItemStack(itemstack1, 11, 47, false))
                 {
@@ -273,6 +300,7 @@ public class CustomContainer extends Container
      * Called to determine if the current slot is valid for the stack merging (double-click) code. The stack passed in
      * is null for the initial slot that was double-clicked.
      */
+    @Override
     public boolean canMergeSlot(ItemStack stack, Slot slotIn)
     {
         return slotIn.inventory != this.craftResult && super.canMergeSlot(stack, slotIn);
