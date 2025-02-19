@@ -41,6 +41,7 @@ minecraft {
     makeObfSourceJar = true
     String resolved_core_config = mod_mixin_configs.replace('${mod_id}', mod_id)
     clientRunArgs.addAll('--tweakClass', 'org.spongepowered.asm.launch.MixinTweaker', '--mixin', resolved_core_config)
+    clientJvmArgs += "-Dfml.coreMods.load=com.qdd.narutofix.core.FixPlugin"
     serverRunArgs.addAll('--tweakClass', 'org.spongepowered.asm.launch.MixinTweaker', '--mixin', resolved_core_config)
    }
 repositories {

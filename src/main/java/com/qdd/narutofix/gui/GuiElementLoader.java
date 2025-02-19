@@ -30,7 +30,8 @@ public class GuiElementLoader implements IGuiHandler {
     {
         switch (ID)
         {
-            case GUI_DEMO: return new CustomGuiContainer(new CustomContainer(player.inventory,!world.isRemote,player));
+            case GUI_DEMO:
+                return new CustomGuiContainer(new CustomContainer(player.inventory,!world.isRemote,player));
             default:
                 return null;
         }

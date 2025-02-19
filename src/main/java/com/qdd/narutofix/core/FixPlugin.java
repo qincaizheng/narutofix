@@ -7,6 +7,7 @@ import java.util.Map;
 @IFMLLoadingPlugin.Name("NarutoFix plugin")
 @IFMLLoadingPlugin.MCVersion("1.12.2")
 @IFMLLoadingPlugin.TransformerExclusions({"com.qdd.narutofix.core"})
+@IFMLLoadingPlugin.SortingIndex(-10)
 public class FixPlugin implements IFMLLoadingPlugin{
     private static final String[] TRANSFORMERS = {
             "com.qdd.narutofix.core.FixTransformer"
@@ -29,8 +30,7 @@ public class FixPlugin implements IFMLLoadingPlugin{
 
     @Override
     public void injectData(Map<String, Object> data) {
-        ModConfig.initConfig();
-        PositionHelper.setupSlots();
+
     }
 
     @Override

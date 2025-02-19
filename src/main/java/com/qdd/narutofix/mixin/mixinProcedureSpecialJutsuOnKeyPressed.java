@@ -26,6 +26,7 @@ public class mixinProcedureSpecialJutsuOnKeyPressed {
             for (int i=3;i<player.inventory.armorInventory.size();i++){
                 if (player.inventory.armorInventory.get(i).getItem() instanceof ItemSharingan.Base){
                     helmet = player.inventory.armorInventory.get(i);
+                    break;
                 }
             }
         }

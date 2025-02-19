@@ -3,6 +3,7 @@ package com.qdd.narutofix.gui;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonImage;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.gui.recipebook.GuiRecipeBook;
@@ -10,12 +11,13 @@ import net.minecraft.client.gui.recipebook.IRecipeShownListener;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.InventoryEffectRenderer;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
 import com.qdd.narutofix.gui.CustomContainer;
 import net.minecraft.inventory.Slot;
 
 import java.io.IOException;
-
+//public class CustomGuiContainer extends GuiInventory {
 public class CustomGuiContainer extends InventoryEffectRenderer implements IRecipeShownListener {
     /** The old x position of the mouse pointer */
     private float oldMouseX;
@@ -30,6 +32,11 @@ public class CustomGuiContainer extends InventoryEffectRenderer implements IReci
         super(customContainer);
         this.allowUserInput = true;
     }
+
+//    public CustomGuiContainer(EntityPlayer player) {
+//        super(player);
+//        this.allowUserInput = true;
+//    }
 
 
     public void updateScreen()
@@ -183,6 +190,7 @@ public class CustomGuiContainer extends InventoryEffectRenderer implements IReci
     protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type)
     {
         super.handleMouseClick(slotIn, slotId, mouseButton, type);
+        System.out.println(slotIn);
         this.recipeBookGui.slotClicked(slotIn);
     }
 
