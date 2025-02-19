@@ -26,10 +26,18 @@ compileJava {
     sourceCompatibility = targetCompatibility = '1.8'
 }
 
+jar {
+    manifest {
+        attributes 'FMLCorePlugin': 'com.qdd.narutofix.core.FixPlugin'
+        attributes 'FMLCorePluginContainsFMLMod': 'true'
+    }
+}
+
 minecraft {
     version = "${minecraft_version}-${forge_version}"
     runDir = 'run'
     mappings = mappings_version
+    coreMod = "com.qdd.narutofix.core.FixPlugin"
     makeObfSourceJar = true
     String resolved_core_config = mod_mixin_configs.replace('${mod_id}', mod_id)
     clientRunArgs.addAll('--tweakClass', 'org.spongepowered.asm.launch.MixinTweaker', '--mixin', resolved_core_config)
