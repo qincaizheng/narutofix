@@ -129,6 +129,7 @@ public class CustomGuiContainer extends InventoryEffectRenderer implements IReci
     {
         if (!this.recipeBookGui.mouseClicked(mouseX, mouseY, mouseButton))
         {
+            System.out.println("false");
             if (!this.widthTooNarrow || !this.recipeBookGui.isVisible())
             {
                 super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -207,7 +208,6 @@ public class CustomGuiContainer extends InventoryEffectRenderer implements IReci
         this.recipeBookGui.removed();
         super.onGuiClosed();
     }
-
     public GuiRecipeBook func_194310_f()
     {
         return this.recipeBookGui;
