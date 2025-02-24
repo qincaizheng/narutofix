@@ -17,80 +17,82 @@ import com.qdd.narutofix.gui.CustomContainer;
 import net.minecraft.inventory.Slot;
 
 import java.io.IOException;
-//public class CustomGuiContainer extends GuiInventory {
-public class CustomGuiContainer extends InventoryEffectRenderer implements IRecipeShownListener {
+public class CustomGuiContainer extends GuiInventory {
+//public class CustomGuiContainer extends InventoryEffectRenderer implements IRecipeShownListener {
     /** The old x position of the mouse pointer */
     private float oldMouseX;
     /** The old y position of the mouse pointer */
     private float oldMouseY;
-    private GuiButtonImage recipeButton;
-    private final GuiRecipeBook recipeBookGui = new GuiRecipeBook();
-    private boolean widthTooNarrow;
-    private boolean buttonClicked;
+//    private GuiButtonImage recipeButton;
+//    private final GuiRecipeBook recipeBookGui = new GuiRecipeBook();
+//    private boolean widthTooNarrow;
+//    private boolean buttonClicked;
 
-    public CustomGuiContainer(CustomContainer customContainer) {
-        super(customContainer);
-        this.allowUserInput = true;
-    }
-
-//    public CustomGuiContainer(EntityPlayer player) {
-//        super(player);
+//    public CustomGuiContainer(CustomContainer customContainer) {
+//        super(customContainer);
 //        this.allowUserInput = true;
 //    }
 
-
-    public void updateScreen()
-    {
-        if (this.mc.playerController.isInCreativeMode())
-        {
-            this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.player));
-        }
-
-        this.recipeBookGui.tick();
-    }
-    public void initGui()
-    {
-        this.buttonList.clear();
-
-        if (this.mc.playerController.isInCreativeMode())
-        {
-            this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.player));
-        }
-        else
-        {
-            super.initGui();
-        }
-
-        this.widthTooNarrow = this.width < 379;
-        this.recipeBookGui.func_194303_a(this.width, this.height, this.mc, this.widthTooNarrow, ((CustomContainer)this.inventorySlots).craftMatrix);
-        this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
-        this.recipeButton = new GuiButtonImage(10, this.guiLeft + 104, this.height / 2 - 22, 20, 18, 178, 0, 19, INVENTORY_BACKGROUND);
-        this.buttonList.add(this.recipeButton);
-    }
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
-    {
-        this.fontRenderer.drawString(I18n.format("container.crafting"), 97, 8, 4210752);
+    public CustomGuiContainer(EntityPlayer player) {
+        super(player);
+        this.allowUserInput = true;
     }
 
+
+//    public void updateScreen()
+//    {
+//        if (this.mc.playerController.isInCreativeMode())
+//        {
+//            this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.player));
+//        }
+//
+//        this.recipeBookGui.tick();
+//    }
+//    public void initGui()
+//    {
+//        this.buttonList.clear();
+//
+//        if (this.mc.playerController.isInCreativeMode())
+//        {
+//            this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.player));
+//        }
+//        else
+//        {
+//            super.initGui();
+//        }
+//
+//        this.widthTooNarrow = this.width < 379;
+//        this.recipeBookGui.func_194303_a(this.width, this.height, this.mc, this.widthTooNarrow, ((CustomContainer)this.inventorySlots).craftMatrix);
+//        this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
+//        this.recipeButton = new GuiButtonImage(10, this.guiLeft + 104, this.height / 2 - 22, 20, 18, 178, 0, 19, INVENTORY_BACKGROUND);
+//        this.buttonList.add(this.recipeButton);
+//    }
+//    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
+//    {
+//        this.fontRenderer.drawString(I18n.format("container.crafting"), 97, 8, 4210752);
+//    }
+//
+    @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        this.drawDefaultBackground();
-        this.hasActivePotionEffects = !this.recipeBookGui.isVisible();
-
-        if (this.recipeBookGui.isVisible() && this.widthTooNarrow)
-        {
-            this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-            this.recipeBookGui.render(mouseX, mouseY, partialTicks);
-        }
-        else
-        {
-            this.recipeBookGui.render(mouseX, mouseY, partialTicks);
-            super.drawScreen(mouseX, mouseY, partialTicks);
-            this.recipeBookGui.renderGhostRecipe(this.guiLeft, this.guiTop, false, partialTicks);
-        }
-
-        this.renderHoveredToolTip(mouseX, mouseY);
-        this.recipeBookGui.renderTooltip(this.guiLeft, this.guiTop, mouseX, mouseY);
+//        this.drawDefaultBackground();
+//        this.hasActivePotionEffects = !this.recipeBookGui.isVisible();
+//
+//        if (this.recipeBookGui.isVisible() && this.widthTooNarrow)
+//        {
+//            this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
+//            this.recipeBookGui.render(mouseX, mouseY, partialTicks);
+//        }
+//        else
+//        {
+//            this.recipeBookGui.render(mouseX, mouseY, partialTicks);
+//            super.drawScreen(mouseX, mouseY, partialTicks);
+//            this.recipeBookGui.renderGhostRecipe(this.guiLeft, this.guiTop, false, partialTicks);
+//        }
+//
+//        this.renderHoveredToolTip(mouseX, mouseY);
+//        this.recipeBookGui.renderTooltip(this.guiLeft, this.guiTop, mouseX, mouseY);
+        super.drawScreen(mouseX, mouseY, partialTicks);
         this.oldMouseX = (float)mouseX;
         this.oldMouseY = (float)mouseY;
     }
@@ -118,100 +120,100 @@ public class CustomGuiContainer extends InventoryEffectRenderer implements IReci
         this.drawTexturedModalRect(x, y, u, v, slotSize, slotSize);
     }
 
-    protected boolean isPointInRegion(int rectX, int rectY, int rectWidth, int rectHeight, int pointX, int pointY)
-    {
-        return (!this.widthTooNarrow || !this.recipeBookGui.isVisible()) && super.isPointInRegion(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
-    }
-    /**
-     * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
-     */
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
-    {
-        if (!this.recipeBookGui.mouseClicked(mouseX, mouseY, mouseButton))
-        {
-            System.out.println("false");
-            if (!this.widthTooNarrow || !this.recipeBookGui.isVisible())
-            {
-                super.mouseClicked(mouseX, mouseY, mouseButton);
-            }
-        }
-    }
-
-    /**
-     * Called when a mouse button is released.
-     */
-    protected void mouseReleased(int mouseX, int mouseY, int state)
-    {
-        if (this.buttonClicked)
-        {
-            this.buttonClicked = false;
-        }
-        else
-        {
-            super.mouseReleased(mouseX, mouseY, state);
-        }
-    }
-
-    protected boolean hasClickedOutside(int p_193983_1_, int p_193983_2_, int p_193983_3_, int p_193983_4_)
-    {
-        boolean flag = p_193983_1_ < p_193983_3_ || p_193983_2_ < p_193983_4_ || p_193983_1_ >= p_193983_3_ + this.xSize || p_193983_2_ >= p_193983_4_ + this.ySize;
-        return this.recipeBookGui.hasClickedOutside(p_193983_1_, p_193983_2_, this.guiLeft, this.guiTop, this.xSize, this.ySize) && flag;
-    }
-
-    /**
-     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
-     */
-    protected void actionPerformed(GuiButton button) throws IOException
-    {
-        if (button.id == 10)
-        {
-            this.recipeBookGui.initVisuals(this.widthTooNarrow, ((CustomContainer)this.inventorySlots).craftMatrix);
-            this.recipeBookGui.toggleVisibility();
-            this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
-            this.recipeButton.setPosition(this.guiLeft + 104, this.height / 2 - 22);
-            this.buttonClicked = true;
-        }
-    }
-
-    /**
-     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
-     * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
-     */
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
-    {
-        if (!this.recipeBookGui.keyPressed(typedChar, keyCode))
-        {
-            super.keyTyped(typedChar, keyCode);
-        }
-    }
-
-    /**
-     * Called when the mouse is clicked over a slot or outside the gui.
-     */
-    protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type)
-    {
-        super.handleMouseClick(slotIn, slotId, mouseButton, type);
-        System.out.println(slotIn);
-        this.recipeBookGui.slotClicked(slotIn);
-    }
-
-    public void recipesUpdated()
-    {
-        this.recipeBookGui.recipesUpdated();
-    }
-
-    /**
-     * Called when the screen is unloaded. Used to disable keyboard repeat events
-     */
-    public void onGuiClosed()
-    {
-        this.recipeBookGui.removed();
-        super.onGuiClosed();
-    }
-    public GuiRecipeBook func_194310_f()
-    {
-        return this.recipeBookGui;
-    }
+//    protected boolean isPointInRegion(int rectX, int rectY, int rectWidth, int rectHeight, int pointX, int pointY)
+//    {
+//        return (!this.widthTooNarrow || !this.recipeBookGui.isVisible()) && super.isPointInRegion(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
+//    }
+//    /**
+//     * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
+//     */
+//    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+//    {
+//        if (!this.recipeBookGui.mouseClicked(mouseX, mouseY, mouseButton))
+//        {
+//            System.out.println("false");
+//            if (!this.widthTooNarrow || !this.recipeBookGui.isVisible())
+//            {
+//                super.mouseClicked(mouseX, mouseY, mouseButton);
+//            }
+//        }
+//    }
+//
+//    /**
+//     * Called when a mouse button is released.
+//     */
+//    protected void mouseReleased(int mouseX, int mouseY, int state)
+//    {
+//        if (this.buttonClicked)
+//        {
+//            this.buttonClicked = false;
+//        }
+//        else
+//        {
+//            super.mouseReleased(mouseX, mouseY, state);
+//        }
+//    }
+//
+//    protected boolean hasClickedOutside(int p_193983_1_, int p_193983_2_, int p_193983_3_, int p_193983_4_)
+//    {
+//        boolean flag = p_193983_1_ < p_193983_3_ || p_193983_2_ < p_193983_4_ || p_193983_1_ >= p_193983_3_ + this.xSize || p_193983_2_ >= p_193983_4_ + this.ySize;
+//        return this.recipeBookGui.hasClickedOutside(p_193983_1_, p_193983_2_, this.guiLeft, this.guiTop, this.xSize, this.ySize) && flag;
+//    }
+//
+//    /**
+//     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+//     */
+//    protected void actionPerformed(GuiButton button) throws IOException
+//    {
+//        if (button.id == 10)
+//        {
+//            this.recipeBookGui.initVisuals(this.widthTooNarrow, ((CustomContainer)this.inventorySlots).craftMatrix);
+//            this.recipeBookGui.toggleVisibility();
+//            this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
+//            this.recipeButton.setPosition(this.guiLeft + 104, this.height / 2 - 22);
+//            this.buttonClicked = true;
+//        }
+//    }
+//
+//    /**
+//     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
+//     * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
+//     */
+//    protected void keyTyped(char typedChar, int keyCode) throws IOException
+//    {
+//        if (!this.recipeBookGui.keyPressed(typedChar, keyCode))
+//        {
+//            super.keyTyped(typedChar, keyCode);
+//        }
+//    }
+//
+//    /**
+//     * Called when the mouse is clicked over a slot or outside the gui.
+//     */
+//    protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type)
+//    {
+//        super.handleMouseClick(slotIn, slotId, mouseButton, type);
+//        System.out.println(slotIn);
+//        this.recipeBookGui.slotClicked(slotIn);
+//    }
+//
+//    public void recipesUpdated()
+//    {
+//        this.recipeBookGui.recipesUpdated();
+//    }
+//
+//    /**
+//     * Called when the screen is unloaded. Used to disable keyboard repeat events
+//     */
+//    public void onGuiClosed()
+//    {
+//        this.recipeBookGui.removed();
+//        super.onGuiClosed();
+//    }
+//    public GuiRecipeBook func_194310_f()
+//    {
+//        return this.recipeBookGui;
+//    }
 }
 
 

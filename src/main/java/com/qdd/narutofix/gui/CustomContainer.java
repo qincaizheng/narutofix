@@ -15,8 +15,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.narutomod.item.ItemDojutsu;
 import net.narutomod.item.ItemSharingan;
 import javax.annotation.Nullable;
+import java.util.List;
 
-public class CustomContainer extends Container
+public class CustomContainer extends ContainerPlayer
 {
     private static final EntityEquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EntityEquipmentSlot[] {EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
     /** The crafting matrix inventory. */
@@ -28,9 +29,10 @@ public class CustomContainer extends Container
 
     public CustomContainer(InventoryPlayer playerInventory, boolean localWorld, EntityPlayer playerIn)
     {
-//        super(playerInventory,localWorld,playerIn);
-//        super.inventorySlots.clear();
-//        super.inventoryItemStacks.clear();
+        super(playerInventory,localWorld,playerIn);
+        this.inventoryItemStacks.clear();
+        this.inventorySlots.clear();
+        System.out.println(this.inventorySlots.size());
         this.isLocalWorld = localWorld;
         this.player = playerIn;
         this.addSlotToContainer(new SlotCrafting(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154, 28));

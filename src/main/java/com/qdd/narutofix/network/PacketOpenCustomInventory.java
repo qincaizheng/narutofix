@@ -1,6 +1,7 @@
 package com.qdd.narutofix.network;
 
 import com.qdd.narutofix.NarutoFix;
+import com.qdd.narutofix.gui.CustomContainer;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.world.WorldServer;
