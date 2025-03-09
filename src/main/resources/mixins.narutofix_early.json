@@ -1,0 +1,15 @@
+{
+  "required" :true,
+  "package": "com.qdd.narutofix.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "refmap.narutofix.json",
+  "target": "@env(DEFAULT)",
+  "mixins": [
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.7"
+}

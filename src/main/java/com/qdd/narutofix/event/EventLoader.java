@@ -1,30 +1,41 @@
 package com.qdd.narutofix.event;
 
 
+import com.qdd.narutofix.NarutoFix;
+import com.qdd.narutofix.cap.IJutsuInventory;
+import com.qdd.narutofix.cap.JutsuCapabilityProvider;
+import com.qdd.narutofix.cap.JutsuInventoryCapability;
+import com.qdd.narutofix.network.PacketCap;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.CommandEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.entity.EntityGedoStatue;
 import net.narutomod.procedure.ProcedureSync;
-import net.minecraft.client.Minecraft;
+
+import static com.qdd.narutofix.NarutoFix.PACKET_HANDLER;
+import static com.qdd.narutofix.cap.JutsuInventoryCapability.Jutsu_INV;
 
 
-
-
-@Mod.EventBusSubscriber(modid = "narutofix")
+@Mod.EventBusSubscriber
 public final class EventLoader {
     private static final String BATTLEXP = NarutomodModVariables.BATTLEXP;
 
@@ -77,6 +88,50 @@ public final class EventLoader {
                 entity.sendStatusMessage(new TextComponentString(
                         net.minecraft.util.text.translation.I18n.translateToLocal("chattext.ninjaexperience")+
                                 String.format("%.1f", getBattleXp(entity))), true);
+            }
+        }
+    }
+
+    @SubscribeEvent
+//    @SideOnly(Side.SERVER)
+    public static void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event){
+        if (event.getObject() instanceof EntityPlayer) {
+//            System.out.println(1);
+            event.addCapability(new ResourceLocation(NarutoFix.MODID, "jutsu_inv"), new JutsuCapabilityProvider());
+        }
+    }
+
+    @SubscribeEvent
+//    @SideOnly(Side.SERVER)
+    public static void onPlayerClone(PlayerEvent.Clone event)
+    {
+        Capability<IJutsuInventory> capability = Jutsu_INV;
+        Capability.IStorage<IJutsuInventory> storage = capability.getStorage();
+
+        if (event.getOriginal().hasCapability(capability, null) && event.getEntityPlayer().hasCapability(capability, null))
+        {
+            NBTBase nbt = storage.writeNBT(capability, event.getOriginal().getCapability(capability, null), null);
+            storage.readNBT(capability, event.getEntityPlayer().getCapability(capability, null), null, nbt);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerjoin(EntityJoinWorldEvent event){
+//        System.out.println(555);
+        if ( event.getEntity() instanceof EntityPlayerMP)
+        {
+            EntityPlayerMP player = (EntityPlayerMP) event.getEntity();
+//            System.out.println(321);
+            if (player.hasCapability(Jutsu_INV, null))
+            {
+//                System.out.println(312);
+                PacketCap message = new PacketCap();
+
+                Capability.IStorage<IJutsuInventory> storage = Jutsu_INV.getStorage();
+
+                message.nbt = (NBTTagCompound) storage.writeNBT(Jutsu_INV, player.getCapability(Jutsu_INV, null), null);
+
+                PACKET_HANDLER.sendTo(message, player);
             }
         }
     }

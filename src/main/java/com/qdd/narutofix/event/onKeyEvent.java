@@ -1,19 +1,15 @@
 package com.qdd.narutofix.event;
 
-import com.qdd.narutofix.NarutoFix;
-import com.qdd.narutofix.gui.CustomContainer;
-import com.qdd.narutofix.gui.CustomGuiContainer;
-import com.qdd.narutofix.network.PacketOpenCustomInventory;
+import com.qdd.narutofix.cap.IJutsuInventory;
+import com.qdd.narutofix.cap.JutsuInventoryCapability;
+import com.qdd.narutofix.network.PacketOpenJutsugui;
+import com.qdd.narutofix.network.PacketSwitchhatbot;
+import com.qdd.narutofix.network.PacketUseJutsu;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.command.CommandGameMode;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.client.gui.GuiChat;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.IThreadListener;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -21,24 +17,27 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import com.qdd.narutofix.keybind.KeyLoader;
+import net.narutomod.PlayerTracker;
 import net.narutomod.procedure.ProcedureSync;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+
+import java.io.IOException;
 
 import static com.qdd.narutofix.NarutoFix.PACKET_HANDLER;
 
 @Mod.EventBusSubscriber(modid = "narutofix")
 public class onKeyEvent {
     private static final String shouldTargetLockOnEntity = "shouldTargetLockOnEntity";
-    private static final String targetLockOnEntityId = "targetLockOnEntityId";
-    private static final ResourceLocation TEXTURE = new ResourceLocation("minecraft", "textures/gui/container/inventory.png");
-
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void onKeyInput(InputEvent.KeyInputEvent event){
+        EntityPlayer player = Minecraft.getMinecraft().player;
+        IJutsuInventory jutsu_inv=player.getCapability(JutsuInventoryCapability.Jutsu_INV, null);
 //        System.out.println("onKeyInput");
-        if (KeyLoader.LockOnEntity.isPressed())
-        {
-            EntityPlayer player = Minecraft.getMinecraft().player;
-            if (FMLClientHandler.instance().isGUIOpen(net.minecraft.client.gui.GuiChat.class) || player == null) {
+        if (KeyLoader.LockOnEntity.isPressed())        {
+
+            if (FMLClientHandler.instance().isGUIOpen(GuiChat.class) || player == null) {
                 return;
             }
             boolean flag = player.getEntityData().getBoolean("shouldTargetLockOnEntity");
@@ -46,18 +45,17 @@ public class onKeyEvent {
             player.getEntityData().setBoolean(shouldTargetLockOnEntity, !flag);
             ProcedureSync.EntityNBTTag.sendToServer(player, shouldTargetLockOnEntity, !flag);
         }
-    }
-    private static boolean hasTargetLockOnEntity(EntityLivingBase entity) {
-        return entity.getEntityData().hasKey(targetLockOnEntityId);
-    }
-
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public static void onGuiOpen(GuiOpenEvent event){
-        if (event.getGui() instanceof GuiInventory && !(event.getGui() instanceof CustomGuiContainer) && !(Minecraft.getMinecraft().playerController.isInCreativeMode())){
-            event.setCanceled(true);
-            PACKET_HANDLER.sendToServer(new PacketOpenCustomInventory());
+        if (KeyLoader.usejutsu.isPressed()){
+            // 发送数据包到服务器执行物品使用
+            PACKET_HANDLER.sendToServer(new PacketUseJutsu());
+        }
+        if(KeyLoader.openjutsugui.isPressed()){
+            if(player.hasCapability(JutsuInventoryCapability.Jutsu_INV, null)&& PlayerTracker.isNinja(player)) {
+                player.getCapability(JutsuInventoryCapability.Jutsu_INV, null).setIzanagiSize((int) Math.min(PlayerTracker.getBattleXp(player)/2000,9));
+            }
+            PACKET_HANDLER.sendToServer(new PacketOpenJutsugui());
         }
     }
+
 
 }

@@ -1,13 +1,10 @@
 {
   "compatibilityLevel": "JAVA_8",
   "package": "com.qdd.narutofix.mixin",
-  "refmap": "refmap.Narutofix.json",
+  "refmap": "refmap.narutofix.json",
   "mixins": [
-    "mixinEntityPlayer",
-    "mixinInventoryPlayer",
-    "mixinItemSharingan",
-    "mixinPlayerHook",
-    "mixinProcedureSpecialJutsuOnKeyPressed"
+    "mixinKeyBindingPowerIncrease",
+    "mixinPlayerHook"
   ],
   "client": [
   ],

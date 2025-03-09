@@ -8,15 +8,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemSharingan.PlayerHook.class)
 public class mixinPlayerHook{
-    @Inject(method ="onMouseEvent" ,at = @At("HEAD"),cancellable = true,remap = false)
+    @Inject(method ="onMouseEvent" ,at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/NBTTagCompound;setBoolean(Ljava/lang/String;Z)V"),cancellable = true)
     public void onMouseEvent(CallbackInfo ci) {
         ci.cancel();
+        System.out.println("[Mixin] 鼠标事件已拦截");
     }
 
-    @Inject(method = "onAttacked",at = {@At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityLivingBase;setPositionAndUpdate(DDD)V"),@At(value = "INVOKE", target = "Lnet/narutomod/item/ItemSharingan$PlayerHook;lockOnTarget(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/entity/EntityLivingBase;I)V")}, remap = false, cancellable = true)
+    @Inject(method = "onAttacked",at = {@At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityLivingBase;setPositionAndUpdate(DDD)V")},  cancellable = true)
     public void mixinonAttackEvent(CallbackInfo ci) {
         ci.cancel();
+        System.out.println("[Mixin] 位移事件已拦截");
     }
-
-
 }

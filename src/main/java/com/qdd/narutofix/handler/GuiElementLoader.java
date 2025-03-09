@@ -1,13 +1,16 @@
-package com.qdd.narutofix.gui;
+package com.qdd.narutofix.handler;
 
 import com.qdd.narutofix.NarutoFix;
+import com.qdd.narutofix.container.JutsuContainer;
+import com.qdd.narutofix.gui.GuiJutsuCntainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 
 public class GuiElementLoader implements IGuiHandler {
-    public static final int GUI_DEMO = 1;
+    public static final int GUI_Custom = 1;
+    public static final int GUI_Jutsu = 2;
 
     public GuiElementLoader()
     {
@@ -19,7 +22,9 @@ public class GuiElementLoader implements IGuiHandler {
     {
         switch (ID)
         {
-            case GUI_DEMO: return new CustomContainer(player.inventory,!world.isRemote,player);
+
+            case GUI_Jutsu:
+                return new JutsuContainer(player,!world.isRemote);
             default:
                 return null;
         }
@@ -30,8 +35,8 @@ public class GuiElementLoader implements IGuiHandler {
     {
         switch (ID)
         {
-            case GUI_DEMO:
-                return new CustomGuiContainer(player);
+            case GUI_Jutsu:
+                return new GuiJutsuCntainer(new JutsuContainer(player,!world.isRemote));
             default:
                 return null;
         }

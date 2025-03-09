@@ -26,27 +26,30 @@ compileJava {
     sourceCompatibility = targetCompatibility = '1.8'
 }
 
-jar {
-    manifest {
-        attributes 'FMLCorePlugin': 'com.qdd.narutofix.core.FixPlugin'
-        attributes 'FMLCorePluginContainsFMLMod': 'true'
-    }
+configurations {
+    embed
+    compile.extendsFrom(embed)
 }
 
 minecraft {
     version = "${minecraft_version}-${forge_version}"
     runDir = 'run'
     mappings = mappings_version
-    coreMod = "com.qdd.narutofix.core.FixPlugin"
-    makeObfSourceJar = true
-    String resolved_core_config = mod_mixin_configs.replace('${mod_id}', mod_id)
-    clientRunArgs.addAll('--tweakClass', 'org.spongepowered.asm.launch.MixinTweaker', '--mixin', resolved_core_config)
-    clientJvmArgs += "-Dfml.coreMods.load=com.qdd.narutofix.core.FixPlugin"
-    serverRunArgs.addAll('--tweakClass', 'org.spongepowered.asm.launch.MixinTweaker', '--mixin', resolved_core_config)
+    def args = []
+    args <<  "-Dfml.coreMods.load=com.qdd.narutofix.core.FixPlugin"
+//    args << '-Dmixin.hotSwap=true'
+//    args << '-Dmixin.checks.interfaces=true'
+//    args << '-Dmixin.debug.export=true'
+    clientJvmArgs.addAll(args)
+    serverJvmArgs.addAll(args)
    }
+
 repositories {
     maven {
-        url "https://cursemaven.com"
+        url = "https://cursemaven.com"
+    }
+    maven {
+        url = 'https://maven.cleanroommc.com'
     }
     mavenCentral()
     maven { url = "https://repo.spongepowered.org/maven" }
@@ -58,32 +61,52 @@ configurations {
 }
 
 dependencies {
-    embed('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
-        exclude module: 'guava'
-        exclude module: 'commons-io'
-        exclude module: 'gson'
-    }
-    annotationProcessor 'org.spongepowered:mixin:0.7.11-SNAPSHOT'
+    compile 'com.cleanroommc:assetmover:2.0'
+    compile 'zone.rong:mixinbooter:7.0'
     deobfCompile "curse.maven:ahznbs-naruto-mod-831157:5967126"
+
+}
+
+sourceSets {
+
+    main {
+        ext.refMap = mod_mixin_refmap.replace('${mod_id}', mod_id)
+    }
 
 }
 
 processResources {
     inputs.property 'version', project.version
-    inputs.property 'mcversion', project.minecraft.version
+    inputs.property 'mcversion', minecraft_version
 
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
 
         expand 'mod_id': mod_id, 'mod_name': mod_name, 'version': project.version,
-                'mcversion': project.minecraft.version, 'mod_description': mod_description,
+                'mcversion': minecraft_version, 'mod_description': mod_description,
                 'mod_author': mod_author
     }
 
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+    rename '(.+_at.cfg)', 'META-INF/$1'
 }
+
+
+
+jar {
+    manifest {
+        def attribute_map = [:]
+        attribute_map['FMLCorePlugin'] = 'com.qdd.narutofix.core.FixPlugin'
+        attribute_map['FMLCorePluginContainsFMLMod'] = true
+        attribute_map['ForceLoadAsMod'] = project.gradle.startParameter.taskNames[0] == "build"
+        attribute_map['FMLAT'] = 'narutofix_at.cfg'
+
+        attributes(attribute_map)
+    }
+}
+
 // sourceSets {
 //     main {
 //         refMap = "refmap.Narutofix.json"

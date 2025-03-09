@@ -1,2 +1,17 @@
 key.narutofix.LockOnEntity=锁定
 key.categories.narutofix=火影修复
+key.narutofix.openjutsugui=打开忍术页面
+key.narutofix.switchhatbot=忍术切换按键
+key.narutofix.switchjutsu_1=切换忍术1
+key.narutofix.switchjutsu_2=切换忍术2
+key.narutofix.switchjutsu_3=切换忍术3
+key.narutofix.switchjutsu_4=切换忍术4
+key.narutofix.switchjutsu_5=切换忍术5
+key.narutofix.switchjutsu_6=切换忍术6
+key.narutofix.switchjutsu_7=切换忍术7
+key.narutofix.switchjutsu_8=切换忍术8
+key.narutofix.switchjutsu_9=切换忍术9
+key.narutofix.Izanagi=开启伊邪那岐
+narutofix.text.isIzanaqi=伊邪那岐
+potion.izanagi=伊邪那岐
+item.narutofix.sealscroll.name=封印卷轴
