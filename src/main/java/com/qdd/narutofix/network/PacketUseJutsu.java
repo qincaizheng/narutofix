@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.narutomod.PlayerTracker;
 import net.narutomod.item.ItemDojutsu;
 import net.narutomod.item.ItemJutsu;
+import org.lwjgl.Sys;
 
 public class PacketUseJutsu implements IMessage, IMessageHandler<PacketUseJutsu, IMessage> {
     public PacketUseJutsu() {}
@@ -31,6 +32,7 @@ public class PacketUseJutsu implements IMessage, IMessageHandler<PacketUseJutsu,
             ItemStack stack = inv.getItems().getStackInSlot(inv.getSelected());
             if (!stack.isEmpty()) {
                 int powertick= Config.powertick;
+                System.out.println(powertick);
                 stack.getItem().onPlayerStoppedUsing(stack, player.world, player,powertick);
             }
         });
