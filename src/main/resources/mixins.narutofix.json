@@ -4,6 +4,7 @@
   "refmap": "refmap.narutofix.json",
   "mixins": [
     "mixinKeyBindingPowerIncrease",
+    "mixinPathway",
     "mixinPlayerHook"
   ],
   "client": [

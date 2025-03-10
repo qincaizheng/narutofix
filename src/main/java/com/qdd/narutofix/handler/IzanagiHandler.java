@@ -58,6 +58,10 @@ public class IzanagiHandler {
             entity.clearActivePotions();
             inv.Izanagi();
             entity.addPotionEffect(new PotionEffect(PotionLoader.PotionIzanagi,3600));
+            inv.setIzanagi(false);
+            PacketIzanagi message = new PacketIzanagi();
+            message.isIzanagi=false;
+            PACKET_HANDLER.sendToServer(message);
         }
     }
 

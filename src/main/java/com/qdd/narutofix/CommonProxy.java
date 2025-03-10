@@ -13,6 +13,7 @@ public class CommonProxy
     {
         new PacketRegister();
         JutsuInventoryCapability.register();
+        Config.initialize(event.getSuggestedConfigurationFile());
     }
 
     public void init(FMLInitializationEvent event)

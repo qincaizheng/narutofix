@@ -11,7 +11,12 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 
-@Mod(modid = NarutoFix.MODID, name = NarutoFix.NAME, version = NarutoFix.VERSION, dependencies = "required-after:narutomod")
+@Mod(modid = NarutoFix.MODID,
+        name = NarutoFix.NAME,
+        version = NarutoFix.VERSION,
+        dependencies = "required-after:narutomod",
+        guiFactory ="com.qdd.narutofix.gui.NarutoFixGuiFactory"
+)
 public class NarutoFix {
 
     public static final String MODID = "narutofix";

@@ -1,5 +1,6 @@
 package com.qdd.narutofix.network;
 
+import com.qdd.narutofix.Config;
 import com.qdd.narutofix.cap.IJutsuInventory;
 import com.qdd.narutofix.cap.JutsuInventoryCapability;
 import io.netty.buffer.ByteBuf;
@@ -29,7 +30,8 @@ public class PacketUseJutsu implements IMessage, IMessageHandler<PacketUseJutsu,
             IJutsuInventory inv = player.getCapability(JutsuInventoryCapability.Jutsu_INV, null);
             ItemStack stack = inv.getItems().getStackInSlot(inv.getSelected());
             if (!stack.isEmpty()) {
-                stack.getItem().onPlayerStoppedUsing(stack, player.world, player,40);
+                int powertick= Config.powertick;
+                stack.getItem().onPlayerStoppedUsing(stack, player.world, player,powertick);
             }
         });
         return null;
