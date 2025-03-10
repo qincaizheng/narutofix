@@ -31,7 +31,7 @@ public class PacketUseJutsu implements IMessage, IMessageHandler<PacketUseJutsu,
             IJutsuInventory inv = player.getCapability(JutsuInventoryCapability.Jutsu_INV, null);
             ItemStack stack = inv.getItems().getStackInSlot(inv.getSelected());
             if (!stack.isEmpty()) {
-                int powertick= Config.powertick;
+                int powertick=72000- Config.powertick;
                 System.out.println(powertick);
                 stack.getItem().onPlayerStoppedUsing(stack, player.world, player,powertick);
             }
