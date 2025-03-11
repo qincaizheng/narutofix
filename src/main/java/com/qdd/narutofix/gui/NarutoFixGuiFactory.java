@@ -1,6 +1,6 @@
 package com.qdd.narutofix.gui;
 
-import com.qdd.narutofix.Config;
+import com.qdd.narutofix.Configs;
 import com.qdd.narutofix.NarutoFix;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.config.ConfigElement;
@@ -15,7 +15,7 @@ import java.util.List;
 public class NarutoFixGuiFactory extends DefaultGuiFactory {
 
     public NarutoFixGuiFactory() {
-        super(NarutoFix.MODID, GuiConfig.getAbridgedConfigPath(Config.config.toString()));
+        super(NarutoFix.MODID, "config");
     }
 
     @Override
@@ -26,9 +26,7 @@ public class NarutoFixGuiFactory extends DefaultGuiFactory {
     private static List<IConfigElement> getConfigElements() {
         List<IConfigElement> list = new ArrayList<IConfigElement>();
 
-        list.addAll(new ConfigElement(Config.config
-                .getCategory(Configuration.CATEGORY_GENERAL))
-                .getChildElements());
+        list.addAll(ConfigElement.from(Configs.class).getChildElements());
 
         return list;
     }

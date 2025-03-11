@@ -1,6 +1,7 @@
 package com.qdd.narutofix.items;
 
 import com.google.common.base.CharMatcher;
+import com.qdd.narutofix.Configs;
 import com.qdd.narutofix.NarutoFix;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockStairs;
@@ -31,14 +32,12 @@ import net.narutomod.Chakra;
 import net.narutomod.creativetab.TabModTab;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ItemSealScroll extends Item {
     public static final String SEAL_DATA_KEY = "sealData";
     public static final String[] FACING_KEYS = new String[] { "rotation", "rot", "facing", "face", "direction", "dir", "front", "forward" };
+    public static Set<String> ALLOWED_TILES = new HashSet<>();
     public ItemSealScroll() {
         this.setTranslationKey("narutofix.sealscroll");
         this.setRegistryName(NarutoFix.MODID, "sealscroll");
@@ -51,8 +50,7 @@ public class ItemSealScroll extends Item {
     {
         if (hasSealData(stack))
         {
-            NBTTagCompound nbt = getSealData(stack);
-            return super.getItemStackDisplayName(stack)+" Seal "+nbt.getString("block");
+            return super.getItemStackDisplayName(stack)+" Seal "+stack.getTagCompound().getString("block");
         }
 
         return  super.getItemStackDisplayName(stack);
@@ -197,16 +195,36 @@ public class ItemSealScroll extends Item {
                 e.printStackTrace();
             }
 
-        } else if (Chakra.pathway(player).consume(100d)){
-        if (storeSealData(world.getTileEntity(pos),world,pos, world.getBlockState(pos),stack)) {
-            if(world.getTileEntity(pos) != null ){
-                emptyTileEntity(world.getTileEntity(pos));
-            }
-            world.setBlockState(pos, Blocks.AIR.getDefaultState());
-            return EnumActionResult.SUCCESS;
-        }}else{clearSealData(stack);}
+        } else if (isAllowed(world.getBlockState(pos).getBlock())){
+            if (Chakra.pathway(player).consume(100d)){
+            if (storeSealData(world.getTileEntity(pos),world,pos, world.getBlockState(pos),stack)) {
+                if(world.getTileEntity(pos) != null ){
+                    emptyTileEntity(world.getTileEntity(pos));
+                }
+                world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                return EnumActionResult.SUCCESS;
+        }}}else{clearSealData(stack);}
 
         return EnumActionResult.FAIL;
+    }
+
+    public static boolean isAllowed(Block block){
+        String name = block.getRegistryName().toString();
+        if (ALLOWED_TILES.contains(name))
+            return false;
+        else
+        {
+            boolean contains = true;
+            for (String s : ALLOWED_TILES)
+            {
+                if (s.contains("*"))
+                {
+                    if(name.contains(s.replace("*", "")))
+                        contains = false;
+                }
+            }
+            return contains;
+        }
     }
 
     public static void emptyTileEntity(TileEntity te)
@@ -281,6 +299,7 @@ public class ItemSealScroll extends Item {
         ItemStack drop = new ItemStack(state.getBlock().getItemDropped(state, itemRand, 0), 1, state.getBlock().damageDropped(state));
 
         tag.setString("block", state.getBlock().getRegistryName().toString());
+        System.out.println(state.getBlock().getRegistryName().toString());
         tag.setInteger("meta", drop.getItemDamage());
         tag.setInteger("stateid", Block.getStateId(state));
         stack.setTagCompound(tag);

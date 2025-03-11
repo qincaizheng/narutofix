@@ -94,7 +94,7 @@ public class JutsuInventoryCapability {
 
         @Override
         public void Izanagi(){
-            for(int i = IzanagiSize+28;i>27;i--){
+            for(int i = IzanagiSize+27;i>27;i--){
                 if (this.itemHandler.getStackInSlot(i).getItem() instanceof ItemSharingan.Base) {
                     this.itemHandler.setStackInSlot(i, ItemStack.EMPTY);
                 }

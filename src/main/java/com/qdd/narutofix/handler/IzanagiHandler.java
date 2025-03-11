@@ -54,7 +54,10 @@ public class IzanagiHandler {
         EntityLivingBase entity = event.getEntityLiving();
         IJutsuInventory inv=entity.getCapability(Jutsu_INV, null);
         if (entity instanceof EntityPlayer && inv.isIzanagi()) {
+            System.out.println(inv.isIzanagi());
             event.setCanceled(true);
+            entity.setHealth(entity.getMaxHealth()
+            );
             entity.clearActivePotions();
             inv.Izanagi();
             entity.addPotionEffect(new PotionEffect(PotionLoader.PotionIzanagi,3600));
