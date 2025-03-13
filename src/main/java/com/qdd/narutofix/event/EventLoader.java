@@ -33,6 +33,7 @@ import net.narutomod.procedure.ProcedureSync;
 
 import static com.qdd.narutofix.NarutoFix.PACKET_HANDLER;
 import static com.qdd.narutofix.cap.JutsuInventoryCapability.Jutsu_INV;
+import static net.narutomod.PlayerTracker.addBattleXp;
 
 
 @Mod.EventBusSubscriber
@@ -56,7 +57,7 @@ public final class EventLoader {
 //                System.out.println(parameters.toString());
                 if (server != null) {
 //                    System.out.println("parameters");
-                    addBattleXp((EntityPlayer) event.getSender().getCommandSenderEntity(),(double) Double.parseDouble(parameters[0]),true);  // 执行原命令
+                    addBattleXp((EntityPlayer) event.getSender().getCommandSenderEntity(),(double) Double.parseDouble(parameters[0]));  // 执行原命令
                     event.setCanceled(true);
                 }
 
@@ -72,25 +73,6 @@ public final class EventLoader {
             }
         }
         }
-
-
-    public static double getBattleXp(EntityPlayer player) {
-        return player.getEntityData().getDouble(BATTLEXP);
-    }
-    private static void sendBattleXPToTracking(EntityPlayerMP player) {
-        ProcedureSync.EntityNBTTag.sendToTracking(player, BATTLEXP, getBattleXp(player));
-    }
-    private static void addBattleXp(EntityPlayer entity, double xp, boolean sendMessage) {
-        entity.getEntityData().setDouble(BATTLEXP, getBattleXp(entity) + xp);
-        if (entity instanceof EntityPlayerMP) {
-            sendBattleXPToTracking((EntityPlayerMP)entity);
-            if (sendMessage) {
-                entity.sendStatusMessage(new TextComponentString(
-                        net.minecraft.util.text.translation.I18n.translateToLocal("chattext.ninjaexperience")+
-                                String.format("%.1f", getBattleXp(entity))), true);
-            }
-        }
-    }
 
     @SubscribeEvent
 //    @SideOnly(Side.SERVER)

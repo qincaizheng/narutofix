@@ -16,10 +16,12 @@ out
 # gradle
 build
 .gradle
+g.bat
 
 # other
 eclipse
 run
+logs
 
 # Files from Forge MDK
 forge*changelog.txt
