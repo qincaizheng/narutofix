@@ -3,6 +3,7 @@
   "package": "com.qdd.narutofix.mixin",
   "refmap": "refmap.narutofix.json",
   "mixins": [
+    "mixinEternal",
     "mixinKeyBindingPowerIncrease",
     "mixinPathway",
     "mixinPlayerHook",
