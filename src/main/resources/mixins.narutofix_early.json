@@ -1,5 +1,5 @@
 {
-  "required" :true,
+  "required": true,
   "package": "com.qdd.narutofix.mixin",
   "compatibilityLevel": "JAVA_8",
   "refmap": "refmap.narutofix.json",
