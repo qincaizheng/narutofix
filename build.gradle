@@ -37,9 +37,9 @@ minecraft {
     mappings = mappings_version
     def args = []
     args <<  "-Dfml.coreMods.load=com.qdd.narutofix.core.FixPlugin"
-//    args << '-Dmixin.hotSwap=true'
-//    args << '-Dmixin.checks.interfaces=true'
-//    args << '-Dmixin.debug.export=true'
+    args << '-Dmixin.hotSwap=true'
+    args << '-Dmixin.checks.interfaces=true'
+    args << '-Dmixin.debug.export=true'
     clientJvmArgs.addAll(args)
     serverJvmArgs.addAll(args)
    }

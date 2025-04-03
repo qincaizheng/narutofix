@@ -5,6 +5,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.narutomod.entity.EntitySusanooBase;
@@ -13,6 +14,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class SetSusanooColor extends CommandBase {
+
+    public static int color=539760701;
 
     @Override
     public String getName() {
@@ -31,10 +34,7 @@ public class SetSusanooColor extends CommandBase {
             if(player.getRidingEntity() instanceof EntitySusanooBase) {
                 try {
                     EntitySusanooBase Mentity= (EntitySusanooBase) player.getRidingEntity();
-                    Class<?> clasz=Mentity.getClass().getSuperclass();
-                    Method setFlameColor=clasz.getDeclaredMethod("setFlameColor",int.class);
-                    setFlameColor.setAccessible(true);
-                    setFlameColor.invoke(Mentity,Integer.parseInt(strings[0]));
+                    setColor(Mentity,Integer.parseInt(strings[0]));
                 } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
@@ -46,7 +46,11 @@ public class SetSusanooColor extends CommandBase {
         return 0; // 0 代表任何人都能用
     }
 
-    public static void setColor(EntitySusanooBase Mentity, int color) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-
+    public static void setColor(EntitySusanooBase Mentity, int Color) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Class<?> clasz=Mentity.getClass().getSuperclass();
+        Method setFlameColor=clasz.getDeclaredMethod("setFlameColor",int.class);
+        setFlameColor.setAccessible(true);
+        setFlameColor.invoke(Mentity,Color);
+        color=Color;
     }
 }

@@ -3,12 +3,15 @@
   "package": "com.qdd.narutofix.mixin",
   "refmap": "refmap.narutofix.json",
   "mixins": [
+    "ItemJutsuBase",
     "mixinEternal",
     "mixinKeyBindingPowerIncrease",
     "mixinPathway",
     "mixinPlayerHook",
     "mixinPlayerTracker",
-    "mixinSkeleton"
+    "mixinProcedureSusanoo",
+    "mixinSkeleton",
+    "mixinSusanooBase"
   ],
   "client": [
   ],
