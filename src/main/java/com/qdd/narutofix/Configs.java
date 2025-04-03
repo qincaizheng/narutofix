@@ -2,16 +2,18 @@ package com.qdd.narutofix;
 
 import com.qdd.narutofix.items.ItemSealScroll;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
-import java.util.HashSet;
-import java.util.Set;
 
 
 @Config(modid = NarutoFix.MODID)
@@ -36,10 +38,10 @@ public class Configs {
             for (String s : blacklist) {
                 Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(s));
                 if (block != null) {
+                    ItemSealScroll.ALLOWED_TILES.clear();
                     ItemSealScroll.ALLOWED_TILES.add(s);
                 }
             }
-
         }
     }
 }

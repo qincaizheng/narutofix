@@ -1,10 +1,11 @@
 package com.qdd.narutofix.event;
 
 
+import com.qdd.narutofix.Configs;
 import com.qdd.narutofix.NarutoFix;
 import com.qdd.narutofix.cap.IJutsuInventory;
 import com.qdd.narutofix.cap.JutsuCapabilityProvider;
-import com.qdd.narutofix.cap.JutsuInventoryCapability;
+import com.qdd.narutofix.command.SetSusanooColor;
 import com.qdd.narutofix.network.PacketCap;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -15,21 +16,23 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.CommandEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.entity.EntityGedoStatue;
-import net.narutomod.procedure.ProcedureSync;
+import net.narutomod.entity.EntitySusanooBase;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import static com.qdd.narutofix.NarutoFix.PACKET_HANDLER;
 import static com.qdd.narutofix.cap.JutsuInventoryCapability.Jutsu_INV;
@@ -41,7 +44,7 @@ public final class EventLoader {
     private static final String BATTLEXP = NarutomodModVariables.BATTLEXP;
 
     @SubscribeEvent
-    public static void onCommandAddNinjaXp(CommandEvent event) throws CommandException {
+    public static void onCommand(CommandEvent event) throws CommandException {
         ICommandSender sender = event.getSender();
         MinecraftServer server=sender.getServer() ;
         String[] parameters= event.getParameters();
@@ -85,8 +88,7 @@ public final class EventLoader {
 
     @SubscribeEvent
 //    @SideOnly(Side.SERVER)
-    public static void onPlayerClone(PlayerEvent.Clone event)
-    {
+    public static void onPlayerClone(PlayerEvent.Clone event)    {
         Capability<IJutsuInventory> capability = Jutsu_INV;
         Capability.IStorage<IJutsuInventory> storage = capability.getStorage();
 
@@ -117,6 +119,5 @@ public final class EventLoader {
             }
         }
     }
-
 
 }
