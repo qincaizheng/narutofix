@@ -32,12 +32,7 @@ public class SetSusanooColor extends CommandBase {
         if(iCommandSender.getCommandSenderEntity() instanceof EntityPlayer){
             Entity player = iCommandSender.getCommandSenderEntity();
             if(player.getRidingEntity() instanceof EntitySusanooBase) {
-                try {
-                    EntitySusanooBase Mentity= (EntitySusanooBase) player.getRidingEntity();
-                    setColor(Mentity,Integer.parseInt(strings[0]));
-                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
+                color=Integer.parseInt(strings[0]);
             }
         }
     }
@@ -46,11 +41,4 @@ public class SetSusanooColor extends CommandBase {
         return 0; // 0 代表任何人都能用
     }
 
-    public static void setColor(EntitySusanooBase Mentity, int Color) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Class<?> clasz=Mentity.getClass().getSuperclass();
-        Method setFlameColor=clasz.getDeclaredMethod("setFlameColor",int.class);
-        setFlameColor.setAccessible(true);
-        setFlameColor.invoke(Mentity,Color);
-        color=Color;
-    }
 }

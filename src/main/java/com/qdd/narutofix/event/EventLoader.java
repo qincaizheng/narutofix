@@ -20,6 +20,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityMountEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -120,4 +121,13 @@ public final class EventLoader {
         }
     }
 
+    @SubscribeEvent
+    public static void onEntitilinghurt(LivingHurtEvent event){
+        if(event.getEntity() instanceof EntitySusanooBase){
+            EntitySusanooBase susanooBase= (EntitySusanooBase) event.getEntity();
+            if(event.getSource().getTrueSource()==susanooBase.getOwnerPlayer()){
+                event.setAmount(0f);
+            }
+        }
+    }
 }
