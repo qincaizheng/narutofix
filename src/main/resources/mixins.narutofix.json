@@ -10,7 +10,8 @@
     "mixinPlayerHook",
     "mixinPlayerTracker",
     "mixinSkeleton",
-    "mixinSusanooBase"
+    "mixinSusanooBase",
+    "mixinProcedureSusanoo"
   ],
   "client": [
   ],

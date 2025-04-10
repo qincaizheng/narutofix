@@ -19,3 +19,4 @@ item.narutofix.sealscroll.name=sealScroll
 narutofix.powertick=powertick
 narutofix.sealscroll.blacklist=sealscroll's blacklist
 narutofix.command.setcolor=/setcolor <color>
+narutofix.sound.susanoo=spawn susanoo
