@@ -9,9 +9,10 @@
     "mixinPathway",
     "mixinPlayerHook",
     "mixinPlayerTracker",
+    "mixinProcedureSusanoo",
+    "mixinSealingChains",
     "mixinSkeleton",
-    "mixinSusanooBase",
-    "mixinProcedureSusanoo"
+    "mixinSusanooBase"
   ],
   "client": [
   ],

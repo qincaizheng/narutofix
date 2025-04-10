@@ -41,7 +41,7 @@ public class PacketUseJutsu implements IMessage, IMessageHandler<PacketUseJutsu,
                     Method method = clazz.getDeclaredMethod("getCurrentJutsu", ItemStack.class);
                     method.setAccessible(true);
                     Long cd =stack.getTagCompound().getLong("JutsuCDMapKey" + ((ItemJutsu.JutsuEnum) method.invoke(stack.getItem(),stack)).index);
-                    System.out.println(Configs.powertick);
+//                    System.out.println(Configs.powertick);
                     if (cd<player.world.getTotalWorldTime()) {
                         stack.getItem().onPlayerStoppedUsing(stack, player.world, player,powertick);
                         ((ItemJutsu.Base) stack.getItem()).setCurrentJutsuCooldown(stack, Configs.powertick);

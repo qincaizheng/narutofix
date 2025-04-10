@@ -1,9 +1,7 @@
 {
-  "susanoo": {
-    "category": "player",
-    "subtitle": "narutofix.sound.susanoo",
+  "player.susanoo": {
     "sounds": [
-      "narutofix:susanoo"
+      "narutofix:music/susanoo"
     ]
   }
 }

@@ -116,7 +116,9 @@ public abstract class mixinSusanooBase extends EntityCreature {
 
     @Inject(method = "getFlameColor",at=@At("HEAD"), cancellable = true,remap = false)
     public void getFlameColor(CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(SetSusanooColor.color);
+        if(getOwnerPlayer() instanceof EntityPlayer){
+            cir.setReturnValue(SetSusanooColor.color);
+        }
     }
 
 

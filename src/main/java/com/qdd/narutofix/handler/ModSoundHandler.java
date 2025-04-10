@@ -9,10 +9,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber
 public class ModSoundHandler {
-    public static final SoundEvent SUSANOOSOUND = new SoundEvent(new ResourceLocation(NarutoFix.MODID, "susanoo"));
+    public static final SoundEvent SUSANOOSOUND = new SoundEvent(new ResourceLocation(NarutoFix.MODID, "player.susanoo"));
 
     @SubscribeEvent
     public static void onSoundEvenrRegistration(RegistryEvent.Register<SoundEvent> event) {
-        event.getRegistry().register(SUSANOOSOUND.setRegistryName(new ResourceLocation(NarutoFix.MODID, "susanoo")));
+        event.getRegistry().register(SUSANOOSOUND.setRegistryName(new ResourceLocation(NarutoFix.MODID, "player.susanoo")));
+//        System.out.println(event.getRegistry().getKeys()) ;
+
     }
 }
