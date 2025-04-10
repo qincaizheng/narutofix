@@ -3,7 +3,7 @@
     "category": "player",
     "subtitle": "narutofix.sound.susanoo",
     "sounds": [
-      "susanoo"
+      "narutofix:susanoo"
     ]
   }
 }
