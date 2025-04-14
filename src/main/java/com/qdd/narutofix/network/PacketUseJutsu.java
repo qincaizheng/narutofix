@@ -44,7 +44,11 @@ public class PacketUseJutsu implements IMessage, IMessageHandler<PacketUseJutsu,
 //                    System.out.println(Configs.powertick);
                     if (cd<player.world.getTotalWorldTime()) {
                         stack.getItem().onPlayerStoppedUsing(stack, player.world, player,powertick);
-                        ((ItemJutsu.Base) stack.getItem()).setCurrentJutsuCooldown(stack, Configs.powertick);
+                        if(Configs.cooldown<0){
+                            ((ItemJutsu.Base) stack.getItem()).setCurrentJutsuCooldown(stack, Configs.powertick);
+                        }else{
+                            ((ItemJutsu.Base) stack.getItem()).setCurrentJutsuCooldown(stack, Configs.cooldown);
+                        }
                     } else {
                         player.sendStatusMessage(new TextComponentTranslation("chattext.cooldown.formatted", new Object[]{(cd - player.world.getTotalWorldTime()) / 20L}), true);
                     }
