@@ -1,5 +1,6 @@
 package com.qdd.narutofix.world;
 
+import com.qdd.narutofix.Configs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Biomes;
@@ -8,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldProviderSurface;
 import net.minecraft.world.biome.BiomeProviderSingle;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.gen.ChunkGeneratorFlat;
@@ -21,7 +23,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 
-public class modWorldProvider extends WorldProvider {
+public class modWorldProvider extends WorldProviderSurface {
     public static int DIMID = 4;
     public static final boolean NETHER_TYPE = false;
     public static DimensionType dtype;
@@ -38,61 +40,12 @@ public class modWorldProvider extends WorldProvider {
     public modWorldProvider() {
     }
 
-    public void init() {
-        this.biomeProvider = new BiomeProviderSingle(Biomes.PLAINS);
-        this.world.setSeaLevel(64);
-        this.nether = false;
-    }
-
     public DimensionType getDimensionType() {
         return modWorldProvider.dtype;
     }
 
-    @SideOnly(Side.CLIENT)
-    public Vec3d getFogColor(float par1, float par2) {
-        return new Vec3d((double)0.0F, (double)0.0F, (double)0.0F);
-    }
+    public long getSeed(){return Long.parseLong(Configs.ninjarealmseed);}
 
-    public IChunkGenerator createChunkGenerator() {
-        FlatGeneratorInfo flat = new FlatGeneratorInfo();
-        flat.getFlatLayers().add(new FlatLayerInfo(1, Blocks.BEDROCK));
-        flat.getFlatLayers().add(new FlatLayerInfo(2, Blocks.DIRT));
-        flat.getFlatLayers().add(new FlatLayerInfo(1, Blocks.GRASS));
-
-        return new ChunkGeneratorFlat(
-                world,                  // 世界对象
-                world.getSeed(),        // 种子
-                false,                  // 是否生成结构
-                flat.toString()         // 超平坦配置
-        );
-    }
-
-    public boolean isSurfaceWorld() {
-        return false;
-    }
-
-    public boolean canRespawnHere() {
-        return true;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public boolean doesXZShowFog(int par1, int par2) {
-        return false;
-    }
-
-    public WorldProvider.WorldSleepResult canSleepAt(EntityPlayer player, BlockPos pos) {
-        return WorldSleepResult.ALLOW;
-    }
-
-    protected void generateLightBrightnessTable() {
-        float f = 0.12F;
-
-        for(int i = 0; i <= 15; ++i) {
-            float f1 = 1.0F - (float)i / 15.0F;
-            this.lightBrightnessTable[i] = (1.0F - f1) / (f1 * 3.0F + 1.0F) * (1.0F - f) + f;
-        }
-
-    }
     @Override
     public WorldBorder createWorldBorder() {
         WorldBorder border = new WorldBorder();
@@ -103,27 +56,6 @@ public class modWorldProvider extends WorldProvider {
         border.setSize(10000);           // 边界大小（100x100）
         return border;
     }
-
-    public boolean doesWaterVaporize() {
-        return false;
-    }
-
-    public BlockPos getSpawnPoint() {
-        WorldInfo info = this.world.getWorldInfo();
-        new BlockPos(info.getSpawnX(), info.getSpawnY(), info.getSpawnZ());
-        BlockPos pos = new BlockPos(info.getSpawnX(), 4, info.getSpawnZ());
-        this.setSpawnPoint(pos);
-        return pos;
-    }
-
-    public void onPlayerAdded(EntityPlayerMP entity) {
-        entity.sendPlayerAbilities();
-    }
-
-    public void onPlayerRemoved(EntityPlayerMP player) {
-        player.sendPlayerAbilities();
-    }
-
 
 }
 

@@ -30,7 +30,7 @@ public class ToNinjaRealm extends CommandBase {
             if(player.dimension!= modWorldProvider.DIMID){
                 player.changeDimension(modWorldProvider.DIMID, new SimpleTeleporter(targetWorld) );
             } else {
-                player.changeDimension(modWorldProvider.DIMID, new SimpleTeleporter(player.getServer().getWorld(0)) );
+                player.changeDimension(0, new SimpleTeleporter(player.getServer().getWorld(0)) );
             }
         }
     }
@@ -46,7 +46,7 @@ public class ToNinjaRealm extends CommandBase {
         }
         @Override
         public void placeInPortal(Entity entity, float rotationYaw) {
-            // 空实现，避免默认传送逻辑干扰
+
         }
 
     }

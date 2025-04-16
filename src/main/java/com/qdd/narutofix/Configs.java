@@ -2,14 +2,10 @@ package com.qdd.narutofix;
 
 import com.qdd.narutofix.items.ItemSealScroll;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -34,6 +30,12 @@ public class Configs {
     @Config.Name("cooldown")
     @Config.RangeInt(min = -72000, max = 72000)
     public static int cooldown=-1;
+
+    @Config.LangKey("narutofix.ninjarealm.seed")
+    @Config.Comment("Set Seed for NinjaRealm World")
+    @Config.Name("ninjarealmseed")
+    @Config.RequiresMcRestart
+    public static String ninjarealmseed="0";
 
 
     @Mod.EventBusSubscriber()

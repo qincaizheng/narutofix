@@ -20,3 +20,5 @@ narutofix.powertick=忍术威力
 narutofix.sealscroll.blacklist=封印卷轴黑名单
 narutofix.command.setcolor=/setcolor <颜色>
 narutofix.sound.susanoo=召唤须佐
+narutofix.cooldown=忍术冷却
+narutofix.ninjarealm.seed=忍界世界种子
