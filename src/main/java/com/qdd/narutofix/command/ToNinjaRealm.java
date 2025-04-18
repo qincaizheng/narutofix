@@ -7,6 +7,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
 
@@ -29,6 +30,8 @@ public class ToNinjaRealm extends CommandBase {
             WorldServer targetWorld = player.getServer().getWorld(modWorldProvider.DIMID);
             if(player.dimension!= modWorldProvider.DIMID){
                 player.changeDimension(modWorldProvider.DIMID, new SimpleTeleporter(targetWorld) );
+                targetWorld.setBlockToAir(player.getPosition());
+                targetWorld.setBlockToAir(new BlockPos(player.posX,player.posY+1,player.posZ));
             } else {
                 player.changeDimension(0, new SimpleTeleporter(player.getServer().getWorld(0)) );
             }

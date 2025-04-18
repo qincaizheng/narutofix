@@ -1,0 +1,6 @@
+{
+  "parent": "narutomod:custom/sharingan1",
+  "textures": {
+    "1": "narutomod:blocks/sharingan2"
+  }
+}

@@ -37,6 +37,18 @@ public class Configs {
     @Config.RequiresMcRestart
     public static String ninjarealmseed="0";
 
+    @Config.LangKey("narutofix.miss1")
+    @Config.Comment("Set this to how Amount can miss when you have sharingan-1")
+    @Config.Name("miss1")
+    @Config.RangeInt(min = 0, max = 1000)
+    public static int miss1=5;
+
+    @Config.LangKey("narutofix.miss2")
+    @Config.Comment("Set this to how Amount can miss when you have sharingan-2")
+    @Config.Name("miss2")
+    @Config.RangeInt(min = 0, max = 1000)
+    public static int miss2=20;
+
 
     @Mod.EventBusSubscriber()
     public static class ConfigChangeListener {

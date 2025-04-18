@@ -1,5 +1,11 @@
 package com.qdd.narutofix.mixin;
 
+import com.qdd.narutofix.Configs;
+import com.qdd.narutofix.items.Sharingan1;
+import com.qdd.narutofix.items.Sharingan2;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.Item;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.narutomod.item.ItemSharingan;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,9 +20,17 @@ public class mixinPlayerHook{
 //        System.out.println("[Mixin] 鼠标事件已拦截");
     }
 
-    @Inject(method = "onAttacked",at = {@At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityLivingBase;setPositionAndUpdate(DDD)V")},  cancellable = true)
-    public void mixinonAttackEvent(CallbackInfo ci) {
+    @Inject(method = "onAttacked",at = @At(value = "INVOKE", target = "Lnet/narutomod/procedure/ProcedureUtils;getAllAirBlocks(Lnet/minecraft/world/World;Lnet/minecraft/util/math/AxisAlignedBB;)Ljava/util/List;"),remap = false,cancellable = true)
+    public void mixinonAttackEvent(LivingAttackEvent event,CallbackInfo ci) {
+        Item head=event.getEntityLiving().getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem();
+        if( head!= Sharingan1.helmet && head!= Sharingan2.helmet){
+            event.setCanceled(true);
+        } else if (head == Sharingan1.helmet && event.getAmount()< Configs.miss1) {
+            event.setCanceled(true);
+        }else if (head == Sharingan2.helmet && event.getAmount()<Configs.miss2) {
+            event.setCanceled(true);
+        }
         ci.cancel();
-//        System.out.println("[Mixin] 位移事件已拦截");
+        System.out.println("[Mixin] 位移事件已拦截");
     }
 }

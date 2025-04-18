@@ -23,7 +23,7 @@ public class NarutoFix {
 
     public static final String MODID = "narutofix";
     public static final String NAME = "narutofix";
-    public static final String VERSION = "0.1.8";
+    public static final String VERSION = "0.1.9";
     public static final SimpleNetworkWrapper PACKET_HANDLER = NetworkRegistry.INSTANCE.newSimpleChannel("narutofix");
     @SidedProxy(clientSide = "com.qdd.narutofix.ClientProxy",
             serverSide = "com.qdd.narutofix.CommonProxy")
