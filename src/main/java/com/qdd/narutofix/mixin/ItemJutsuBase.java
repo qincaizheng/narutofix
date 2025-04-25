@@ -12,7 +12,7 @@ public class ItemJutsuBase {
     @ModifyArg(method = "executeJutsu",at= @At(value = "INVOKE", target = "Lnet/narutomod/item/ItemJutsu$IJutsuCallback;createJutsu(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/EntityLivingBase;F)Z"),index = 1,remap = false)
     protected EntityLivingBase executeJutsu(EntityLivingBase entityLivingBase){
         if(entityLivingBase.getRidingEntity() instanceof EntitySusanooBase){
-            return entityLivingBase;
+            return (EntityLivingBase) entityLivingBase.getRidingEntity();
         }
         return entityLivingBase;
     }

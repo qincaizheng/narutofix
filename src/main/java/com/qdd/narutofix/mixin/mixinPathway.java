@@ -39,13 +39,18 @@ public abstract class mixinPathway<T extends EntityLivingBase> {
             ItemStack newitem;
            if(this.getMax()<= Configs.upgrade &&item!=Sharingan1.helmet){
                newitem=new ItemStack(Sharingan1.helmet,1);
-           } else if (this.getMax()<=Configs.upgrade*2&&item!=Sharingan2.helmet) {
+               ((ItemDojutsu.Base)newitem.getItem()).setOwner(newitem, user);
+               user.setItemStackToSlot(EntityEquipmentSlot.HEAD,newitem);
+           } else if (this.getMax()<=Configs.upgrade*2&&item!=Sharingan2.helmet&&this.getMax()>Configs.upgrade) {
                newitem=new ItemStack(Sharingan2.helmet,1);
-           }else{
+               ((ItemDojutsu.Base)newitem.getItem()).setOwner(newitem, user);
+               user.setItemStackToSlot(EntityEquipmentSlot.HEAD,newitem);
+           }else if(this.getMax()>Configs.upgrade*2){
                newitem=new ItemStack(ItemSharingan.helmet,1);
+               ((ItemDojutsu.Base)newitem.getItem()).setOwner(newitem, user);
+               user.setItemStackToSlot(EntityEquipmentSlot.HEAD,newitem);
            }
-            ((ItemDojutsu.Base)newitem.getItem()).setOwner(newitem, user);
-            user.setItemStackToSlot(EntityEquipmentSlot.HEAD,newitem);
+
         }
     }
 }
