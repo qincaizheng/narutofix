@@ -32,7 +32,7 @@ public class SetSusanooColor extends CommandBase {
         if(iCommandSender.getCommandSenderEntity() instanceof EntityPlayer){
             Entity player = iCommandSender.getCommandSenderEntity();
             if(player.getRidingEntity() instanceof EntitySusanooBase) {
-                color=Integer.parseInt(strings[0]);
+                color=Integer.parseInt(strings[0],16);
                 ((EntitySusanooBase) player.getRidingEntity()).killBullet();
                 ((EntitySusanooBase) player.getRidingEntity()).createBullet(player.getRidingEntity().height);
             }

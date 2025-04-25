@@ -49,6 +49,19 @@ public class Configs {
     @Config.RangeInt(min = 0, max = 1000)
     public static int miss2=20;
 
+    @Config.LangKey("narutofix.susanoo.unride")
+    @Config.Comment("You can unride susanoo if True")
+    @Config.Name("unride")
+    @Config.RequiresWorldRestart
+    public static boolean unride=false;
+
+    @Config.LangKey("narutofix.sharingan.upgrade")
+    @Config.Comment("How Chakra can upgrade Sharingan, only for 1,2,3")
+    @Config.Name("upgrade")
+    @Config.RangeInt(min = 0, max = 10000)
+    @Config.RequiresWorldRestart
+    public static int upgrade=1000;
+
 
     @Mod.EventBusSubscriber()
     public static class ConfigChangeListener {

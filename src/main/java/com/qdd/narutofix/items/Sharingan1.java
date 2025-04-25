@@ -48,7 +48,7 @@ public class Sharingan1 extends ElementsNarutomodMod.ModElement {
                 super.onArmorTick(world, entity, itemstack);
             }
             public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
-                return "narutomod:textures/sharinganhelmet.png";
+                return "narutomod:textures/sharinganhelmet1.png";
             }
             public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
                 super.addInformation(stack, worldIn, tooltip, flagIn);

@@ -12,7 +12,8 @@
     "mixinProcedureSusanoo",
     "mixinSealingChains",
     "mixinSkeleton",
-    "mixinSusanooBase"
+    "mixinSusanooBase",
+    "mixinKGD"
   ],
   "client": [
   ],

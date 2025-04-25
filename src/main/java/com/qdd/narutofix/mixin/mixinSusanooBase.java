@@ -2,6 +2,7 @@ package com.qdd.narutofix.mixin;
 
 import com.qdd.narutofix.AI.EntityAISusanoo;
 import com.qdd.narutofix.AI.SusanooAIOwnerHurtTarget;
+import com.qdd.narutofix.Configs;
 import com.qdd.narutofix.command.SetSusanooColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
@@ -52,53 +53,55 @@ public abstract class mixinSusanooBase extends EntityCreature {
 
     @Inject(method = "onLivingUpdate",at=@At("HEAD"),cancellable = true)
     public void onLivingUpdate(CallbackInfo ci) {
-        EntityLivingBase ownerPlayer = this.getOwnerPlayer();
-        boolean flag = ownerPlayer instanceof EntityPlayer;
-        EntityAISusanoo aiFollow =new EntityAISusanoo((EntitySusanooBase)(Object)this,1,10,64);
-        SusanooAIOwnerHurtTarget aiTarget= new SusanooAIOwnerHurtTarget((EntitySusanooBase)(Object)this) ;
-        EntityAIAttackMelee aiAttackMelee =new EntityAIAttackMelee(this, (double)5.0F, true);
-        if (!this.world.isRemote && (ownerPlayer == null || !ownerPlayer.isEntityAlive() || ownerPlayer instanceof EntityPlayerMP && ((EntityPlayerMP)ownerPlayer).hasDisconnected() || !flag)) {
-            this.setDead();
-        }
+        if(Configs.unride){
+            EntityLivingBase ownerPlayer = this.getOwnerPlayer();
+            boolean flag = ownerPlayer instanceof EntityPlayer;
+            EntityAISusanoo aiFollow =new EntityAISusanoo((EntitySusanooBase)(Object)this,1,10,64);
+            SusanooAIOwnerHurtTarget aiTarget= new SusanooAIOwnerHurtTarget((EntitySusanooBase)(Object)this) ;
+            EntityAIAttackMelee aiAttackMelee =new EntityAIAttackMelee(this, (double)5.0F, true);
+            if (!this.world.isRemote && (ownerPlayer == null || !ownerPlayer.isEntityAlive() || ownerPlayer instanceof EntityPlayerMP && ((EntityPlayerMP)ownerPlayer).hasDisconnected() || !flag)) {
+                this.setDead();
+            }
 
-        if (flag) {
-            if (!((EntityPlayer)ownerPlayer).isCreative()) {
-                if (!this.world.isRemote) {
-                    this.consumeChakra();
+            if (flag) {
+                if (!((EntityPlayer)ownerPlayer).isCreative()) {
+                    if (!this.world.isRemote) {
+                        this.consumeChakra();
+                    }
+                }
+                if(!this.isBeingRidden()){
+                    this.setNoAI(false);
+                    this.tasks.addTask(2,aiFollow);
+                    this.targetTasks.addTask(1,aiTarget);
+                    this.tasks.addTask(1,aiAttackMelee);
+                }else{
+                    this.tasks.removeTask(aiFollow);
+                    this.targetTasks.removeTask(aiTarget);
+                    this.tasks.removeTask(aiAttackMelee);
+                    this.setNoAI(true);
+                }
+
+                if (!this.world.isRemote && this.ticksExisted % 20 == 1) {
+                    ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 22, 6, false, false));
                 }
             }
-            if(!this.isBeingRidden()){
-                this.setNoAI(false);
-                this.tasks.addTask(2,aiFollow);
-                this.targetTasks.addTask(1,aiTarget);
-                this.tasks.addTask(1,aiAttackMelee);
-            }else{
-                this.tasks.removeTask(aiFollow);
-                this.targetTasks.removeTask(aiTarget);
-                this.tasks.removeTask(aiAttackMelee);
-                this.setNoAI(true);
+
+            this.updateArmSwingProgress();
+            super.onLivingUpdate();
+            this.clampMotion(0.05);
+            if (this.ticksExisted % 30 == 0) {
+                this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("block.fire.ambient")), 1.0F, this.rand.nextFloat() * 0.7F + 0.3F);
             }
 
-            if (!this.world.isRemote && this.ticksExisted % 20 == 1) {
-                ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 22, 6, false, false));
+            for(int i = 0; i < (int)this.height; ++i) {
+                double d0 = this.posX + ((double)this.rand.nextFloat() - (double)0.5F) * (double)this.width;
+                double d1 = this.posY + (double)(this.rand.nextFloat() * this.height);
+                double d2 = this.posZ + ((double)this.rand.nextFloat() - (double)0.5F) * (double)this.width;
+                this.world.spawnAlwaysVisibleParticle(Particles.Types.FLAME.getID(), d0, d1, d2, (double)0.0F, 0.05, (double)0.0F, new int[]{this.getFlameColor(), (int)(this.width * 15.0F)});
             }
-        }
 
-        this.updateArmSwingProgress();
-        super.onLivingUpdate();
-        this.clampMotion(0.05);
-        if (this.ticksExisted % 30 == 0) {
-            this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("block.fire.ambient")), 1.0F, this.rand.nextFloat() * 0.7F + 0.3F);
+            ci.cancel();
         }
-
-        for(int i = 0; i < (int)this.height; ++i) {
-            double d0 = this.posX + ((double)this.rand.nextFloat() - (double)0.5F) * (double)this.width;
-            double d1 = this.posY + (double)(this.rand.nextFloat() * this.height);
-            double d2 = this.posZ + ((double)this.rand.nextFloat() - (double)0.5F) * (double)this.width;
-            this.world.spawnAlwaysVisibleParticle(Particles.Types.FLAME.getID(), d0, d1, d2, (double)0.0F, 0.05, (double)0.0F, new int[]{this.getFlameColor(), (int)(this.width * 15.0F)});
-        }
-
-        ci.cancel();
 
     }
 
