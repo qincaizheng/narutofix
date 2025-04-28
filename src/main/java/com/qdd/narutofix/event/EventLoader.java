@@ -1,11 +1,8 @@
 package com.qdd.narutofix.event;
 
-
-import com.qdd.narutofix.Configs;
 import com.qdd.narutofix.NarutoFix;
 import com.qdd.narutofix.cap.IJutsuInventory;
 import com.qdd.narutofix.cap.JutsuCapabilityProvider;
-import com.qdd.narutofix.command.SetSusanooColor;
 import com.qdd.narutofix.network.PacketCap;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -16,16 +13,13 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.CommandEvent;
 import net.narutomod.NarutomodModVariables;
@@ -33,8 +27,6 @@ import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.entity.EntityGedoStatue;
 import net.narutomod.entity.EntitySusanooBase;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import static com.qdd.narutofix.NarutoFix.PACKET_HANDLER;
 import static com.qdd.narutofix.cap.JutsuInventoryCapability.Jutsu_INV;

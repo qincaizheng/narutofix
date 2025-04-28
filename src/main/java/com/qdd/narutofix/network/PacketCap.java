@@ -38,19 +38,14 @@ public class PacketCap implements IMessage
             if (ctx.side == Side.CLIENT)
             {
                 final NBTBase nbt = message.nbt;
-                Minecraft.getMinecraft().addScheduledTask(new Runnable()
-                {
-                    @Override
-                    public void run()
+                Minecraft.getMinecraft().addScheduledTask(() -> {
+                    EntityPlayer player = Minecraft.getMinecraft().player;
+                    if (player.hasCapability(Jutsu_INV, null))
                     {
-                        EntityPlayer player = Minecraft.getMinecraft().player;
-                        if (player.hasCapability(Jutsu_INV, null))
-                        {
 //                            System.out.println(123);
-                            IJutsuInventory inv = player.getCapability(Jutsu_INV, null);
-                            Capability.IStorage<IJutsuInventory> storage = Jutsu_INV.getStorage();
-                            storage.readNBT(Jutsu_INV, player.getCapability(Jutsu_INV, null), null, nbt);
-                        }
+                        IJutsuInventory inv = player.getCapability(Jutsu_INV, null);
+                        Capability.IStorage<IJutsuInventory> storage = Jutsu_INV.getStorage();
+                        storage.readNBT(Jutsu_INV, player.getCapability(Jutsu_INV, null), null, nbt);
                     }
                 });
             }

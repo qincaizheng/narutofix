@@ -51,7 +51,7 @@ public class Sharingan2 extends ElementsNarutomodMod.ModElement {
 
             public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
                 super.addInformation(stack, worldIn, tooltip, flagIn);
-                tooltip.add(TextFormatting.DARK_GRAY + I18n.translateToLocal("tooltip.sharingan2.descr") + Configs.miss2+ TextFormatting.WHITE);
+                tooltip.add(TextFormatting.DARK_GRAY + I18n.translateToLocal("tooltip.sharingan1.descr") + Configs.miss2+ TextFormatting.WHITE);
             }
 
         }).setTranslationKey("narutofix.sharinganhelmet2").setRegistryName("sharinganhelmet2").setCreativeTab(TabModTab.tab));
