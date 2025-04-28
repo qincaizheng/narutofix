@@ -58,6 +58,7 @@ public class onKeyEvent {
             }
             PACKET_HANDLER.sendToServer(new PacketOpenJutsugui());
         }
+
     }
 
 

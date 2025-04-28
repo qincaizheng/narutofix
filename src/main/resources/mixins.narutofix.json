@@ -13,7 +13,8 @@
     "mixinSealingChains",
     "mixinSkeleton",
     "mixinSusanooBase",
-    "mixinKGD"
+    "mixinKGD",
+    "mixinEntityBijuManager"
   ],
   "client": [
   ],
