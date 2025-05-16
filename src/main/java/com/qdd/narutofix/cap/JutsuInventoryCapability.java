@@ -103,7 +103,12 @@ public class JutsuInventoryCapability {
 
         @Override
         public boolean isIzanagi(){
-        return this.isIzanagi;
+            for(int i = 28;i<28+IzanagiSize;i++){
+                if (this.itemHandler.getStackInSlot(i).getItem() instanceof ItemSharingan.Base) {
+                    return this.isIzanagi;
+                }
+            }
+        return false;
         }
 
         @Override

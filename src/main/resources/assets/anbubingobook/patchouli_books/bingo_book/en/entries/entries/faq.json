@@ -1,0 +1,15 @@
+{
+    "name": "问题解答",
+    "icon": "minecraft:writable_book",
+    "category": "anbubingobook:starting",
+    "pages": [
+        {
+            "type": "text",
+            "text": "$(li)Q:如何为积蓄查克拉$(li2)A:站着不动，吃兵粮丸，睡觉，或者你可以下载$(l:https://www.curseforge.com/minecraft/mc-mods/ahznbs-naruto-mod-addon) AHZNB's Naruto Mod || ADD-ON。$(/l)$(li)Q:我如何获得在单人模式下获得万花筒写轮眼/永恒万花筒写轮眼？$(li2)A:你通常无法在正常的单人模式下获得万花筒和永恒万花筒，只能通过作弊/直接从创造模式下获取，但是本扩展中你可以通过开启配置令你能在单人模式下杀死自己驯"
+        },
+		{
+			"type": "text",
+			"text": "服的狼从而获取万花筒写轮眼，但永恒万花筒终究是个问题。$(li)Q:为什么我吃了白绝的肉会把我杀死。$(li2)A:因为除非你是万花筒/永恒万花筒持有者，否则这会随机造成24~240的伤害。$(li)Q:我能在单人模式下变为尘遁持有者吗？ $(li2)A:需要土遁，风遁和火遁查克拉获取它。"
+		}
+    ]
+}

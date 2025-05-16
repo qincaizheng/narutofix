@@ -1,0 +1,15 @@
+{
+    "name": "叮咚！书",
+    "landing_text": "你可以在 $(l:https://ahznb-naruto-shinobicraft.fandom.com/wiki/AHZNB_Naruto_ShinobiCraft_Wiki) 这个Wiki $(/l)中找到这些信息，我们尽最大的努力定时更新这些内容 ",
+	"show_progress": false,
+    "version": 0,
+	
+    "index_icon":"anbubingobook:textures/items/anbumask1_item.png",
+    "filler_texture": "anbubingobook:textures/items/anbumask1_item.png",
+    
+	"subtitle": "第四次忍界大战版",
+    "creative_tab": "tabmodtab",
+    "model": "anbubingobook:bingo_book", 
+    "book_texture": "patchouli:textures/gui/book_cyan.png", 
+    "use_resource_pack": true
+}

@@ -1,0 +1,12 @@
+{
+    "name": "图片测试",
+    "icon": "narutomod:eightgates",
+    "category": "anbubingobook:other",
+    "pages": [
+		{
+            "type": "image",
+            "title": "没错，只是测试图片而已。",
+			"images": ["anbubingobook:textures/items/anbumask1_item.png"]
+        }
+	]
+}

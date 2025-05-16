@@ -1,0 +1,15 @@
+{
+    "name": "合成表",
+    "icon": "minecraft:crafting_table",
+    "category": "anbubingobook:other",
+    "pages": [
+		{
+            "type": "text",
+            "text": "在这里，你可以看到忍界中所有可以制作的物品，但目前有bug，无法显示。"
+        },
+		{
+			"type":"crafting",
+			"recipe": "narutomod:curryof_life"
+		}
+	]
+}

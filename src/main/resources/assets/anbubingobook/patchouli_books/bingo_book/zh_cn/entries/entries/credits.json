@@ -1,0 +1,11 @@
+{
+    "name": "感谢名单",
+    "icon": "narutomod:team_scroll",
+    "category": "anbubingobook:other",
+    "pages": [
+		{
+            "type": "text",
+            "text": "非常感谢X（这个扩展与WIKI的主要贡献者）和制作mod的ahz，点此可以链接到MOD的$(l:https://discord.gg/6wrfgNFrnP) 官方Discord！ $(/l)"
+        }
+	]
+}

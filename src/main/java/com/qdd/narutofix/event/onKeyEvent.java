@@ -3,6 +3,7 @@ package com.qdd.narutofix.event;
 import com.qdd.narutofix.cap.IJutsuInventory;
 import com.qdd.narutofix.cap.JutsuInventoryCapability;
 import com.qdd.narutofix.network.PacketOpenJutsugui;
+import com.qdd.narutofix.network.PacketSwitcheres;
 import com.qdd.narutofix.network.PacketSwitchhatbot;
 import com.qdd.narutofix.network.PacketUseJutsu;
 import net.minecraft.client.Minecraft;
@@ -10,6 +11,8 @@ import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -21,6 +24,7 @@ import com.qdd.narutofix.keybind.KeyLoader;
 import net.narutomod.PlayerTracker;
 import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.entity.EntitySevenTails;
+import net.narutomod.item.*;
 import net.narutomod.procedure.ProcedureSync;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -57,6 +61,9 @@ public class onKeyEvent {
                 player.getCapability(JutsuInventoryCapability.Jutsu_INV, null).setIzanagiSize((int) Math.min(PlayerTracker.getBattleXp(player)/2000,9));
             }
             PACKET_HANDLER.sendToServer(new PacketOpenJutsugui());
+        }
+        if(KeyLoader.switcheyes.isPressed()){
+            PACKET_HANDLER.sendToServer(new PacketSwitcheres());
         }
 
     }

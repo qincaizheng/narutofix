@@ -1,0 +1,13 @@
+tooltip.mangekyo.tsukuyomi.jutsu2=月读
+tooltip.mangekyo.genjutsu.jutsu1=幻术
+tooltip.mangekyo.kotoamatsukami.jutsu2=别天神
+chattext.needmorechakra.formmated=至少需要 %.1f 的最大查克拉量
+item.mangekyosharinganitachihelmet.name=万花筒写轮眼 - 月读
+item.mangekyosharinganshisuihelmet.name=万花筒写轮眼 - 别天神
+death.attack.TSUKUYOMI=%1$s 被 %2$s 困入月读之中。
+death.attack.KOTOAMATSUKAMI=%1$s 被 %2$s 困入别天神当中。
+entity.PlayerClone.name=玩家的复制体
+entity.shisui.name=宇智波止水
+entity.itachi2.name=宇智波鼬
+chattext.tsukuyomi.activated=月读 已开启
+chattext.tsukuyomi.deactivated=月读 已关闭

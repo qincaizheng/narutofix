@@ -1,0 +1,11 @@
+{
+    "name": "仙术",
+    "icon": "narutomod:futton",
+    "category": "anbubingobook:other",
+    "pages": [
+		{
+            "type": "text",
+            "text": "暂无，这是要准备添加的信息"	
+        }
+	]
+}

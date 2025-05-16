@@ -13,6 +13,7 @@ public class KeyLoader {
     public static KeyBinding openjutsugui;
     public static KeyBinding[] switchjutsus =new KeyBinding[9];
     public static KeyBinding Izanagi;
+    public static KeyBinding switcheyes;
 
     public KeyLoader()
     {
@@ -20,6 +21,7 @@ public class KeyLoader {
         KeyLoader.switchhatbot =CreateKey("switchhatbot",Keyboard.KEY_LMENU);
         KeyLoader.usejutsu =CreateKey("usejutsu",Keyboard.KEY_G);
         KeyLoader.openjutsugui =CreateKey("openjutsugui",Keyboard.KEY_P);
+        KeyLoader.switcheyes=CreateKey("switcheyes",Keyboard.KEY_Z);
         for(int i = 0; i < 9; i++){
             KeyLoader.switchjutsus[i] = CreateKey("switchjutsu_"+(i+1),Keyboard.KEY_1+i,KeyModifier.ALT);
         }

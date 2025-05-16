@@ -10,7 +10,8 @@ public class TailsHandler {
     public static void SevenTails(EntityPlayer player,boolean in){
         if(!player.isCreative()&&!player.isSpectator()){
             player.capabilities.allowFlying=in;
-            if (player instanceof EntityPlayerMP){
+            player.sendPlayerAbilities();
+            if (!player.world.isRemote){
                 PacketFly packet =new PacketFly();
                 packet.allowFlying=in;
                 PACKET_HANDLER.sendTo(packet, (EntityPlayerMP) player);

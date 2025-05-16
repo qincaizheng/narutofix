@@ -14,5 +14,6 @@ public class PacketRegister {
         PACKET_HANDLER.registerMessage(PacketCap.Handler.class,PacketCap.class,nextID++, Side.CLIENT);
         PACKET_HANDLER.registerMessage(PacketIzanagi.Handler.class,PacketIzanagi.class,nextID++, Side.SERVER);
         PACKET_HANDLER.registerMessage(PacketFly.Handler.class,PacketFly.class,nextID++, Side.CLIENT);
+        PACKET_HANDLER.registerMessage(PacketSwitcheres.Handler.class,PacketSwitcheres.class,nextID++, Side.SERVER);
     }
 }

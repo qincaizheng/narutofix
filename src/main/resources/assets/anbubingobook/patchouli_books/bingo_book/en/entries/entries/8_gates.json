@@ -1,0 +1,36 @@
+{
+   "name" : "八门遁甲之阵",
+   "icon" : "narutomod:eightgates",
+   "category" : "anbubingobook:other",
+   "pages" : [
+      {
+         "type" : "text",
+         "text" : "八门遁甲可以通过完成迈特凯的“守护村庄”任务$(br2)获得要想接下这个任务的话，首先你要去一个森林群系中的至少有20扇门和10个村民的村庄，然后他将生成在这个村庄，接着右键他对话接下任务。$(br2)在午夜后他会播报，让你保护村民，镇压这次围攻。"
+      },
+      {
+         "type" : "entity",
+         "entity" : "narutomod:mightguy",
+         "scale" : 1.1,
+         "text" : "贯彻青春之道的男人，木叶的苍蓝猛兽，拥有禁术“八门遁甲之阵”和高超的体术。"
+      },
+      {
+         "type" : "entity",
+         "name" : "砂隐村的骷髅",         
+         "entity" : "minecraft:skeleton{ArmorItems:[{},{id:\"narutomod:ninja_armor_sunalegs\",Count:1b,Damage:0s},{id:\"narutomod:ninja_armor_sunabody\",Count:1b,Damage:0s},{id:\"narutomod:ninja_armor_sunahelmet\",Count:1b,Damage:0s}],HandItems:[{id:\"minecraft:bow\",Count:1b,Damage:0s},{}]}",
+         "scale" : 0.8,
+         "text" : "围攻中将会出现的骷髅，基本穿着砂隐村的忍者服，或许是砂隐村的亡灵吧。"
+      },
+      {
+         "type" : "entity",
+         "name" : "木叶村的僵尸",
+         "entity" : "minecraft:zombie{ArmorItems:[{},{id:\"narutomod:ninja_armor_konohalegs\",Count:1b,Damage:0s},{id:\"narutomod:ninja_armor_konohabody\",Count:1b,Damage:0s},{id:\"narutomod:ninja_armor_konohahelmet\",Count:1b,Damage:0s}]}",       
+         "scale" : 0.8,
+         "text" : "围攻中将会出现的僵尸，基本穿着木叶村的忍者服，为啥木叶村的亡灵会进攻村庄也是难以理解的事情。"
+      },                    
+      {
+         "type" : "text",
+         "text" : "$(br2)完成条件：在围攻中你必须击杀比迈特凯更多的怪物（实则任何生物都行）。$(br2)但你的击杀数若低于迈特凯或让任何一个村民死亡，你将会失败，并且需要再次接下任务。$(br2)若成功，迈特凯将传授你八门遁甲之阵。"
+      }
+   ],
+   "sortnum" : 4
+}

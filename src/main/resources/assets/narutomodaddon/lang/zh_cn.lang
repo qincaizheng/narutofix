@@ -1,0 +1,9 @@
+advancements.activate_chakra_charge.descr=- 开启 -
+tipped_arrow.effect.potion_chakra_charge=积蓄查克拉之箭
+key.mcreator.chakracharge=积蓄查克拉
+advancements.activate_chakra_charge.title=开始积蓄查克拉！
+effect.potion_chakra_charge=积蓄查克拉
+potion.effect.potion_chakra_charge=积蓄查克拉
+item.item_chakra_charge.name=积蓄查克拉
+splash_potion.effect.potion_chakra_charge=喷溅型积蓄查克拉药水
+lingering_potion.effect.potion_chakra_charge=滞留型积蓄查克拉药水
