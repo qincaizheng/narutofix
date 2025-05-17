@@ -14,7 +14,9 @@
     "mixinSkeleton",
     "mixinSusanooBase",
     "mixinKGD",
-    "mixinEntityBijuManager"
+    "mixinEntityBijuManager",
+
+    "mixinProcedureAddXP2JutsuCommandExecuted"
   ],
   "client": [
   ],

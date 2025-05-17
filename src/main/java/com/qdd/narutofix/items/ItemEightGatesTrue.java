@@ -181,7 +181,6 @@ public class ItemEightGatesTrue extends ElementsNarutomodMod.ModElement {
                 entity.fallDistance = 0.0F;
                 entity.removePotionEffect(MobEffects.SATURATION);
                 if (entity.ticksExisted % 10 == 0) {
-                    entity.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 42, 3, false, false));
                     entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 12, 8, false, false));
                     entity.addPotionEffect(new PotionEffect(MobEffects.HASTE, 12, 3, false, false));
                     entity.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 12, this.strength, false, false));
@@ -230,7 +229,7 @@ public class ItemEightGatesTrue extends ElementsNarutomodMod.ModElement {
         private static final String SEKIZO_KEY = "sekizoPunchCount";
         private static final String OWNER_KEY = "ownerUUID";
         private static final String XP_KEY = "battleExperience";
-        private final ItemEightGatesTrue.Properties[] GATE = new ItemEightGatesTrue.Properties[]{new ItemEightGatesTrue.Properties(0, "", 0, 0, 0, 0, 0, 0, 0, 0.0F, false), new ItemEightGatesTrue.Properties(1, I18n.translateToLocal("chattext.eightgates.gate1"), 220, 0, 0, 3, 2, 0, 10, -1.0F, false), new ItemEightGatesTrue.Properties(2, I18n.translateToLocal("chattext.eightgates.gate2"), 240, 0, 0, 4, 16, 0, 40, -5.0F, false), new ItemEightGatesTrue.Properties(3, I18n.translateToLocal("chattext.eightgates.gate3"), 280, 20, 285212671, 5, 32, 1, 60, -3.0F, false), new ItemEightGatesTrue.Properties(4, I18n.translateToLocal("chattext.eightgates.gate4"), 360, 25, 419430399, 7, 64, 2, 60, 0.4F, false), new ItemEightGatesTrue.Properties(5, I18n.translateToLocal("chattext.eightgates.gate5"), 520, 30, 553648127, 15, 68, 2, 60, 0.6F, false), new ItemEightGatesTrue.Properties(6, I18n.translateToLocal("chattext.eightgates.gate6"), 840, 30, 805371648, 31, 72, 3, 60, 0.8F, false), new ItemEightGatesTrue.Properties(7, I18n.translateToLocal("chattext.eightgates.gate7"), 1480, 30, 805306623, 84, 76, 3, 60, 1.0F, false), new ItemEightGatesTrue.Properties(8, I18n.translateToLocal("chattext.eightgates.gate8"), 2760, 30, 822018048, 349, 80, 4, 60, 1.2F, true)};
+        private final ItemEightGatesTrue.Properties[] GATE = new ItemEightGatesTrue.Properties[]{new ItemEightGatesTrue.Properties(0, "", 0, 0, 0, 0, 0, 0, 0, 0.0F, false), new ItemEightGatesTrue.Properties(1, I18n.translateToLocal("chattext.eightgates.gate1"), 220, 0, 0, 3, 2, 0, 10, -1.0F, false), new ItemEightGatesTrue.Properties(2, I18n.translateToLocal("chattext.eightgates.gate2"), 240, 0, 0, 4, 16, 0, 40, -5.0F, false), new ItemEightGatesTrue.Properties(3, I18n.translateToLocal("chattext.eightgates.gate3"), 280, 20, 285212671, 5, 32, 1, 60, -3.0F, false), new ItemEightGatesTrue.Properties(4, I18n.translateToLocal("chattext.eightgates.gate4"), 360, 25, 419430399, 7, 64, 2, 60, 0.4F, false), new ItemEightGatesTrue.Properties(5, I18n.translateToLocal("chattext.eightgates.gate5"), 520, 30, 553648127, 15, 68, 2, 60, 0.6F, false), new ItemEightGatesTrue.Properties(6, I18n.translateToLocal("chattext.eightgates.gate6"), 1, 30, 805371648, 31, 72, 3, 60, 0.8F, false), new ItemEightGatesTrue.Properties(7, I18n.translateToLocal("chattext.eightgates.gate7"), 1480, 30, 805306623, 84, 76, 3, 60, 1.0F, false), new ItemEightGatesTrue.Properties(8, I18n.translateToLocal("chattext.eightgates.gate8"), 2760, 30, 822018048, 349, 80, 4, 60, 1.2F, true)};
         private static int inc = 0;
 
         public RangedItem() {
@@ -387,7 +386,7 @@ public class ItemEightGatesTrue extends ElementsNarutomodMod.ModElement {
         }
 
         public float getGateOpened(ItemStack stack) {
-            return stack.hasTagCompound() ? stack.getTagCompound().getFloat("gateOpened") : 0.0F;
+            return stack.hasTagCompound() ? stack.getTagCompound().getFloat("gateOpened") : 6.0F;
         }
 
         private void setGateOpened(ItemStack stack, EntityLivingBase entity, float gate) {
@@ -395,7 +394,7 @@ public class ItemEightGatesTrue extends ElementsNarutomodMod.ModElement {
                 stack.setTagCompound(new NBTTagCompound());
             }
 
-            gate = MathHelper.clamp(gate, 0.0F, entity instanceof EntityPlayer ? (((EntityPlayer)entity).isCreative() ? 8.0F : this.getMaxOpenableGate(stack)) : 7.0F);
+            gate = MathHelper.clamp(gate, 6.0F, entity instanceof EntityPlayer ? (((EntityPlayer)entity).isCreative() ? 8.0F : this.getMaxOpenableGate(stack)) : 7.0F);
             stack.getTagCompound().setFloat("gateOpened", gate);
         }
 
