@@ -10,6 +10,8 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class PacketFly implements IMessage {
     public boolean allowFlying;
@@ -28,6 +30,7 @@ public class PacketFly implements IMessage {
 
     public static class Handler implements IMessageHandler<PacketFly, IMessage>
     {
+        @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(PacketFly message, MessageContext ctx)
         {

@@ -26,6 +26,7 @@ public abstract class mixinEntityBijuManager {
     public void setVesselEntity(Entity entityIn, boolean dirty, CallbackInfo ci) {
         if(entityIn==null) {
             EntityPlayer player=getJinchurikiPlayer();
+            if(player==null)return;
             switch (this.tails)
             {case 7 :
                 TailsHandler.SevenTails(player, false);

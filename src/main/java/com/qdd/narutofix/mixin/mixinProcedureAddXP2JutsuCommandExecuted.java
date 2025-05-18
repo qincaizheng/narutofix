@@ -22,7 +22,7 @@ import java.util.Map;
 
 @Mixin(ProcedureAddXP2JutsuCommandExecuted.class)
 public class mixinProcedureAddXP2JutsuCommandExecuted {
-    @Inject(method = "executeProcedure",at= @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;",ordinal = 1),remap = false)
+    @Inject(method = "executeProcedure",at= @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;",ordinal = 1),remap = false, cancellable = true)
     private static void executeProcedure(Map<String, Object> dependencies, CallbackInfo ci) {
         Entity entity = (Entity)dependencies.get("entity");
         final HashMap cmdparams = (HashMap)dependencies.get("cmdparams");
@@ -77,6 +77,6 @@ public class mixinProcedureAddXP2JutsuCommandExecuted {
             } else if (itemoffhand.getItem() instanceof ItemJutsu.Base) {
                 ItemJutsu.addBattleXP((EntityPlayer)entity, (int)xp2add);
             }
-        }
+        }ci.cancel();
     }
 }

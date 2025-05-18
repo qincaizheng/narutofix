@@ -1,5 +1,6 @@
 package com.qdd.narutofix.cap;
 
+import com.qdd.narutofix.Configs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -52,6 +53,8 @@ public class JutsuInventoryCapability {
         private int selected;
         private boolean isIzanagi;
         private int IzanagiSize;
+        private int cd= Configs.cooldown;
+        private int power=Configs.powertick;
 
         @Override
         public ItemStackHandler getItems() {
@@ -62,6 +65,26 @@ public class JutsuInventoryCapability {
         public int getSelected() {
 //            System.out.println(this.selected);
             return this.selected;
+        }
+
+        @Override
+        public int getCd() {
+            return cd;
+        }
+
+        @Override
+        public void setCd(int cd) {
+            this.cd = Math.abs(cd);
+        }
+
+        @Override
+        public int getPower() {
+            return power;
+        }
+
+        @Override
+        public void setPower(int power) {
+            this.power = Math.abs(power);
         }
 
         @Override

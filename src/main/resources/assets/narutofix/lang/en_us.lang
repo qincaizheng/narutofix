@@ -32,3 +32,5 @@ narutofix.susanoo.unride=unrideable
 narutofix.sharingan.upgrade=upgrade Sharingan
 item.narutofix.eightgatestrue.name=True EightGates
 key.narutofix.switcheyes=switcheyes
+narutofix.command.narutofixset=/narutofixset <player> [cd|power] <value>
+item.narutofix.ogi.name=Ogi

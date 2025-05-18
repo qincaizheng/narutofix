@@ -1,6 +1,7 @@
 package com.qdd.narutofix.network;
 
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static com.qdd.narutofix.NarutoFix.PACKET_HANDLER;
 

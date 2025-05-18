@@ -3,6 +3,8 @@ package com.qdd.narutofix.keybind;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 import net.minecraft.client.settings.KeyBinding;
 
@@ -15,6 +17,7 @@ public class KeyLoader {
     public static KeyBinding Izanagi;
     public static KeyBinding switcheyes;
 
+    @SideOnly(Side.CLIENT)
     public KeyLoader()
     {
         KeyLoader.LockOnEntity =CreateKey("LockOnEntity",Keyboard.KEY_O);

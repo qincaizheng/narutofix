@@ -32,3 +32,5 @@ narutofix.susanoo.unride=是否可以不骑乘须佐
 narutofix.sharingan.upgrade=写轮眼进化所需查克拉
 item.narutofix.eightgatestrue.name=真·八门
 key.narutofix.switcheyes=切换眼睛
+item.narutofix.ogi.name=奥义
+narutofix.command.narutofixset=/narutofixset <玩家> [cd|power] <值>

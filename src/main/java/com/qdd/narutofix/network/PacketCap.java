@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static com.qdd.narutofix.cap.JutsuInventoryCapability.Jutsu_INV;
 
@@ -30,8 +31,10 @@ public class PacketCap implements IMessage
     {
         ByteBufUtils.writeTag(buf, nbt);
     }
+
     public static class Handler implements IMessageHandler<PacketCap, IMessage>
     {
+        @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(PacketCap message, MessageContext ctx)
         {

@@ -9,6 +9,15 @@ import net.narutomod.item.ItemSharingan;
 public interface IJutsuInventory extends INBTSerializable<NBTTagCompound> {
     ItemStackHandler getItems();
     int getSelected();
+
+    int getCd();
+
+    void setCd(int cd);
+
+    int getPower();
+
+    void setPower(int power);
+
     void setSelected(int index);
     void setIzanagi(boolean isIzanagi);
     boolean isIzanagi();

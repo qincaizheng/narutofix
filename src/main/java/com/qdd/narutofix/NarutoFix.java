@@ -1,5 +1,6 @@
 package com.qdd.narutofix;
 
+import com.qdd.narutofix.command.SetCDandPower;
 import com.qdd.narutofix.command.ToNinjaRealm;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -53,5 +54,6 @@ public class NarutoFix {
     @EventHandler
     public void onServerStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(new ToNinjaRealm());
+        event.registerServerCommand(new SetCDandPower());
     }
 }
