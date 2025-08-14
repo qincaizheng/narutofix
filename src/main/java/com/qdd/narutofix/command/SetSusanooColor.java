@@ -4,14 +4,12 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.narutomod.entity.EntitySusanooBase;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import net.narutomod.item.ItemSharingan;
 
 public class SetSusanooColor extends CommandBase {
 
@@ -30,11 +28,10 @@ public class SetSusanooColor extends CommandBase {
     @Override
     public void execute(MinecraftServer minecraftServer, ICommandSender iCommandSender, String[] strings) throws CommandException{
         if(iCommandSender.getCommandSenderEntity() instanceof EntityPlayer){
-            Entity player = iCommandSender.getCommandSenderEntity();
-            if(player.getRidingEntity() instanceof EntitySusanooBase) {
+            EntityPlayer player = (EntityPlayer) iCommandSender.getCommandSenderEntity();
+            if(player.getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem() instanceof ItemSharingan.Base) {
                 color=Integer.parseInt(strings[0],16);
-                ((EntitySusanooBase) player.getRidingEntity()).killBullet();
-                ((EntitySusanooBase) player.getRidingEntity()).createBullet(player.getRidingEntity().height);
+                ((ItemSharingan.Base)ItemSharingan.helmet).setColor(player.getItemStackFromSlot(EntityEquipmentSlot.HEAD),color);
             }
         }
     }

@@ -1,11 +1,11 @@
 package com.qdd.narutofix.network;
 
-import com.qdd.narutofix.NarutoFix;
-import com.qdd.narutofix.cap.JutsuInventoryCapability;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.world.WorldServer;
+import com.qdd.narutofix.NarutoFix;
+import com.qdd.narutofix.cap.JutsuInventoryCapability;
+import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;

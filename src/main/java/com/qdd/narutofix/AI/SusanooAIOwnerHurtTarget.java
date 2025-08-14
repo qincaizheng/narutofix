@@ -1,9 +1,7 @@
 package com.qdd.narutofix.AI;
 
-import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAITarget;
-import net.minecraft.entity.passive.EntityTameable;
 import net.narutomod.entity.EntitySusanooBase;
 
 public class SusanooAIOwnerHurtTarget extends EntityAITarget {

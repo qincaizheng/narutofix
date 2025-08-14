@@ -34,3 +34,4 @@ item.narutofix.eightgatestrue.name=真·八门
 key.narutofix.switcheyes=切换眼睛
 item.narutofix.ogi.name=奥义
 narutofix.command.narutofixset=/narutofixset <玩家> [cd|power] <值>
+narutofix.msg.sealingchains=开始封印

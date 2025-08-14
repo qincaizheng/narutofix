@@ -1,7 +1,6 @@
 package com.qdd.narutofix.network;
 
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static com.qdd.narutofix.NarutoFix.PACKET_HANDLER;
 
@@ -15,6 +14,6 @@ public class PacketRegister {
         PACKET_HANDLER.registerMessage(PacketCap.Handler.class,PacketCap.class,nextID++, Side.CLIENT);
         PACKET_HANDLER.registerMessage(PacketIzanagi.Handler.class,PacketIzanagi.class,nextID++, Side.SERVER);
         PACKET_HANDLER.registerMessage(PacketFly.Handler.class,PacketFly.class,nextID++, Side.CLIENT);
-        PACKET_HANDLER.registerMessage(PacketSwitcheres.Handler.class,PacketSwitcheres.class,nextID++, Side.SERVER);
+        PACKET_HANDLER.registerMessage(PacketColor.Handler.class,PacketColor.class,nextID++, Side.CLIENT);
     }
 }

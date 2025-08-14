@@ -1,16 +1,15 @@
 package com.qdd.narutofix.mixin;
 
-import com.qdd.narutofix.NarutoFix;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
+import com.qdd.narutofix.NarutoFix;
 import net.narutomod.procedure.ProcedureSusanoo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import com.qdd.narutofix.handler.ModSoundHandler;
 
 @Mixin(ProcedureSusanoo.class)
 public class mixinProcedureSusanoo {

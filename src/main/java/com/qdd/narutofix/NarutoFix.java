@@ -1,6 +1,7 @@
 package com.qdd.narutofix;
 
 import com.qdd.narutofix.command.SetCDandPower;
+import com.qdd.narutofix.command.SetSusanooColor;
 import com.qdd.narutofix.command.ToNinjaRealm;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -24,7 +25,7 @@ public class NarutoFix {
 
     public static final String MODID = "narutofix";
     public static final String NAME = "narutofix";
-    public static final String VERSION = "0.2.1";
+    public static final String VERSION = "0.2.2";
     public static final SimpleNetworkWrapper PACKET_HANDLER = NetworkRegistry.INSTANCE.newSimpleChannel("narutofix");
     @SidedProxy(clientSide = "com.qdd.narutofix.ClientProxy",
             serverSide = "com.qdd.narutofix.CommonProxy")
@@ -55,5 +56,6 @@ public class NarutoFix {
     public void onServerStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(new ToNinjaRealm());
         event.registerServerCommand(new SetCDandPower());
+        event.registerServerCommand(new SetSusanooColor());
     }
 }

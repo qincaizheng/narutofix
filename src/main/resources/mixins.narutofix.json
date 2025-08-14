@@ -3,7 +3,6 @@
   "package": "com.qdd.narutofix.mixin",
   "refmap": "refmap.narutofix.json",
   "mixins": [
-    "ItemJutsuBase",
     "mixinEternal",
     "mixinPathway",
     "mixinPlayerHook",
@@ -14,7 +13,6 @@
     "mixinSusanooBase",
     "mixinKGD",
     "mixinEntityBijuManager",
-    "mixinEc",
     "mixinProcedureAddXP2JutsuCommandExecuted"
   ],
   "client": [

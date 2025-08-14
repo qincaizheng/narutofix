@@ -1,6 +1,5 @@
 package com.qdd.narutofix.command;
 
-import com.qdd.narutofix.world.modWorldProvider;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -10,6 +9,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
+import com.qdd.narutofix.world.modWorldProvider;
 
 public class ToNinjaRealm extends CommandBase {
 

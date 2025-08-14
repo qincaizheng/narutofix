@@ -8,9 +8,6 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.narutomod.entity.EntitySusanooBase;
-
-import java.util.Objects;
 
 import static com.qdd.narutofix.cap.JutsuInventoryCapability.Jutsu_INV;
 

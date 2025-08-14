@@ -1,10 +1,10 @@
 package com.qdd.narutofix.mixin;
 
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.Item;
 import com.qdd.narutofix.Configs;
 import com.qdd.narutofix.items.Sharingan1;
 import com.qdd.narutofix.items.Sharingan2;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.Item;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.narutomod.item.ItemSharingan;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,6 +31,5 @@ public class mixinPlayerHook{
             event.setCanceled(true);
         }
         ci.cancel();
-        System.out.println("[Mixin] 位移事件已拦截");
     }
 }

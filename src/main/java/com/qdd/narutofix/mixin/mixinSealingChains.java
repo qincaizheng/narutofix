@@ -2,6 +2,8 @@ package com.qdd.narutofix.mixin;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.narutomod.entity.EntityBeamBase;
 import net.narutomod.entity.EntityBijuManager;
@@ -28,6 +30,7 @@ public abstract class mixinSealingChains extends EntityBeamBase.Base{
     public void onUpdate(CallbackInfo ci) {
         EntityLivingBase target = this.getTarget();
         if (target instanceof EntityBijuManager.ITailBeast && this.shootingEntity instanceof EntityPlayer && !((EntityPlayer)this.shootingEntity).isCreative() && ProcedureUtils.getModifiedSpeed(target) < 0.05) {
+            this.shootingEntity.sendMessage(new TextComponentTranslation("narutofix.msg.sealingchains"));
             ((EntityBijuManager.ITailBeast)target).fuuinIntoVessel(this.shootingEntity, 400);
         }
     }

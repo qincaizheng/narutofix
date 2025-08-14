@@ -1,21 +1,19 @@
 package com.qdd.narutofix.event;
 
-import com.qdd.narutofix.NarutoFix;
-import com.qdd.narutofix.cap.IJutsuInventory;
-import com.qdd.narutofix.cap.JutsuInventoryCapability;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import com.qdd.narutofix.NarutoFix;
+import com.qdd.narutofix.cap.IJutsuInventory;
+import com.qdd.narutofix.cap.JutsuInventoryCapability;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.narutomod.item.ItemJutsu;
-import net.narutomod.item.ItemSharingan;
 
 import java.util.Objects;
 

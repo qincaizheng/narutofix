@@ -1,12 +1,12 @@
 package com.qdd.narutofix.keybind;
 
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
-import net.minecraft.client.settings.KeyBinding;
 
 public class KeyLoader {
     public static KeyBinding LockOnEntity;
@@ -24,7 +24,6 @@ public class KeyLoader {
         KeyLoader.switchhatbot =CreateKey("switchhatbot",Keyboard.KEY_LMENU);
         KeyLoader.usejutsu =CreateKey("usejutsu",Keyboard.KEY_G);
         KeyLoader.openjutsugui =CreateKey("openjutsugui",Keyboard.KEY_P);
-        KeyLoader.switcheyes=CreateKey("switcheyes",Keyboard.KEY_Z);
         for(int i = 0; i < 9; i++){
             KeyLoader.switchjutsus[i] = CreateKey("switchjutsu_"+(i+1),Keyboard.KEY_1+i,KeyModifier.ALT);
         }

@@ -1,9 +1,5 @@
 package com.qdd.narutofix.mixin;
 
-import com.qdd.narutofix.AI.EntityAISusanoo;
-import com.qdd.narutofix.AI.SusanooAIOwnerHurtTarget;
-import com.qdd.narutofix.Configs;
-import com.qdd.narutofix.command.SetSusanooColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
@@ -12,14 +8,20 @@ import net.minecraft.entity.ai.EntityAIAttackMelee;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.MobEffects;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
+import com.qdd.narutofix.AI.EntityAISusanoo;
+import com.qdd.narutofix.AI.SusanooAIOwnerHurtTarget;
+import com.qdd.narutofix.Configs;
 import net.narutomod.Particles;
 import net.narutomod.entity.EntitySusanooBase;
+import net.narutomod.item.ItemSharingan;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -51,8 +53,16 @@ public abstract class mixinSusanooBase extends EntityCreature {
     @Shadow(remap = false)
     public abstract int getFlameColor();
 
+    @Shadow(remap = false)
+    protected abstract void setFlameColor(int color);
+
     @Inject(method = "onLivingUpdate",at=@At("HEAD"),cancellable = true)
     public void onLivingUpdate(CallbackInfo ci) {
+        ItemStack helmetstack = this.getOwnerPlayer().getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+        int color = ((ItemSharingan.Base)helmetstack.getItem()).getColor(helmetstack);
+        if(getFlameColor()!=color){
+            setFlameColor( color);
+        }
         if(Configs.unride){
             EntityLivingBase ownerPlayer = this.getOwnerPlayer();
             boolean flag = ownerPlayer instanceof EntityPlayer;
@@ -117,12 +127,6 @@ public abstract class mixinSusanooBase extends EntityCreature {
         }
     }
 
-    @Inject(method = "getFlameColor",at=@At("HEAD"), cancellable = true,remap = false)
-    public void getFlameColor(CallbackInfoReturnable<Integer> cir) {
-        if(getOwnerPlayer() instanceof EntityPlayer){
-            cir.setReturnValue(SetSusanooColor.color);
-        }
-    }
 
 
 }

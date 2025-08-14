@@ -1,8 +1,8 @@
 package com.qdd.narutofix.handler;
 
-import com.qdd.narutofix.NarutoFix;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
+import com.qdd.narutofix.NarutoFix;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;

@@ -1,12 +1,8 @@
 package com.qdd.narutofix.network;
 
-import com.qdd.narutofix.cap.IJutsuInventory;
-import com.qdd.narutofix.cap.JutsuInventoryCapability;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.IThreadListener;
-import net.minecraft.world.WorldServer;
+import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -14,18 +10,18 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class PacketFly implements IMessage {
-    public boolean allowFlying;
+    public boolean isFlying;
 
     @Override
     public void fromBytes(ByteBuf buf)
     {
-        allowFlying = buf.readBoolean();
+        isFlying = buf.readBoolean();
     }
 
     @Override
     public void toBytes(ByteBuf buf)
     {
-        buf.writeBoolean(allowFlying);
+        buf.writeBoolean(isFlying);
     }
 
     public static class Handler implements IMessageHandler<PacketFly, IMessage>
@@ -36,7 +32,7 @@ public class PacketFly implements IMessage {
         {
             Minecraft.getMinecraft().addScheduledTask(() -> {
                 EntityPlayer player = Minecraft.getMinecraft().player;
-                player.capabilities.allowFlying=message.allowFlying;
+                player.capabilities.isFlying=message.isFlying;
             });
             return null;
         }

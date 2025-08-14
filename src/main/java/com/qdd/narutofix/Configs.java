@@ -1,8 +1,8 @@
 package com.qdd.narutofix;
 
-import com.qdd.narutofix.items.ItemSealScroll;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
+import com.qdd.narutofix.items.ItemSealScroll;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;

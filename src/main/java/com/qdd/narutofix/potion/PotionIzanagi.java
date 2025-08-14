@@ -1,8 +1,8 @@
 package com.qdd.narutofix.potion;
 
-import com.qdd.narutofix.NarutoFix;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
+import com.qdd.narutofix.NarutoFix;
 
 public class PotionIzanagi extends Potion {
     // 构造方法：注册药水效果的基本属性

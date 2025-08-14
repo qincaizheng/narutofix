@@ -1,20 +1,16 @@
 package com.qdd.narutofix.network;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextComponentTranslation;
 import com.qdd.narutofix.Configs;
 import com.qdd.narutofix.cap.IJutsuInventory;
 import com.qdd.narutofix.cap.JutsuInventoryCapability;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.narutomod.PlayerTracker;
-import net.narutomod.item.ItemDojutsu;
 import net.narutomod.item.ItemJutsu;
-import org.lwjgl.Sys;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

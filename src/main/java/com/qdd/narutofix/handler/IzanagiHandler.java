@@ -1,22 +1,18 @@
 package com.qdd.narutofix.handler;
 
-import com.qdd.narutofix.cap.IJutsuInventory;
-import com.qdd.narutofix.keybind.KeyLoader;
-import com.qdd.narutofix.network.PacketIzanagi;
-import ibxm.Player;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import com.qdd.narutofix.cap.IJutsuInventory;
+import com.qdd.narutofix.keybind.KeyLoader;
+import com.qdd.narutofix.network.PacketIzanagi;
+import com.qdd.narutofix.potion.PotionLoader;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.PotionEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import com.qdd.narutofix.potion.PotionLoader;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -54,7 +50,6 @@ public class IzanagiHandler {
         EntityLivingBase entity = event.getEntityLiving();
         IJutsuInventory inv=entity.getCapability(Jutsu_INV, null);
         if (entity instanceof EntityPlayer && inv.isIzanagi()) {
-            System.out.println(inv.isIzanagi());
             event.setCanceled(true);
             entity.setHealth(entity.getMaxHealth()
             );

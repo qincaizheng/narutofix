@@ -1,21 +1,16 @@
 package com.qdd.narutofix.container;
 
 
-import com.qdd.narutofix.NarutoFix;
-import com.qdd.narutofix.cap.IJutsuInventory;
-import com.qdd.narutofix.cap.JutsuInventoryCapability;
-import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.items.IItemHandler;
+import com.qdd.narutofix.cap.IJutsuInventory;
+import com.qdd.narutofix.cap.JutsuInventoryCapability;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemSharingan;
-import net.narutomod.procedure.ProcedureUtils;
 
 public class JutsuContainer extends Container {
 

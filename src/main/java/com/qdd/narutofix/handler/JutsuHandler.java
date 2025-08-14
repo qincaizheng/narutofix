@@ -1,5 +1,8 @@
 package com.qdd.narutofix.handler;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import com.qdd.narutofix.ClientProxy;
 import com.qdd.narutofix.NarutoFix;
 import com.qdd.narutofix.cap.IJutsuInventory;
@@ -7,23 +10,11 @@ import com.qdd.narutofix.cap.JutsuInventoryCapability;
 import com.qdd.narutofix.keybind.KeyLoader;
 import com.qdd.narutofix.network.PacketSwitchNextJutsu;
 import com.qdd.narutofix.network.PacketSwitchhatbot;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
-import net.narutomod.NarutomodMod;
-import net.narutomod.item.ItemJutsu;
-import net.narutomod.keybind.KeyBindingPowerIncrease;
-import org.lwjgl.input.Keyboard;
-
-import java.lang.reflect.Field;
 
 import static com.qdd.narutofix.NarutoFix.PACKET_HANDLER;
 

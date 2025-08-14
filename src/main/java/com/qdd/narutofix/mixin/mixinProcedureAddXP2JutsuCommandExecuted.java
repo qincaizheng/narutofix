@@ -1,6 +1,5 @@
 package com.qdd.narutofix.mixin;
 
-import com.qdd.narutofix.items.ItemEightGatesTrue;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -64,14 +63,10 @@ public class mixinProcedureAddXP2JutsuCommandExecuted {
             itemoffhand = entity instanceof EntityLivingBase ? ((EntityLivingBase)entity).getHeldItemOffhand() : ItemStack.EMPTY;
             if (EntityBijuManager.cloakLevel((EntityPlayer)entity) > 0) {
                 EntityBijuManager.addCloakXp((EntityPlayer)entity, (int)xp2add);
-            } else if (itemmainhand.getItem() == (new ItemStack(ItemEightGatesTrue.block, 1)).getItem()) {
-                ItemEightGatesTrue.addBattleXP((EntityPlayer)entity, (int)xp2add);
-            }else if (itemmainhand.getItem() == (new ItemStack(ItemEightGates.block, 1)).getItem()) {
+            } else if (itemmainhand.getItem() == (new ItemStack(ItemEightGates.block, 1)).getItem()) {
                 ItemEightGates.addBattleXP((EntityPlayer)entity, (int)xp2add);
             } else if (itemmainhand.getItem() instanceof ItemJutsu.Base) {
                 ItemJutsu.addBattleXP((EntityPlayer)entity, (int)xp2add);
-            } else if (itemoffhand.getItem() == (new ItemStack(ItemEightGatesTrue.block, 1)).getItem()) {
-                ItemEightGatesTrue.addBattleXP((EntityPlayer)entity, (int)xp2add);
             }else if (itemoffhand.getItem() == (new ItemStack(ItemEightGates.block, 1)).getItem()) {
                 ItemEightGates.addBattleXP((EntityPlayer)entity, (int)xp2add);
             } else if (itemoffhand.getItem() instanceof ItemJutsu.Base) {

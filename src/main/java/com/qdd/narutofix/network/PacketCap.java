@@ -1,11 +1,11 @@
 package com.qdd.narutofix.network;
 
-import com.qdd.narutofix.cap.IJutsuInventory;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import com.qdd.narutofix.cap.IJutsuInventory;
+import io.netty.buffer.ByteBuf;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;

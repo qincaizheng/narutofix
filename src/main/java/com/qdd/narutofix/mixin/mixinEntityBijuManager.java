@@ -1,8 +1,8 @@
 package com.qdd.narutofix.mixin;
 
-import com.qdd.narutofix.handler.TailsHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import com.qdd.narutofix.handler.TailsHandler;
 import net.narutomod.entity.EntityBijuManager;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

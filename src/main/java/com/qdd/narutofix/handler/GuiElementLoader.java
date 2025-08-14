@@ -1,10 +1,10 @@
 package com.qdd.narutofix.handler;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 import com.qdd.narutofix.NarutoFix;
 import com.qdd.narutofix.container.JutsuContainer;
 import com.qdd.narutofix.gui.GuiJutsuCntainer;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 

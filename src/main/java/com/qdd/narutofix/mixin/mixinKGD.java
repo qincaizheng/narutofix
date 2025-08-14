@@ -1,6 +1,5 @@
 package com.qdd.narutofix.mixin;
 
-import com.qdd.narutofix.items.Sharingan1;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.entity.Entity;
@@ -9,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import com.qdd.narutofix.items.Sharingan1;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.narutomod.item.ItemDojutsu;
 import net.narutomod.procedure.ProcedureKGDistribution;

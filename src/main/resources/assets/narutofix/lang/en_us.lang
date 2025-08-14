@@ -34,3 +34,4 @@ item.narutofix.eightgatestrue.name=True EightGates
 key.narutofix.switcheyes=switcheyes
 narutofix.command.narutofixset=/narutofixset <player> [cd|power] <value>
 item.narutofix.ogi.name=Ogi
+narutofix.msg.sealingchains=Start seal

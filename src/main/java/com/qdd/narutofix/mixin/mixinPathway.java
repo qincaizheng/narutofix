@@ -1,13 +1,13 @@
 package com.qdd.narutofix.mixin;
 
-import com.qdd.narutofix.Configs;
-import com.qdd.narutofix.items.Sharingan1;
-import com.qdd.narutofix.items.Sharingan2;
-import com.qdd.narutofix.potion.PotionLoader;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import com.qdd.narutofix.Configs;
+import com.qdd.narutofix.items.Sharingan1;
+import com.qdd.narutofix.items.Sharingan2;
+import com.qdd.narutofix.potion.PotionLoader;
 import net.narutomod.Chakra;
 import net.narutomod.item.ItemDojutsu;
 import net.narutomod.item.ItemSharingan;

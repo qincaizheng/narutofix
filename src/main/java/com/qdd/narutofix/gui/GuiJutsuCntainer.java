@@ -1,20 +1,13 @@
 package com.qdd.narutofix.gui;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.ResourceLocation;
 import com.qdd.narutofix.NarutoFix;
 import com.qdd.narutofix.cap.JutsuInventoryCapability;
 import com.qdd.narutofix.container.JutsuContainer;
 import com.qdd.narutofix.keybind.KeyLoader;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 
-import javax.swing.*;
 import java.io.IOException;
 
 public class GuiJutsuCntainer extends GuiContainer {

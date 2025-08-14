@@ -1,8 +1,5 @@
 package com.qdd.narutofix.items;
 
-import com.google.common.base.CharMatcher;
-import com.qdd.narutofix.Configs;
-import com.qdd.narutofix.NarutoFix;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.properties.IProperty;
@@ -23,6 +20,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import com.google.common.base.CharMatcher;
+import com.qdd.narutofix.NarutoFix;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.world.BlockEvent;
