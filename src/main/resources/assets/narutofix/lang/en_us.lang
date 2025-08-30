@@ -35,3 +35,8 @@ key.narutofix.switcheyes=switcheyes
 narutofix.command.narutofixset=/narutofixset <player> [cd|power] <value>
 item.narutofix.ogi.name=Ogi
 narutofix.msg.sealingchains=Start seal
+item.narutofix.obsidianchokuto.name=Obsidian Chokuto
+item.obsidianchokuto.tooltip=§c§lATTACK_DAMAGE: §r§650 ==§6+9 §4MAX_HEALTH ==§6+9 §bARMOR ==§6+9 §3ARMOR_TOUGHNESS ==§6+5 §3REACH_DISTANCE ==§7The third force is the power of Susano'u
+msg.obsidianchokuto.success= §5§lSusanoo!
+msg.obsidianchokuto.fail=§cUnable to use the Fist of Susanoo, the inventory may be full!
+msg.obsidianchokuto.heavy=§5§lSusanoo Heavy Attack!!!

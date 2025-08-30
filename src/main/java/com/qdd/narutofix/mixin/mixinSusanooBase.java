@@ -58,10 +58,14 @@ public abstract class mixinSusanooBase extends EntityCreature {
 
     @Inject(method = "onLivingUpdate",at=@At("HEAD"),cancellable = true)
     public void onLivingUpdate(CallbackInfo ci) {
-        ItemStack helmetstack = this.getOwnerPlayer().getItemStackFromSlot(EntityEquipmentSlot.HEAD);
-        int color = ((ItemSharingan.Base)helmetstack.getItem()).getColor(helmetstack);
-        if(getFlameColor()!=color){
-            setFlameColor( color);
+        if(this.getOwnerPlayer()!=null) {
+            ItemStack helmetstack = this.getOwnerPlayer().getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+            if (!helmetstack.isEmpty() && helmetstack.getItem() instanceof ItemSharingan.Base) {
+                int color = ((ItemSharingan.Base) helmetstack.getItem()).getColor(helmetstack);
+                if (getFlameColor() != color) {
+                    setFlameColor(color);
+                }
+            }
         }
         if(Configs.unride){
             EntityLivingBase ownerPlayer = this.getOwnerPlayer();
