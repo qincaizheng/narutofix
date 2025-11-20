@@ -19,7 +19,7 @@ public class SetCDandPower extends CommandBase {
 
     @Override
     public String getUsage(ICommandSender iCommandSender) {
-        return I18n.format( "narutofix.command.narutofixset");
+        return "/narutofixset <player> [cd|power] <value>";
     }
 
     @Override

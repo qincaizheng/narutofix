@@ -2,15 +2,20 @@ package com.qdd.narutofix.container;
 
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import com.qdd.narutofix.cap.IJutsuInventory;
 import com.qdd.narutofix.cap.JutsuInventoryCapability;
+import com.qdd.narutofix.items.CopyJutsuScroll;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemSharingan;
+
+import javax.annotation.Nullable;
 
 public class JutsuContainer extends Container {
 
@@ -99,6 +104,22 @@ public class JutsuContainer extends Container {
     @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
     {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player){
+        InventoryPlayer inventoryplayer = player.inventory;
+        if (inventoryplayer.getItemStack().getItem() instanceof CopyJutsuScroll&&slotId>=0){
+            Slot slot = this.inventorySlots.get(slotId);
+            if (slot.getStack().getItem() instanceof ItemJutsu.Base){
+                ((CopyJutsuScroll)inventoryplayer.getItemStack().getItem()).copy(slot.getStack());
+            }else {
+                return super.slotClick(slotId, dragType, clickTypeIn, player);
+            }
+        }else{
+            return super.slotClick(slotId, dragType, clickTypeIn, player);
+        }
         return ItemStack.EMPTY;
     }
 }

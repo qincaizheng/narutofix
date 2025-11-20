@@ -6,9 +6,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.narutomod.entity.EntitySusanooBase;
 import net.narutomod.item.ItemSharingan;
 
 public class SetSusanooColor extends CommandBase {
@@ -22,7 +20,7 @@ public class SetSusanooColor extends CommandBase {
 
     @Override
     public String getUsage(ICommandSender iCommandSender) {
-        return I18n.format( "narutofix.command.setcolor");
+        return "/setcolor <color>";
     }
 
     @Override

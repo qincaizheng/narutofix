@@ -2,12 +2,15 @@ package com.qdd.narutofix.gui;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import com.qdd.narutofix.NarutoFix;
 import com.qdd.narutofix.cap.JutsuInventoryCapability;
 import com.qdd.narutofix.container.JutsuContainer;
 import com.qdd.narutofix.keybind.KeyLoader;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 
 public class GuiJutsuCntainer extends GuiContainer {
@@ -51,4 +54,5 @@ public class GuiJutsuCntainer extends GuiContainer {
         }
         super.keyTyped(typedChar, keyCode);
     }
+
 }

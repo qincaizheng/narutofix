@@ -13,7 +13,8 @@
     "mixinSusanooBase",
     "mixinKGD",
     "mixinEntityBijuManager",
-    "mixinProcedureAddXP2JutsuCommandExecuted"
+    "mixinProcedureAddXP2JutsuCommandExecuted",
+    "mixinSpawnTailedBeasts"
   ],
   "client": [
     "mixinKeyBindingPowerIncrease"

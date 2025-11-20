@@ -62,6 +62,14 @@ public class Configs {
     @Config.RequiresWorldRestart
     public static int upgrade=1000;
 
+    @Config.LangKey("narutofix.tails.spawn")
+    @Config.Comment("Tails spawn distance")
+    @Config.Name("distance")
+    @Config.RequiresWorldRestart
+    @Config.RangeInt(min = 100, max = 100000)
+    public static int distance= 1000;
+
+
 
     @Mod.EventBusSubscriber()
     public static class ConfigChangeListener {

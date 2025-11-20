@@ -36,7 +36,10 @@ item.narutofix.ogi.name=奥义
 narutofix.command.narutofixset=/narutofixset <玩家> [cd|power] <值>
 narutofix.msg.sealingchains=开始封印
 item.narutofix.obsidianchokuto.name=§5§l【须佐能乎之拳】
+item.copyjutsuscroll.name=忍术复制卷轴
 item.obsidianchokuto.tooltip=§c§l攻击力: §r§650 ==§6+9 §4最大生命值 ==§6+9 §b护甲值 ==§6+9 §3护甲韧性 ==§6+5 §3攻击范围 ==§7第三之力，须佐能乎的力量
 msg.obsidianchokuto.success=§5§l须佐能乎！
 msg.obsidianchokuto.fail=§c无法使出须佐能乎之拳，物品栏可能已满！
 msg.obsidianchokuto.heavy=§5§l须佐能乎重拳！！！
+entity.empty.name=空
+narutofix.tails.spawn=尾兽生成距离

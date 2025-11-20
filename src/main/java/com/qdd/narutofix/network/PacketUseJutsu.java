@@ -2,6 +2,7 @@ package com.qdd.narutofix.network;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.text.TextComponentTranslation;
 import com.qdd.narutofix.Configs;
 import com.qdd.narutofix.cap.IJutsuInventory;
@@ -30,6 +31,7 @@ public class PacketUseJutsu implements IMessage, IMessageHandler<PacketUseJutsu,
             EntityPlayer player = ctx.getServerHandler().player;
             IJutsuInventory inv = player.getCapability(JutsuInventoryCapability.Jutsu_INV, null);
             ItemStack stack = inv.getItems().getStackInSlot(inv.getSelected());
+            if(((ItemJutsu.Base) stack.getItem()).canActivateJutsu(stack, ItemJutsu.getCurrentJutsu(stack), player)!= EnumActionResult.SUCCESS) return;
             if (!stack.isEmpty()) {
                 int powertick= 72000- Configs.powertick;
                 Class<?> clazz = ItemJutsu.Base.class;

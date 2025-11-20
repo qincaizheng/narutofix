@@ -11,13 +11,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(IForgeRegistryEntry.Impl.class)
 public abstract class mixinImpl<T  extends IForgeRegistryEntry<T>> implements IForgeRegistryEntry<T> {
-    @Shadow(remap = false)
-    private ResourceLocation registryName;
-
-    @Inject(method = "setRegistryName(Ljava/lang/String;)Lnet/minecraftforge/registries/IForgeRegistryEntry;",at = @At("HEAD"),remap = false, cancellable = true)
-    public final void setRegistryName(String name, CallbackInfoReturnable<T> cir)
-    {
-        this.registryName = GameData.checkPrefix(name, true);
-        cir.setReturnValue((T) this);
-    }
+//    @Shadow(remap = false)
+//    private ResourceLocation registryName;
+//
+//    @Inject(method = "setRegistryName(Ljava/lang/String;)Lnet/minecraftforge/registries/IForgeRegistryEntry;",at = @At("HEAD"),remap = false, cancellable = true)
+//    public final void setRegistryName(String name, CallbackInfoReturnable<T> cir)
+//    {
+//        this.registryName = GameData.checkPrefix(name, true);
+//        cir.setReturnValue((T) this);
+//    }
 }

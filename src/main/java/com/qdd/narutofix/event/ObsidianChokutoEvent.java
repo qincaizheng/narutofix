@@ -53,14 +53,6 @@ public class ObsidianChokutoEvent {
             }
         }
     }
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public static void onScroll(MouseEvent event){
-        int k = event.getDwheel();
-        int i=event.getButton();
-        if (Minecraft.getMinecraft().player.getRidingEntity() instanceof EntitySusanooBase&&(k!=0||i==1)){
-            event.setCanceled(true);
-        }
-    }
+
 
 }
