@@ -32,7 +32,7 @@ public abstract class mixinEntityBijuManager {
                 TailsHandler.SevenTails(player, false);
                 break;
             }
-        }else{
+        }else if (entityIn instanceof EntityPlayer){
             switch (this.tails)
             {case 7 :
                 TailsHandler.SevenTails((EntityPlayer) entityIn, true);
