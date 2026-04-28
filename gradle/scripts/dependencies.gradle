@@ -1,0 +1,26 @@
+dependencies {
+    if (propertyBool('use_asset_mover')) {
+        implementation "com.cleanroommc:assetmover:${propertyString('asset_mover_version')}"
+    }
+
+    if (propertyBool('use_mixins')) {
+        String mixin = modUtils.enableMixins("zone.rong:mixinbooter:${propertyString('mixinbooter_version')}", propertyString('mixin_refmap'))
+        api(mixin) {
+            transitive = false
+        }
+        implementation("io.github.llamalad7:mixinextras-common:${propertyString('mixinextras_version')}") {
+            transitive = false
+        }
+        annotationProcessor("io.github.llamalad7:mixinextras-common:${propertyString('mixinextras_version')}") {
+            transitive = false
+        }
+        annotationProcessor 'org.ow2.asm:asm-debug-all:5.2'
+        annotationProcessor 'com.google.guava:guava:32.1.2-jre'
+        annotationProcessor 'com.google.code.gson:gson:2.8.9'
+        annotationProcessor(mixin) {
+            transitive = false
+        }
+    }
+
+    implementation rfg.deobf('curse.maven:ahznbs-naruto-mod-831157:5967126')
+}

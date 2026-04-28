@@ -1,6 +1,8 @@
 package com.qdd.narutofix.event;
 
+import com.qdd.narutofix.Configs;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -8,11 +10,16 @@ import net.minecraft.util.ResourceLocation;
 import com.qdd.narutofix.NarutoFix;
 import com.qdd.narutofix.cap.IJutsuInventory;
 import com.qdd.narutofix.cap.JutsuInventoryCapability;
+import com.qdd.narutofix.cap.body.BodyEnergyDataProvider;
+import com.qdd.narutofix.cap.body.IBodyEnergyData;
+import com.qdd.narutofix.cap.soul.ISoulEnergyData;
+import com.qdd.narutofix.cap.soul.SoulEnergyDataProvider;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.narutomod.Chakra;
 import net.narutomod.item.ItemJutsu;
 
 import java.util.Objects;
@@ -24,13 +31,16 @@ public class onOverlayEvent {
     @SideOnly(Side.CLIENT)
     public static void onRenderGameOverlayPost(RenderGameOverlayEvent.Post event){
         EntityPlayer player = Minecraft.getMinecraft().player;
+        if (player == null) return;
         if(player.isSpectator()) return;
         int width = event.getResolution().getScaledWidth();
         int height = event.getResolution().getScaledHeight();
-        if(!player.hasCapability(JutsuInventoryCapability.Jutsu_INV, null))return;
-        IJutsuInventory Jutsu_INV= player.getCapability(JutsuInventoryCapability.Jutsu_INV, null);
         if (Objects.requireNonNull(event.getType()) == RenderGameOverlayEvent.ElementType.HOTBAR) {
-            renderSpellHUD(player, Jutsu_INV, width, height, event.getPartialTicks());
+            renderEnergyHUD(player);
+            if(player.hasCapability(JutsuInventoryCapability.Jutsu_INV, null)) {
+                IJutsuInventory Jutsu_INV= player.getCapability(JutsuInventoryCapability.Jutsu_INV, null);
+                renderSpellHUD(player, Jutsu_INV, width, height, event.getPartialTicks());
+            }
         }
 
 
@@ -95,6 +105,41 @@ public class onOverlayEvent {
 
 
         GlStateManager.popMatrix();
+    }
+
+    private static void renderEnergyHUD(EntityPlayer player) {
+        Minecraft mc = Minecraft.getMinecraft();
+        int x = Configs.hudXOffset;
+        int y = Configs.hudYOffset;
+        int width = 96;
+        int barHeight = 6;
+        int rowHeight = 14;
+
+        ISoulEnergyData soul = SoulEnergyDataProvider.get(player);
+        IBodyEnergyData body = BodyEnergyDataProvider.get(player);
+        Chakra.Pathway chakra = Chakra.pathway(player);
+
+        drawEnergyBar(mc, "Soul", x, y, width, barHeight,
+                soul == null ? 0.0D : soul.getCurrent(),
+                soul == null ? 0.0D : soul.getMax(),
+                0xFF7B2CBF);
+        drawEnergyBar(mc, "Body", x, y + rowHeight, width, barHeight,
+                body == null ? 0.0D : body.getCurrent(),
+                body == null ? 0.0D : body.getMax(),
+                0xFFE85D04);
+        drawEnergyBar(mc, "Chakra", x, y + rowHeight * 2, width, barHeight,
+                chakra == null ? 0.0D : chakra.getAmount(),
+                chakra == null ? 0.0D : chakra.getMax(),
+                0xFF00A6FB);
+    }
+
+    private static void drawEnergyBar(Minecraft mc, String label, int x, int y, int width, int height, double current, double max, int color) {
+        double ratio = max <= 0.0D ? 0.0D : Math.max(0.0D, Math.min(1.0D, current / max));
+        Gui.drawRect(x - 1, y - 1, x + width + 1, y + height + 1, 0xAA101010);
+        Gui.drawRect(x, y, x + width, y + height, 0xAA2A2A2A);
+        Gui.drawRect(x, y, x + (int) (width * ratio), y + height, color);
+        String text = label + " " + (int) current + "/" + (int) max;
+        mc.fontRenderer.drawStringWithShadow(text, x, y + height + 1, 0xFFFFFFFF);
     }
 
 }

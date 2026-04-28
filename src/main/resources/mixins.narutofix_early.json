@@ -8,6 +8,8 @@
     "mixinImpl"
   ],
   "client": [
+    "MixinContainerPlayer",
+    "MixinGuiInventory"
   ],
   "injectors": {
     "defaultRequire": 1

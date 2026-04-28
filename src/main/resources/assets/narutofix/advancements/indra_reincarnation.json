@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "narutofix:madararinneemsitem"
+    },
+    "title": {
+      "translate": "advancements.achievement_indra_reincarnation.title"
+    },
+    "description": {
+      "translate": "advancements.achievement_indra_reincarnation.descr"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "achievement_indra_reincarnation": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 0
+  },
+  "parent": "narutomod:ninjaachievement"
+}

@@ -1,130 +1,150 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        maven { url = "https://files.minecraftforge.net/maven" }
-        maven { url = 'https://repo.spongepowered.org/maven' }        
-    }
-    dependencies {
-        classpath files('forgegradle/ForgeGradle-2.3.8.jar')
-        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
-//        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
-    }
-}
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'org.spongepowered.mixin'
-//apply plugin: 'net.minecraftforge.gradle'
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
-
-version = mod_version
-group = mod_group
-archivesBaseName = mod_id
-
-sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'idea'
+    id 'maven-publish'
+    id 'com.gtnewhorizons.retrofuturagradle' version '2.0.2'
+    id 'com.diffplug.spotless' version '7.2.1'
+    id 'com.github.ben-manes.versions' version '0.51.0'
 }
 
-configurations {
-    embed
-    compile.extendsFrom(embed)
+ext.propertyString = { String key -> providers.gradleProperty(key).get() }
+ext.propertyBool = { String key -> propertyString(key).toBoolean() }
+ext.propertyStringList = { String key ->
+    String value = providers.gradleProperty(key).orElse('').get().trim()
+    value.isEmpty() ? [] : value.split(',').collect { it.trim() }.findAll { !it.isEmpty() }
+}
+
+version = propertyString('mod_version')
+group = propertyString('mod_group_id')
+
+base {
+    archivesName = propertyString('mod_id')
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+        vendor.set(JvmVendorSpec.AZUL)
+    }
+    withSourcesJar()
+    withJavadocJar()
 }
 
 minecraft {
-    version = "${minecraft_version}-${forge_version}"
-    runDir = 'run'
-    mappings = mappings_version
-    def args = []
-    args <<  "-Dfml.coreMods.load=com.qdd.narutofix.core.FixPlugin"
-    args << '-Dmixin.hotSwap=true'
-    args << '-Dmixin.checks.interfaces=true'
-    args << '-Dmixin.debug.export=true'
-    clientJvmArgs.addAll(args)
-    serverJvmArgs.addAll(args)
-   }
+    mcVersion = propertyString('minecraft_version')
+    mcpMappingChannel = propertyString('mcp_mapping_channel')
+    mcpMappingVersion = propertyString('mcp_mapping_version')
+    username = 'Developer'
+    useDependencyAccessTransformers = true
+
+    extraRunJvmArguments.addAll(propertyStringList('extra_jvm_args'))
+
+    if (propertyBool('is_coremod')) {
+        extraRunJvmArguments.add("-Dfml.coreMods.load=${propertyString('coremod_plugin_class_name')}")
+    }
+
+    if (propertyBool('use_mixins')) {
+        propertyStringList('mixin_configs').each { config ->
+            extraRunJvmArguments.add("-Dmixin.config=mixins.${config}.json")
+        }
+        extraRunJvmArguments.addAll([
+                '-Dmixin.hotSwap=true',
+                '-Dmixin.checks.interfaces=true',
+                '-Dmixin.debug.export=true'
+        ])
+    }
+}
 
 repositories {
-    maven {
-        url = "https://cursemaven.com"
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'CurseMaven'
+                url = uri('https://cursemaven.com')
+            }
+        }
+        filter {
+            includeGroup 'curse.maven'
+        }
     }
     maven {
-        url = 'https://maven.cleanroommc.com'
+        name = 'CleanroomMC Maven'
+        url = uri('https://maven.cleanroommc.com')
+    }
+    maven {
+        name = 'SpongePowered Maven'
+        url = uri('https://repo.spongepowered.org/maven')
     }
     mavenCentral()
-    maven { url = "https://repo.spongepowered.org/maven" }
 }
 
 configurations {
-    embed
-    compile.extendsFrom(embed)
+    shade
+    implementation.extendsFrom(shade)
 }
 
-dependencies {
-    compile 'com.cleanroommc:assetmover:2.0'
-    compile 'zone.rong:mixinbooter:7.0'
-    deobfCompile "curse.maven:ahznbs-naruto-mod-831157:5967126"
-
-
-}
+apply from: 'gradle/scripts/dependencies.gradle'
 
 sourceSets {
-
     main {
-        ext.refMap = mod_mixin_refmap.replace('${mod_id}', mod_id)
+        ext.refMap = propertyString('mixin_refmap')
     }
-
 }
 
 processResources {
     inputs.property 'version', project.version
-    inputs.property 'mcversion', minecraft_version
+    inputs.property 'mod_id', propertyString('mod_id')
+    inputs.property 'mod_name', propertyString('mod_name')
+    inputs.property 'mod_version', propertyString('mod_version')
+    inputs.property 'mod_description', propertyString('mod_description')
+    inputs.property 'mod_authors', propertyString('mod_authors')
+    inputs.property 'minecraft_version', propertyString('minecraft_version')
+    inputs.property 'mcversion', propertyString('minecraft_version')
+    inputs.property 'mixin_refmap', propertyString('mixin_refmap')
+    inputs.property 'mixin_package', propertyString('mixin_package')
 
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-
-        expand 'mod_id': mod_id, 'mod_name': mod_name, 'version': project.version,
-                'mcversion': minecraft_version, 'mod_description': mod_description,
-                'mod_author': mod_author
+    filesMatching(['mcmod.info', 'pack.mcmeta', 'mixins.*.json']) {
+        expand(
+                'version': project.version,
+                'mod_id': propertyString('mod_id'),
+                'mod_name': propertyString('mod_name'),
+                'mod_version': propertyString('mod_version'),
+                'mod_description': propertyString('mod_description'),
+                'mod_authors': propertyString('mod_authors'),
+                'minecraft_version': propertyString('minecraft_version'),
+                'mcversion': propertyString('minecraft_version'),
+                'mixin_refmap': propertyString('mixin_refmap'),
+                'mixin_package': propertyString('mixin_package')
+        )
     }
 
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
     rename '(.+_at.cfg)', 'META-INF/$1'
 }
 
-
-
 jar {
     manifest {
-        def attribute_map = [:]
-        attribute_map['FMLCorePlugin'] = 'com.qdd.narutofix.core.FixPlugin'
-        attribute_map['FMLCorePluginContainsFMLMod'] = true
-        attribute_map['ForceLoadAsMod'] = project.gradle.startParameter.taskNames[0] == "build"
-        attribute_map['FMLAT'] = 'narutofix_at.cfg'
-
-        attributes(attribute_map)
+        def attributesMap = [:]
+        if (propertyBool('use_access_transformer')) {
+            attributesMap['FMLAT'] = propertyString('access_transformer_locations')
+        }
+        if (propertyBool('is_coremod')) {
+            attributesMap['FMLCorePlugin'] = propertyString('coremod_plugin_class_name')
+            attributesMap['FMLCorePluginContainsFMLMod'] = 'true'
+            attributesMap['ForceLoadAsMod'] = 'true'
+        }
+        if (propertyBool('use_mixins')) {
+            attributesMap['MixinConfigs'] = propertyStringList('mixin_configs').collect { "mixins.${it}.json" }.join(',')
+        }
+        attributes(attributesMap)
     }
 }
 
-// sourceSets {
-//     main {
-//         refMap = "refmap.Narutofix.json"
-//     }
-// }
-// jar {
-//     from(configurations.embed.collect {
-//         it.isDirectory() ? it : zipTree(it)
-//     }) {
-//         exclude 'LICENSE.txt', 'META-INF/MANIFSET.MF', 'META-INF/maven/**', 'META-INF/*.RSA', 'META-INF/*.SF'
-//     }
-
-//     manifest.attributes(
-//             'ForceLoadAsMod': 'true',
-//             'FMLCorePluginContainsFMLMod': 'true',
-//             'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-//             'TweakOrder': '0',
-//             'MixinConfigs': "mixins.Narutofix.json"
-//     )
-// }
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId = propertyString('mod_id')
+        }
+    }
+}

@@ -6,6 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextComponentString;
+import com.qdd.narutofix.util.EnergyMath;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.item.ItemEightGates;
@@ -61,6 +62,7 @@ public class mixinProcedureAddXP2JutsuCommandExecuted {
         } else {
             itemmainhand = entity instanceof EntityLivingBase ? ((EntityLivingBase)entity).getHeldItemMainhand() : ItemStack.EMPTY;
             itemoffhand = entity instanceof EntityLivingBase ? ((EntityLivingBase)entity).getHeldItemOffhand() : ItemStack.EMPTY;
+            xp2add = xp2add * EnergyMath.jutsuXpMultiplier((EntityPlayer) entity);
             if (EntityBijuManager.cloakLevel((EntityPlayer)entity) > 0) {
                 EntityBijuManager.addCloakXp((EntityPlayer)entity, (int)xp2add);
             } else if (itemmainhand.getItem() == (new ItemStack(ItemEightGates.block, 1)).getItem()) {

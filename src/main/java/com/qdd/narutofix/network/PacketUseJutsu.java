@@ -7,6 +7,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import com.qdd.narutofix.Configs;
 import com.qdd.narutofix.cap.IJutsuInventory;
 import com.qdd.narutofix.cap.JutsuInventoryCapability;
+import com.qdd.narutofix.util.EnergyMath;
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -33,7 +34,9 @@ public class PacketUseJutsu implements IMessage, IMessageHandler<PacketUseJutsu,
             ItemStack stack = inv.getItems().getStackInSlot(inv.getSelected());
             if(((ItemJutsu.Base) stack.getItem()).canActivateJutsu(stack, ItemJutsu.getCurrentJutsu(stack), player)!= EnumActionResult.SUCCESS) return;
             if (!stack.isEmpty()) {
-                int powertick= 72000- Configs.powertick;
+                int chargeTicks = (int) Math.min(72000.0D, Math.max(1.0D,
+                        Configs.powertick * EnergyMath.jutsuChargeMultiplier(player)));
+                int powertick= 72000- chargeTicks;
                 Class<?> clazz = ItemJutsu.Base.class;
                 try {
                     Method method = clazz.getDeclaredMethod("getCurrentJutsu", ItemStack.class);

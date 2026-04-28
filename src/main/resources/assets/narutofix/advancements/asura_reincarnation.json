@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "narutofix:ironjaysenrigan"
+    },
+    "title": {
+      "translate": "advancements.achievement_asura_reincarnation.title"
+    },
+    "description": {
+      "translate": "advancements.achievement_asura_reincarnation.descr"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "achievement_asura_reincarnation": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 0
+  },
+  "parent": "narutomod:ninjaachievement"
+}

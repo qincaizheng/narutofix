@@ -1,0 +1,6 @@
+{
+  "parent": "narutofix:custom/sharingan",
+  "textures": {
+    "1": "narutofix:items/rinnegantomoe"
+  }
+}

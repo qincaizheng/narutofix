@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "narutofix:madararinneemsitem"
+    },
+    "title": {
+      "translate": "advancements.achievement_get_indrachakra.title"
+    },
+    "description": {
+      "translate": "advancements.achievement_get_indrachakra.descr"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "achievement_get_indrachakra": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 0
+  },
+  "parent": "narutomod:ninjaachievement"
+}

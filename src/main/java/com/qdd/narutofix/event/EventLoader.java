@@ -29,7 +29,6 @@ import net.narutomod.entity.EntitySusanooBase;
 
 import static com.qdd.narutofix.NarutoFix.PACKET_HANDLER;
 import static com.qdd.narutofix.cap.JutsuInventoryCapability.Jutsu_INV;
-import static net.narutomod.PlayerTracker.addBattleXp;
 
 
 @Mod.EventBusSubscriber
@@ -44,20 +43,8 @@ public final class EventLoader {
         Entity vessel = FMLCommonHandler.instance().getMinecraftServerInstance().getEntityFromUuid(EntityGedoStatue.ENTITY_UUID);
 //        System.out.println(event.getCommand().getName());
         if (event.getCommand().getName().equals("addninjaxp")) {
-            // 在这里修改命令参数或命令执行逻辑
-            // 例如，修改第一个参数
-            if (parameters.length < 2) {
-                String[] newArr = new String[parameters.length + 1];
-                newArr[0] = sender.getName();
-                newArr[1] = parameters[0];
-//                System.out.println(parameters.toString());
-                if (server != null) {
-//                    System.out.println("parameters");
-                    addBattleXp((EntityPlayer) event.getSender().getCommandSenderEntity(),(double) Double.parseDouble(parameters[0]));  // 执行原命令
-                    event.setCanceled(true);
-                }
-
-            }
+            event.setCanceled(true);
+            sender.sendMessage(new net.minecraft.util.text.TextComponentString("addninjaxp is disabled. Use soul/body energy conversion instead."));
         }
         if (event.getCommand().getName().equals("locateEntity")) {
             if (parameters.length == 4 && parameters[2].equals("gedo")&&parameters[3].equals("10")) {

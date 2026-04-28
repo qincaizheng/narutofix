@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "narutofix:ironjaysenrigan"
+    },
+    "title": {
+      "translate": "advancements.achievement_get_asurachakra.title"
+    },
+    "description": {
+      "translate": "advancements.achievement_get_asurachakra.descr"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "achievement_get_asurachakra": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 0
+  },
+  "parent": "narutomod:ninjaachievement"
+}
