@@ -1,5 +1,6 @@
 package com.qdd.narutofix.cap.body;
 
+import com.qdd.narutofix.Configs;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -21,8 +22,13 @@ public class BodyEnergyDataStorage implements Capability.IStorage<IBodyEnergyDat
     public void readNBT(Capability<IBodyEnergyData> capability, IBodyEnergyData instance, EnumFacing side, NBTBase nbt) {
         if (nbt instanceof NBTTagCompound) {
             NBTTagCompound compound = (NBTTagCompound) nbt;
-            instance.setCurrent(compound.getDouble("current"));
-            instance.setMax(compound.getDouble("max"));
+            double max = compound.hasKey("max") ? compound.getDouble("max") : Configs.body.bodyInitialMax;
+            if (max <= 0.0D) {
+                max = Configs.body.bodyInitialMax;
+            }
+            instance.setMax(max);
+            double current = compound.hasKey("current") ? compound.getDouble("current") : Configs.body.bodyInitialCurrent;
+            instance.setCurrent(current);
         }
     }
 }

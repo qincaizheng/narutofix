@@ -24,5 +24,6 @@ public class PacketRegister {
         PACKET_HANDLER.registerMessage(ActivateSixTomoeSkillMessage.Handler.class, ActivateSixTomoeSkillMessage.class, nextID++, Side.SERVER);
         PACKET_HANDLER.registerMessage(PacketSyncSoulEnergy.Handler.class, PacketSyncSoulEnergy.class, nextID++, Side.CLIENT);
         PACKET_HANDLER.registerMessage(PacketSyncBodyEnergy.Handler.class, PacketSyncBodyEnergy.class, nextID++, Side.CLIENT);
+        PACKET_HANDLER.registerMessage(PacketSyncChakra.Handler.class, PacketSyncChakra.class, nextID++, Side.CLIENT);
     }
 }

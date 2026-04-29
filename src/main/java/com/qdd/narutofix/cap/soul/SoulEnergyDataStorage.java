@@ -1,5 +1,6 @@
 package com.qdd.narutofix.cap.soul;
 
+import com.qdd.narutofix.Configs;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -21,8 +22,13 @@ public class SoulEnergyDataStorage implements Capability.IStorage<ISoulEnergyDat
     public void readNBT(Capability<ISoulEnergyData> capability, ISoulEnergyData instance, EnumFacing side, NBTBase nbt) {
         if (nbt instanceof NBTTagCompound) {
             NBTTagCompound compound = (NBTTagCompound) nbt;
-            instance.setCurrent(compound.getDouble("current"));
-            instance.setMax(compound.getDouble("max"));
+            double max = compound.hasKey("max") ? compound.getDouble("max") : Configs.soul.soulInitialMax;
+            if (max <= 0.0D) {
+                max = Configs.soul.soulInitialMax;
+            }
+            instance.setMax(max);
+            double current = compound.hasKey("current") ? compound.getDouble("current") : Configs.soul.soulInitialCurrent;
+            instance.setCurrent(current);
         }
     }
 }

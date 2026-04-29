@@ -236,3 +236,36 @@
 ```
 
 所有子计划是 Executor 子代理可承接的最小派发单位（不再向下拆分）。
+
+---
+
+## 11. 增量补充计划（2026-04-28 用户更新 todo）
+
+以下补充项基于 AGENTS.md 中最新 todo，与第 1–10 节并行/后续推进；新工作仍在 `feature/energy-system` 分支或从 `2836` 切出的小分支进行，验证通过后再合回 `2836`。每项保持一个 plan = 一条用户 todo 的粒度，不再向下拆分派发给 subagent。
+
+### Plan 11.1 — 修复 HUD 绝对定位与进度条位置
+- 对应 todo：修复 hud 的绝对定位，模仿原版 hud 渲染，仅占用左屏幕与快捷栏中间区域；当前值进度条位置当前偏下，需要校正。
+- 范围：`event/onOverlayEvent.java`（或 Plan 6.2 引入的 HudHandler）以及 `Configs` 中 HudConfig 的默认 X/Y 偏移。
+- 要求：参考 vanilla `GuiIngameForge` 的 `left_height`/锚点写法，使用 `ScaledResolution` 计算屏幕坐标，三条能量条按从下到上堆叠在快捷栏左侧、上沿不越过快捷栏中线；进度条与文字基线对齐，避免视觉上整体下沉。
+- 验证：IDEA MCP `gradle :compileJava`，再 `runClient` 进入存档目视确认（runClient 仍是上线门禁）。
+
+### Plan 11.2 — 移除两种能量的自然流逝
+- 对应 todo：身体能量与灵魂能量未设定自然流逝，但当前会自动减少，需要修复。
+- 排查路径：`event/SoulEnergyEventHandler`、`event/BodyEnergyEventHandler`、`handler/BodyAttributeHandler`、`handler/NinjaXpConversionHandler`、以及任何 `PlayerTickEvent` 中对 `soul.addCurrent(-x)` / `body.addCurrent(-x)` 的调用；同时检查 narutomod 是否通过其自身 tick 影响到我们的 capability。
+- 修复：仅在显式触发事件（击杀/受击/挖矿/转化为 ninjaXp）时扣减 current；删除任何无条件 tick 衰减分支；NinjaXp 转化必须真实需要 min(soul,body) > 0 才扣减，且不得超出当前值。
+- 验证：IDEA MCP `gradle build`；`runClient` 静置 2 分钟观察 HUD，两条能量值不应下降。
+
+### Plan 11.3 — 灵魂/肉体能量与忍者经验增长时同步刷新查克拉
+- 对应 todo：当前 soul/body/ninjaXp 增长后，narutomod 查克拉上限/当前值未同步刷新。
+- 实现：在 SoulEnergy/BodyEnergy/NinjaXp 任一变更点（事件处理器与转化 handler）调用统一工具 `ChakraSyncHelper.refresh(EntityPlayerMP)`，内部根据 narutomod PlayerData/IChakra 接口重新计算 max（如沿用 Plan 5.2 的乘子逻辑）并将 current 按比例保留，再通过 narutomod 自带同步包或我们自定义 PacketSyncSoulEnergy/BodyEnergy 触发客户端刷新。
+- 注意：避免与 Plan 5.2 的 Mixin 重复触发；统一收口在 helper。
+- 验证：IDEA MCP `gradle build`；`runClient` 内击杀/受击/挖矿后立即读取 `/chakra` 或 HUD，确认数值同步变化。
+
+### Plan 11.4 — 身体/灵魂能量默认初始值 100 且可配置
+- 对应 todo：给 body 与 soul 相同默认初始值 100，可配置。
+- 修改：`Configs.SoulEnergyConfig.soulInitialMax` 与 `Configs.BodyEnergyConfig.bodyInitialMax` 默认值确认为 `100.0`（已规划，复核当前代码实际默认）；同时初始化 `current = soulInitialMax`、`current = bodyInitialMax`（而非 0），保证玩家首次加入即拥有满值。
+- 兼容：对老存档，若读到 `max <= 0` 则回填为配置初值；`current > max` 时夹取。
+- 验证：IDEA MCP `gradle build`；`runClient` 新建世界确认 HUD 起始 100/100；修改 config 后重启确认生效。
+
+### 上线对齐
+- 11.1–11.4 全部完成且 `runClient` 冒烟通过后，纳入 Plan 10.1 集成验证清单，再走 Plan 10.2 合并 `2836` + 打 tag 流程，方可视为可上线。

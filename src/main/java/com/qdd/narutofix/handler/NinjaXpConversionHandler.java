@@ -13,6 +13,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class NinjaXpConversionHandler {
+    private static final String LAST_CONVERT_SOURCE = "narutofixLastNinjaXpConvertSource";
+    private static final String CONVERT_SOURCE_INITIALIZED = "narutofixNinjaXpConvertSourceInitialized";
+
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.END || event.player.world.isRemote || !(event.player instanceof EntityPlayerMP)) {
@@ -31,13 +34,24 @@ public class NinjaXpConversionHandler {
         }
 
         double source = Math.min(soul.getCurrent(), body.getCurrent());
-        double converted = source * Configs.xpConversion.ninjaXpConversionRate;
+        if (!player.getEntityData().getBoolean(CONVERT_SOURCE_INITIALIZED)) {
+            player.getEntityData().setBoolean(CONVERT_SOURCE_INITIALIZED, true);
+            player.getEntityData().setDouble(LAST_CONVERT_SOURCE, source);
+            return;
+        }
+
+        double previousSource = player.getEntityData().getDouble(LAST_CONVERT_SOURCE);
+        player.getEntityData().setDouble(LAST_CONVERT_SOURCE, source);
+        double growth = source - previousSource;
+        if (growth <= 0.0D) {
+            return;
+        }
+
+        double converted = growth * Configs.xpConversion.ninjaXpConversionRate;
         if (converted <= 0.0D) {
             return;
         }
 
-        soul.addCurrent(-converted);
-        body.addCurrent(-converted);
         NinjaXpHelper.add(player, converted, false);
         PacketSyncSoulEnergy.sync(player);
         PacketSyncBodyEnergy.sync(player);

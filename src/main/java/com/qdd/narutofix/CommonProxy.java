@@ -9,6 +9,7 @@ import com.qdd.narutofix.cap.soul.SoulEnergyCapabilityHandler;
 import com.qdd.narutofix.handler.BodyAttributeHandler;
 import com.qdd.narutofix.handler.BloodlineAbilityHandler;
 import com.qdd.narutofix.handler.DojutsuEyeHandler;
+import com.qdd.narutofix.handler.EnergyStateHandler;
 import com.qdd.narutofix.handler.PlayerAwakeningHandler;
 import com.qdd.narutofix.handler.NinjaXpConversionHandler;
 import com.qdd.narutofix.network.PacketRegister;
@@ -33,6 +34,7 @@ public class CommonProxy {
         MinecraftForge.EVENT_BUS.register(new PlayerAwakeningHandler());
         MinecraftForge.EVENT_BUS.register(new BloodlineAbilityHandler());
         MinecraftForge.EVENT_BUS.register(new BodyAttributeHandler());
+        MinecraftForge.EVENT_BUS.register(new EnergyStateHandler());
         MinecraftForge.EVENT_BUS.register(new NinjaXpConversionHandler());
         MinecraftForge.EVENT_BUS.register(new JutsuXpGainHandler());
         MinecraftForge.EVENT_BUS.register(new DojutsuEyeHandler());

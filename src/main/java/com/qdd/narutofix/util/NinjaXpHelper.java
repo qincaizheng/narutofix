@@ -20,6 +20,7 @@ public final class NinjaXpHelper {
         player.getEntityData().setDouble(BATTLEXP, Math.min(Math.max(0.0D, value), 100000.0D));
         if (player instanceof EntityPlayerMP) {
             ProcedureSync.EntityNBTTag.sendToTracking((EntityPlayerMP) player, BATTLEXP, get(player));
+            ChakraSyncHelper.refresh((EntityPlayerMP) player);
             if (sendMessage) {
                 player.sendStatusMessage(new TextComponentString(
                         I18n.translateToLocal("chattext.ninjaexperience") + String.format("%.1f", get(player))), true);

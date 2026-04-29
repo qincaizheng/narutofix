@@ -8,7 +8,7 @@ public class BodyEnergyData implements IBodyEnergyData {
     
     public BodyEnergyData() {
         this.max = Configs.body.bodyInitialMax;
-        this.current = this.max;
+        this.current = Math.min(Configs.body.bodyInitialCurrent, this.max);
     }
     
     @Override

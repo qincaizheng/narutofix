@@ -4,6 +4,7 @@ import com.qdd.narutofix.Configs;
 import com.qdd.narutofix.cap.body.IBodyEnergyData;
 import com.qdd.narutofix.cap.body.BodyEnergyDataProvider;
 import com.qdd.narutofix.network.PacketSyncBodyEnergy;
+import com.qdd.narutofix.util.ChakraSyncHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -25,7 +26,6 @@ public class BodyEnergyEventHandler {
         EntityLivingBase attacker = event.getSource().getTrueSource() instanceof EntityLivingBase
             ? (EntityLivingBase) event.getSource().getTrueSource() : null;
 
-        // Player hits something - gain max, consume current
         if (attacker instanceof EntityPlayerMP && attacker != victim) {
             EntityPlayerMP player = (EntityPlayerMP) attacker;
             IBodyEnergyData data = BodyEnergyDataProvider.get(player);
@@ -33,10 +33,10 @@ public class BodyEnergyEventHandler {
                 data.addMax(Configs.body.bodyMaxGainOnHit);
                 data.addCurrent(-Configs.body.bodyCostOnHit);
                 PacketSyncBodyEnergy.sync(player);
+                ChakraSyncHelper.refresh(player);
             }
         }
 
-        // Player gets hit - gain max, consume current
         if (victim instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP) victim;
             IBodyEnergyData data = BodyEnergyDataProvider.get(player);
@@ -44,6 +44,7 @@ public class BodyEnergyEventHandler {
                 data.addMax(Configs.body.bodyMaxGainOnHurt);
                 data.addCurrent(-Configs.body.bodyCostOnHurt);
                 PacketSyncBodyEnergy.sync(player);
+                ChakraSyncHelper.refresh(player);
             }
         }
     }
@@ -62,6 +63,7 @@ public class BodyEnergyEventHandler {
                 data.addMax(Configs.body.bodyMaxGainOnMine);
                 data.addCurrent(-Configs.body.bodyCostOnMine);
                 PacketSyncBodyEnergy.sync(playerMP);
+                ChakraSyncHelper.refresh(playerMP);
             }
         }
     }

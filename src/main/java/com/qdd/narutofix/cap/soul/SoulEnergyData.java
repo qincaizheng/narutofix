@@ -8,7 +8,7 @@ public class SoulEnergyData implements ISoulEnergyData {
 
     public SoulEnergyData() {
         this.max = Configs.soul.soulInitialMax;
-        this.current = 0.0;
+        this.current = Math.min(Configs.soul.soulInitialCurrent, this.max);
     }
 
     @Override

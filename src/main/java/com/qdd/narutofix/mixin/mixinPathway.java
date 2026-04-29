@@ -16,6 +16,7 @@ import com.qdd.narutofix.items.Sharingan2;
 import com.qdd.narutofix.network.PacketSyncSoulEnergy;
 import com.qdd.narutofix.potion.PotionLoader;
 import com.qdd.narutofix.util.AdvancementHelper;
+import com.qdd.narutofix.util.ChakraSyncHelper;
 import com.qdd.narutofix.util.DojutsuEyeHelper;
 import net.narutomod.Chakra;
 import net.narutomod.item.ItemDojutsu;
@@ -54,13 +55,6 @@ public abstract class mixinPathway<T extends EntityLivingBase> {
         ISoulEnergyData soul = SoulEnergyDataProvider.get(player);
         if (soul == null) {
             return;
-        }
-
-        if (player.ticksExisted % 20 == 0) {
-            double bonusRegen = soul.getCurrent() * Configs.soul.chakraGrowthMultiplierPerSoul;
-            if (bonusRegen > 0.0D) {
-                this.consume(-bonusRegen);
-            }
         }
 
         if (!player.world.isRemote) {
@@ -109,6 +103,7 @@ public abstract class mixinPathway<T extends EntityLivingBase> {
         }
         if (player instanceof EntityPlayerMP) {
             PacketSyncSoulEnergy.sync((EntityPlayerMP) player);
+            ChakraSyncHelper.refresh((EntityPlayerMP) player);
             if (advancementId != null) {
                 AdvancementHelper.grant((EntityPlayerMP) player, advancementId);
             }

@@ -1,5 +1,6 @@
 package com.qdd.narutofix.network;
 
+import com.qdd.narutofix.util.ChakraSyncHelper;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -16,6 +17,7 @@ public class EnergySyncHandler {
             EntityPlayerMP player = (EntityPlayerMP) event.player;
             PacketSyncSoulEnergy.sync(player);
             PacketSyncBodyEnergy.sync(player);
+            ChakraSyncHelper.refresh(player);
         }
     }
 
@@ -25,6 +27,7 @@ public class EnergySyncHandler {
             EntityPlayerMP player = (EntityPlayerMP) event.player;
             PacketSyncSoulEnergy.sync(player);
             PacketSyncBodyEnergy.sync(player);
+            ChakraSyncHelper.refresh(player);
         }
     }
 
@@ -34,6 +37,7 @@ public class EnergySyncHandler {
             EntityPlayerMP player = (EntityPlayerMP) event.player;
             PacketSyncSoulEnergy.sync(player);
             PacketSyncBodyEnergy.sync(player);
+            ChakraSyncHelper.refresh(player);
         }
     }
 }

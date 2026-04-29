@@ -230,3 +230,69 @@ Item (盔甲, 头盔位EntityEquipmentSlot.HEAD)
 
 ## Mixin情况
 **当前mod没有任何Mixin文件。** 所有修改通过Forge Event Bus和反射(reflection)完成。
+
+
+---
+
+## 9项新Todo入口点分析（2026-04-29）
+
+### Todo 1 — HUD条上移（查克拉被吞）
+- **文件**: `event/onOverlayEvent.java`
+- **方法**: `renderEnergyHUD()`, `getHudTop()`, `getHudLeft()`, `drawEnergyBar()`
+- **说明**: 三条HUD堆叠（灵魂/肉体/查克拉），总高度 `HUD_ROW_HEIGHT*2 + HUD_BAR_HEIGHT=32px`，锚点在快捷栏上方。若原版其他HUD元素向下挤占，查克拉条可能被覆盖。
+- **配置**: `Configs.hudYOffset`（默认0）
+
+### Todo 2 — 计算左边距到快捷栏距离，不足时隐藏文本
+- **文件**: `event/onOverlayEvent.java`
+- **方法**: `renderEnergyHUD()`, `drawEnergyBar()`
+- **说明**: `getHudLeft()` 固定 `HUD_TOTAL_WIDTH=182`。需改为动态计算 `hotbarLeft - x`，若 `＜HUD_TOTAL_WIDTH` 则跳过文字（仅保留条）
+- **风险**: 低分辨率可能完全无空间，需保底只渲染条。
+
+### Todo 3 — 查克拉自然恢复检查
+- **文件**: narutomod `Chakra.java` → `PathwayPlayer.onUpdate()`
+- **说明**: 原版逻辑被动回复 `CHAKRA_REGEN_RATE + 0.001*饱和度`（静止>80 ticks）。当前 `mixinPathway.java` 仅叠加 soul 加成，未禁用原版自然恢复→双重恢复。
+- **风险**: 需 Mixin 禁用原版自然恢复分支。
+
+### Todo 4 — 查克拉<10%时消耗灵魂+肉体恢复查克拉
+- **入口**: 新 `handler/ChakraEmergencyHandler.java` 或扩展 `mixinPathway.java`
+- **配置**: 需新增 `chakraEmergencyThreshold`(默认0.10)、`soulToChakraRate`、`bodyToChakraRate`
+- **风险**: 需间隔控制，防死循环。
+
+### Todo 5 — 灵魂<20%时反胃Buff + 睡觉/静止恢复
+- **入口**: 新 `handler/SoulLowHandler.java` 或扩展 `SoulEnergyEventHandler.java`
+- **配置**: 需新增 `lowSoulThreshold`(0.20)、`soulRegenSleeping`、`soulRegenStanding`
+- **风险**: 静止判定需排除骑乘/坠落。
+
+### Todo 6 — 肉体<20%时缓慢+疲劳+虚弱 + 饱食度恢复
+- **入口**: 扩展 `handler/BodyAttributeHandler.java`（已有 per-tick）
+- **配置**: 需新增 `lowBodyThreshold`(0.20)、`hungerToBodyRate`、`hungerConsumePerTick`
+- **风险**: 饱食度过低（＜6）时不应无限扣减。
+
+### Todo 7 — 兵粮丸改为恢复肉体能量
+- **入口**: `MixinProcedureWhiteZetsuFleshFoodEaten.java`（当前仅改概率→0）
+- **说明**: 需要反编译 narutomod 0.3.1-beta 的 `ProcedureWhiteZetsuFleshFoodEaten.executeProcedure()` 确定原版 chakra 注入点，改为增加 body.current
+- **阻塞**: 本地无 narutomod jar 反编译/源码，需 gradle build 后从 `build/tmp/recompileMc` 或 `.gradle/caches` 获取。
+
+### Todo 8 — 因陀罗/阿修罗血脉Buff ×2初始值与恢复
+- **入口**: `handler/BloodlineAbilityHandler.java` + `SoulEnergyData`/`BodyEnergyData` 初始化
+- **配置**: 需新增 `indraSoulMultiplier`(2.0)、`indraSoulRegenMultiplier`(2.0)、`asuraBodyMultiplier`(2.0)、`asuraBodyRegenMultiplier`(2.0)
+- **风险**: 觉醒后通过 `EntityJoinWorldEvent` 对已有血统玩家补偿。
+
+### Todo 9 — 原版涉及以上逻辑全部修改
+- **范围**: 以上8个todo的所有 narutomod 原版代码路径
+- **已知已覆盖**: mixinPathway(查克拉恢复/写轮眼进化)、MixinProcedureWhiteZetsuFleshFoodEaten、MixinPlayerTracker(经验)、MixinOverlayChakraDisplay
+- **遗漏风险**: narutomod 食物类、查克拉耗尽事件、战斗经验绕过路径
+- **建议**: 反编译 jar 搜索 chakra/regen/consume/exp，确保全覆盖。
+
+## Executor 推荐切片（保持9个todo粒度）
+
+| Plan ID | 对应todo | 主要文件 | 依赖 |
+|---------|----------|----------|------|
+| 11.5 | Todo 1+2 | `onOverlayEvent.java`, `Configs.java` | 无 |
+| 11.6 | Todo 3 | `mixinPathway.java` + `Chakra.java` 反编译 | 无 |
+| 11.7 | Todo 4 | 新 `ChakraEmergencyHandler`, `Configs` | 2.1+2.2(已完) |
+| 11.8 | Todo 5 | 新 `SoulLowHandler`, `Configs` | 2.1(已完) |
+| 11.9 | Todo 6 | 扩展 `BodyAttributeHandler`, `Configs` | 2.2(已完) |
+| 11.10 | Todo 7 | 扩展 `MixinProcedureWhiteZetsuFleshFoodEaten` | 反编译narutomod |
+| 11.11 | Todo 8 | `BloodlineAbilityHandler`, `Soul/BodyEnergyData` | 1.1+2.1+2.2(已完) |
+| 11.12 | Todo 9 | 全覆盖审查 | 11.5~11.11完成后 |

@@ -1,12 +1,6 @@
 package com.qdd.narutofix.event;
 
 import com.qdd.narutofix.Configs;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ResourceLocation;
 import com.qdd.narutofix.NarutoFix;
 import com.qdd.narutofix.cap.IJutsuInventory;
 import com.qdd.narutofix.cap.JutsuInventoryCapability;
@@ -14,6 +8,12 @@ import com.qdd.narutofix.cap.body.BodyEnergyDataProvider;
 import com.qdd.narutofix.cap.body.IBodyEnergyData;
 import com.qdd.narutofix.cap.soul.ISoulEnergyData;
 import com.qdd.narutofix.cap.soul.SoulEnergyDataProvider;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -27,6 +27,33 @@ import java.util.Objects;
 @Mod.EventBusSubscriber
 public class onOverlayEvent {
     private static final ResourceLocation DEFUALT = new ResourceLocation(NarutoFix.MODID,"textures/gui/default.png");
+    private static final ResourceLocation ENERGY_HUD = new ResourceLocation(NarutoFix.MODID, "textures/gui/hud.png");
+    private static final int HUD_BAR_WIDTH = 82;
+    private static final int HUD_BAR_HEIGHT = 10;
+    private static final int HUD_ROW_HEIGHT = 12;
+    private static final int HUD_LABEL_GAP = 6;
+    private static final int HUD_VALUE_GAP = 6;
+    private static final int HUD_VALUE_WIDTH = 54;
+    private static final int HUD_HOTBAR_WIDTH = 182;
+    private static final int HUD_HOTBAR_HEIGHT = 22;
+    private static final int HUD_HOTBAR_HORIZONTAL_GAP = 16;
+    private static final int HUD_HOTBAR_VERTICAL_GAP = HUD_ROW_HEIGHT + 2;
+    private static final int HUD_FRAME_V = 0;
+    private static final int HUD_BODY_V = 10;
+    private static final int HUD_SOUL_V = 20;
+    private static final int HUD_CHAKRA_V = 30;
+
+    private static class EnergyHudLayout {
+        private final int x;
+        private final boolean showText;
+        private final int labelColumnWidth;
+
+        private EnergyHudLayout(int x, boolean showText, int labelColumnWidth) {
+            this.x = x;
+            this.showText = showText;
+            this.labelColumnWidth = labelColumnWidth;
+        }
+    }
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public static void onRenderGameOverlayPost(RenderGameOverlayEvent.Post event){
@@ -109,37 +136,80 @@ public class onOverlayEvent {
 
     private static void renderEnergyHUD(EntityPlayer player) {
         Minecraft mc = Minecraft.getMinecraft();
-        int x = Configs.hudXOffset;
-        int y = Configs.hudYOffset;
-        int width = 96;
-        int barHeight = 6;
-        int rowHeight = 14;
+        ScaledResolution resolution = new ScaledResolution(mc);
+        int totalHeight = HUD_ROW_HEIGHT * 2 + HUD_BAR_HEIGHT;
+        String soulLabel = I18n.format(NarutoFix.MODID + ".hud.soul");
+        String bodyLabel = I18n.format(NarutoFix.MODID + ".hud.body");
+        String chakraLabel = I18n.format(NarutoFix.MODID + ".hud.chakra");
+        int labelColumnWidth = getLabelColumnWidth(mc, soulLabel, bodyLabel, chakraLabel);
+        EnergyHudLayout layout = getHudLayout(resolution, labelColumnWidth);
+        int y = getHudTop(resolution, totalHeight);
 
         ISoulEnergyData soul = SoulEnergyDataProvider.get(player);
         IBodyEnergyData body = BodyEnergyDataProvider.get(player);
         Chakra.Pathway chakra = Chakra.pathway(player);
 
-        drawEnergyBar(mc, "Soul", x, y, width, barHeight,
+        GlStateManager.pushMatrix();
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        drawEnergyBar(mc, soulLabel, layout.x, y, HUD_SOUL_V,
                 soul == null ? 0.0D : soul.getCurrent(),
-                soul == null ? 0.0D : soul.getMax(),
-                0xFF7B2CBF);
-        drawEnergyBar(mc, "Body", x, y + rowHeight, width, barHeight,
+                soul == null ? 0.0D : soul.getMax(), layout);
+        drawEnergyBar(mc, bodyLabel, layout.x, y + HUD_ROW_HEIGHT, HUD_BODY_V,
                 body == null ? 0.0D : body.getCurrent(),
-                body == null ? 0.0D : body.getMax(),
-                0xFFE85D04);
-        drawEnergyBar(mc, "Chakra", x, y + rowHeight * 2, width, barHeight,
+                body == null ? 0.0D : body.getMax(), layout);
+        drawEnergyBar(mc, chakraLabel, layout.x, y + HUD_ROW_HEIGHT * 2, HUD_CHAKRA_V,
                 chakra == null ? 0.0D : chakra.getAmount(),
-                chakra == null ? 0.0D : chakra.getMax(),
-                0xFF00A6FB);
+                chakra == null ? 0.0D : chakra.getMax(), layout);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.disableBlend();
+        GlStateManager.popMatrix();
     }
 
-    private static void drawEnergyBar(Minecraft mc, String label, int x, int y, int width, int height, double current, double max, int color) {
+    private static int getLabelColumnWidth(Minecraft mc, String soulLabel, String bodyLabel, String chakraLabel) {
+        int maxLabelWidth = Math.max(mc.fontRenderer.getStringWidth(soulLabel),
+                Math.max(mc.fontRenderer.getStringWidth(bodyLabel), mc.fontRenderer.getStringWidth(chakraLabel)));
+        return maxLabelWidth + HUD_LABEL_GAP;
+    }
+
+    private static EnergyHudLayout getHudLayout(ScaledResolution resolution, int labelColumnWidth) {
+        int hotbarLeft = resolution.getScaledWidth() / 2 - HUD_HOTBAR_WIDTH / 2;
+        int availableWidth = Math.max(0, hotbarLeft - HUD_HOTBAR_HORIZONTAL_GAP);
+        int textWidth = labelColumnWidth + HUD_BAR_WIDTH + HUD_VALUE_GAP + HUD_VALUE_WIDTH;
+        boolean showText = availableWidth >= textWidth;
+        int requiredWidth = showText ? textWidth : HUD_BAR_WIDTH;
+        int leftSlack = Math.max(0, availableWidth - requiredWidth);
+        int left = leftSlack * 2 / 5 + Configs.hudXOffset;
+        int maxLeft = Math.max(0, availableWidth - requiredWidth);
+        return new EnergyHudLayout(Math.max(0, Math.min(left, maxLeft)), showText, labelColumnWidth);
+    }
+
+    private static int getHudTop(ScaledResolution resolution, int totalHeight) {
+        int hotbarTop = resolution.getScaledHeight() - HUD_HOTBAR_HEIGHT;
+        return Math.max(0, hotbarTop - totalHeight - HUD_HOTBAR_VERTICAL_GAP + Configs.hudYOffset);
+    }
+
+    private static void drawEnergyBar(Minecraft mc, String label, int x, int y, int textureV, double current, double max, EnergyHudLayout layout) {
         double ratio = max <= 0.0D ? 0.0D : Math.max(0.0D, Math.min(1.0D, current / max));
-        Gui.drawRect(x - 1, y - 1, x + width + 1, y + height + 1, 0xAA101010);
-        Gui.drawRect(x, y, x + width, y + height, 0xAA2A2A2A);
-        Gui.drawRect(x, y, x + (int) (width * ratio), y + height, color);
-        String text = label + " " + (int) current + "/" + (int) max;
-        mc.fontRenderer.drawStringWithShadow(text, x, y + height + 1, 0xFFFFFFFF);
+        int barX = layout.showText ? x + layout.labelColumnWidth : x;
+        int valueStartX = barX + HUD_BAR_WIDTH + HUD_VALUE_GAP;
+        int textY = y;
+        int fillWidth = (int) ((HUD_BAR_WIDTH - 2) * ratio);
+        String value = (int) current + "/" + (int) max;
+        int valueX = valueStartX + Math.max(0, HUD_VALUE_WIDTH - mc.fontRenderer.getStringWidth(value));
+
+        mc.renderEngine.bindTexture(ENERGY_HUD);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        mc.ingameGUI.drawTexturedModalRect(barX, y, 0, HUD_FRAME_V, HUD_BAR_WIDTH, HUD_BAR_HEIGHT);
+        if (fillWidth > 0) {
+            mc.ingameGUI.drawTexturedModalRect(barX + 1, y + 1, 1, textureV + 1, fillWidth, HUD_BAR_HEIGHT - 2);
+        }
+        mc.ingameGUI.drawTexturedModalRect(barX, y, 0, HUD_FRAME_V, HUD_BAR_WIDTH, HUD_BAR_HEIGHT);
+
+        if (layout.showText) {
+            mc.fontRenderer.drawStringWithShadow(label, x, textY, 0xFFFFFFFF);
+            mc.fontRenderer.drawStringWithShadow(value, valueX, textY, 0xFFFFFFFF);
+        }
     }
 
 }

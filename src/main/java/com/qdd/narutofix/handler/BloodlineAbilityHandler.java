@@ -11,7 +11,6 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.narutomod.Chakra;
 
 import java.util.UUID;
 
@@ -37,7 +36,6 @@ public class BloodlineAbilityHandler {
             return;
         }
 
-        this.applyIndraBonuses(player, data);
         this.applyAsuraBonuses(player, data);
         this.applyDualBloodlineBonuses(player, data);
     }
@@ -59,20 +57,6 @@ public class BloodlineAbilityHandler {
         attribute.applyModifier(new AttributeModifier(ASURA_HEALTH_MODIFIER_ID, "narutofix.asura.health", Configs.asuraHealthBonus, 2));
         if (player.getHealth() > player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());
-        }
-    }
-
-    private void applyIndraBonuses(EntityPlayer player, IPlayerAwakeningData data) {
-        if (!data.hasIndra() || !Chakra.isInitialized(player)) {
-            return;
-        }
-
-        double chakraGain = Configs.indraChakraRegenPerSecond;
-        if (data.hasBothBloodlines()) {
-            chakraGain += Configs.dualBloodlineChakraBonus;
-        }
-        if (chakraGain > 0.0D) {
-            Chakra.pathway(player).consume(-chakraGain);
         }
     }
 

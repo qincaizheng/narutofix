@@ -3,6 +3,7 @@ package com.qdd.narutofix.command;
 import com.qdd.narutofix.cap.body.BodyEnergyDataProvider;
 import com.qdd.narutofix.cap.body.IBodyEnergyData;
 import com.qdd.narutofix.network.PacketSyncBodyEnergy;
+import com.qdd.narutofix.util.ChakraSyncHelper;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -83,6 +84,7 @@ public class CommandBodyEnergy extends CommandBase {
             addValue(data, field, value);
         }
         PacketSyncBodyEnergy.sync(player);
+        ChakraSyncHelper.refresh(player);
         sender.sendMessage(new TextComponentString(player.getName() + " body = " + (int) data.getCurrent() + "/" + (int) data.getMax()));
     }
 
