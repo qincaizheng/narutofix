@@ -40,9 +40,8 @@ public abstract class mixinPathway<T extends EntityLivingBase> {
 
     @Inject(method = "onUpdate",at= @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityLivingBase;addPotionEffect(Lnet/minecraft/potion/PotionEffect;)V"),cancellable = true)
     private void onUpdate(CallbackInfo ci) {
-        if(this.user.isPotionActive(PotionLoader.PotionIzanagi)){
-            ci.cancel();
-        }
+        // narutofix 接管了低能量效果，原版低查克拉触发的虚弱/缓慢/反胃不再需要
+        ci.cancel();
     }
 
     @Inject(method = "onUpdate",at= @At(value = "HEAD"),remap = false)
@@ -58,7 +57,9 @@ public abstract class mixinPathway<T extends EntityLivingBase> {
         }
 
         if (!player.world.isRemote) {
-            this.tryUpgradeSharingan(player, soul);
+            if (Configs.sharinganEvolutionSource != Configs.SharinganEvolutionSource.VANILLA) {
+                this.tryUpgradeSharingan(player, soul);
+            }
         }
     }
 

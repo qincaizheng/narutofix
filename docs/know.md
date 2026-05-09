@@ -296,3 +296,55 @@ Item (盔甲, 头盔位EntityEquipmentSlot.HEAD)
 | 11.10 | Todo 7 | 扩展 `MixinProcedureWhiteZetsuFleshFoodEaten` | 反编译narutomod |
 | 11.11 | Todo 8 | `BloodlineAbilityHandler`, `Soul/BodyEnergyData` | 1.1+2.1+2.2(已完) |
 | 11.12 | Todo 9 | 全覆盖审查 | 11.5~11.11完成后 |
+
+---
+
+## 背包信息展示 Scout 发现（2026-04-29）
+
+### 本轮基线
+- 当前分支：`.git/HEAD` 为 `ref: refs/heads/feature/energy-system`。
+- `docs/project.md` / `docs/diff.md` 显示新增 todo 尚未实现：需要在玩家背包页面顶部或底部插入血脉、身体能量、灵魂能量、查克拉能量及实时回复速度，并适配原版缩放。
+- `/root/.codex/RTK.md` 位于项目外，IDEA MCP 拒绝读取：`outside of the project directory`。
+
+### 背包 GUI 插入点
+- `src/main/java/com/qdd/narutofix/mixin/MixinGuiInventory.java`
+  - 已 Mixin 到 `net.minecraft.client.gui.inventory.GuiInventory`。
+  - 当前注入 `drawGuiContainerBackgroundLayer` 的 `TAIL`，用于绘制虚拟瞳术槽背景。
+  - 推荐复用该类增加背包信息绘制；展示文字更适合注入 `drawGuiContainerForegroundLayer` 的 `TAIL`，坐标可相对 `guiLeft/guiTop` 和原版 `xSize/ySize` 计算。
+- `build/rfg/minecraft-src/java/net/minecraft/client/gui/inventory/GuiInventory.java`
+  - 原版背包 `xSize=176,ySize=166` 由 `GuiContainer` 管理；`drawGuiContainerForegroundLayer()` 只在 `(97,8)` 绘制 `container.crafting`。
+  - `initGui()` 会因配方书和窄屏更新 `guiLeft`，因此新增信息必须每帧使用当前 `guiLeft/guiTop`，不要固定屏幕绝对坐标。
+
+### 现有 HUD / 缩放处理参考
+- `src/main/java/com/qdd/narutofix/event/onOverlayEvent.java`
+  - `renderEnergyHUD()` 通过 `new ScaledResolution(mc)` 取缩放后的宽高，按原版快捷栏位置计算 HUD。
+  - 使用 `Minecraft.fontRenderer.getStringWidth()` 动态计算标签列宽，并在空间不足时隐藏文字。
+  - 背包内绘制已经处于 GUI 缩放坐标系，通常应直接使用 `guiLeft/guiTop/width/height/fontRenderer`，仅在做屏幕外侧附着布局时参考 `ScaledResolution`。
+
+### 能量 / 查克拉数据来源
+- 灵魂能量：`src/main/java/com/qdd/narutofix/cap/soul/ISoulEnergyData.java`，通过 `SoulEnergyDataProvider.get(player)` 取得；当前/最大值 API 为 `getCurrent()` / `getMax()`。
+- 身体能量：`src/main/java/com/qdd/narutofix/cap/body/IBodyEnergyData.java`，通过 `BodyEnergyDataProvider.get(player)` 取得；当前/最大值 API 为 `getCurrent()` / `getMax()`。
+- 查克拉：narutomod `Chakra.pathway(player)`，现有代码使用 `getAmount()` / `getMax()`，并通过 `PacketSyncChakra` 同步到客户端。
+- 现有三条能量 HUD 已在 `onOverlayEvent.renderEnergyHUD()` 同时读取以上三个来源，可直接作为背包展示的数据读取参考。
+
+### 回复速度数据来源
+- 当前没有独立的“实时回复速度”字段或 capability API。
+- 已发现的实际回复/变化逻辑在 `src/main/java/com/qdd/narutofix/handler/EnergyStateHandler.java`：
+  - 低灵魂：低于阈值时，睡觉用 `Configs.soul.soulSleepRecoveryPerTick`，静止达到要求后用 `Configs.soul.soulIdleRecoveryPerTick`，因陀罗乘 `Configs.soul.indraSoulRecoveryMultiplier`。
+  - 低身体：低于阈值时，消耗饱食/饱和恢复，速度受 `Configs.body.bodyFoodCostPerTick`、`Configs.body.foodToBodyRate`、阿修罗倍率和当前食物状态限制。
+  - 低查克拉：低于阈值时，同时消耗灵魂/身体恢复，速度受 `Configs.chakraEmergency.chakraEmergencyEnergyCostPerTick`、`soulToChakraRate + bodyToChakraRate`、当前灵魂/身体能量和缺口限制。
+- 若背包页面要显示真正“实时回复速度”，需要复用或抽出这些计算，避免 GUI 端重复一套易漂移公式。
+
+### 血脉数据来源
+- `src/main/java/com/qdd/narutofix/cap/awakening/IPlayerAwakeningData.java`
+  - `hasIndra()`、`hasAsura()`、`hasBothBloodlines()`、`hasAnyBloodline()`。
+- `src/main/java/com/qdd/narutofix/cap/awakening/PlayerAwakeningDataProvider.java`
+  - 通过 `PlayerAwakeningDataProvider.get(player)` 读取。
+- `src/main/java/com/qdd/narutofix/awakening/Bloodline.java`
+  - 当前枚举值：`INDRA`、`ASURA`。
+
+### 上线风险
+- 需要确认背包文字不会覆盖原版配方书按钮、合成标题、玩家模型、物品槽、虚拟瞳术槽；窄屏和配方书打开时尤其要测。
+- 如果采用 `drawGuiContainerBackgroundLayer` 绘制文字，可能被物品槽/后续前景层遮挡；文字类信息更建议前景层绘制。
+- “实时回复速度”若只显示配置常量，会与食物不足、能量不足、阈值未触发、血脉倍率等实际状态不一致；上线前需实机确认数值和状态切换。
+- 当前文档状态仍是可构建候选但缺少最新背包展示功能的实现、编译验证和 `runClient` 实机冒烟，验证通过后才可合回 `2836`。

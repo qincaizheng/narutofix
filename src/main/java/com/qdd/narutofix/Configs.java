@@ -9,11 +9,14 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 
 @Config(modid = NarutoFix.MODID)
 public class Configs {
+    private static final Logger LOGGER = LogManager.getLogger("NarutoFix-Config");
     @Config.LangKey("narutofix.powertick")
     @Config.Comment("快速使用忍术的蓄力时长（游戏刻）。当冷却配置小于 0 时也作为冷却时间使用。")
     @Config.Name("powertick")
@@ -55,12 +58,17 @@ public class Configs {
     @Config.RequiresWorldRestart
     public static boolean unride=false;
 
-    @Config.LangKey("narutofix.sharingan.upgrade")
-    @Config.Comment("旧版写轮眼勾玉进化的查克拉阈值。新的能量进化逻辑使用灵魂能量配置。")
-    @Config.Name("upgrade")
-    @Config.RangeInt(min = 0, max = 10000)
-    @Config.RequiresWorldRestart
-    public static int upgrade=1000;
+
+    @Config.LangKey("narutofix.sharingan.evolution.source")
+    @Config.Comment("写轮眼进化来源：VANILLA（仅原版 narutomod 规则触发）、SOUL（仅灵魂能量阈值触发并尽量屏蔽原版进化）、BOTH（原版规则或灵魂能量任一满足即可触发）。")
+    @Config.Name("sharinganEvolutionSource")
+    public static SharinganEvolutionSource sharinganEvolutionSource = SharinganEvolutionSource.BOTH;
+
+    public enum SharinganEvolutionSource {
+        VANILLA,
+        SOUL,
+        BOTH
+    }
 
     @Config.LangKey("narutofix.tails.spawn")
     @Config.Comment("尾兽生成使用的距离。")
@@ -69,9 +77,9 @@ public class Configs {
     @Config.RangeInt(min = 100, max = 100000)
     public static int distance= 1000;
 
-    @Config.Name("Indra Chakra Regen")
-    @Config.Comment("旧版因陀罗直接恢复查克拉配置；当前能量系统不再使用，保留用于兼容旧配置文件。")
-    public static double indraChakraRegenPerSecond = 6.0D;
+    @Config.Name("Dual Bloodline Resistance Amplifier")
+    @Config.Comment("玩家同时拥有因陀罗和阿修罗血统且处于低生命值时，抗性效果的等级。")
+    public static int dualBloodlineResistanceAmplifier = 0;
 
     @Config.Name("Asura Health Bonus")
     @Config.Comment("阿修罗血统提供的固定最大生命值加成比例。")
@@ -80,14 +88,6 @@ public class Configs {
     @Config.Name("Asura Heal Per Second")
     @Config.Comment("玩家拥有阿修罗血统且受伤时，每秒恢复的生命值比例。")
     public static float asuraHealPerSecond = 0.01F;
-
-    @Config.Name("Dual Bloodline Resistance Amplifier")
-    @Config.Comment("玩家同时拥有因陀罗和阿修罗血统且处于低生命值时，抗性效果的等级。")
-    public static int dualBloodlineResistanceAmplifier = 0;
-
-    @Config.Name("Dual Bloodline Chakra Bonus")
-    @Config.Comment("旧版双血脉直接恢复查克拉配置；当前能量系统不再使用，保留用于兼容旧配置文件。")
-    public static double dualBloodlineChakraBonus = 4.0D;
 
     @Config.Name("Required Chakra for Bloodline Awaken")
     @Config.Comment("玩家觉醒血统所需的查克拉数量。")
@@ -121,7 +121,37 @@ public class Configs {
     @Config.Name("HUD Y Offset")
     @Config.Comment("能量显示条相对快捷栏上方位置的垂直微调偏移，负数向上。")
     @Config.RangeInt(min = -1000, max = 1000)
-    public static int hudYOffset = -6;
+    public static int hudYOffset = 30;
+
+    @Config.Name("Susanoo Settings")
+    @Config.Comment("须佐能乎设置")
+    public static SusanooConfig susanoo = new SusanooConfig();
+
+    public static class SusanooConfig {
+        @Config.Name("BATTLEXP Required L0")
+        @Config.Comment("召唤须佐L0所需的BATTLEXP下限")
+        public double bxpRequiredL0 = 2000.0;
+
+        @Config.Name("BATTLEXP Required L1")
+        @Config.Comment("升级至L1（骨架完整上身）所需的BATTLEXP下限")
+        public double bxpRequiredL1 = 5000.0;
+
+        @Config.Name("BATTLEXP Required L2")
+        @Config.Comment("升级至L2（着铠无腿）所需的BATTLEXP下限")
+        public double bxpRequiredL2 = 10000.0;
+
+        @Config.Name("BATTLEXP Required L3")
+        @Config.Comment("升级至L3（着铠有腿）所需的BATTLEXP下限")
+        public double bxpRequiredL3 = 20000.0;
+
+        @Config.Name("BATTLEXP Required L4")
+        @Config.Comment("升级至L4（完成体·翼）所需的BATTLEXP下限")
+        public double bxpRequiredL4 = 40000.0;
+
+        @Config.Name("Base Chakra Usage")
+        @Config.Comment("召唤/升级消耗的基础查克拉量")
+        public double baseChakraUsage = 500.0;
+    }
 
     @Config.Name("Chakra Emergency Settings")
     @Config.Comment("查克拉低量时消耗灵魂能量和肉体能量恢复查克拉的配置。")
@@ -134,9 +164,9 @@ public class Configs {
         public double chakraEmergencyThreshold = 0.10;
 
         @Config.Name("Chakra Emergency Energy Cost Per Tick")
-        @Config.Comment("触发时每游戏刻最多从灵魂能量和肉体能量各消耗的数量。")
-        @Config.RangeDouble(min = 0.0, max = 10000.0)
-        public double chakraEmergencyEnergyCostPerTick = 0.25;
+        @Config.Comment("触发时每游戏刻最多从灵魂能量和肉体能量各消耗的百分比（0~1 表示 0%~100%）。")
+        @Config.RangeDouble(min = 0.0, max = 1.0)
+        public double chakraEmergencyEnergyCostPercent = 0.0025;
 
         @Config.Name("Soul to Chakra Rate")
         @Config.Comment("低查克拉恢复时，每 1 点灵魂能量转化的查克拉数量。")
@@ -234,10 +264,15 @@ public class Configs {
         @Config.RangeInt(min = 0, max = 72000)
         public int soulIdleRequiredTicks = 80;
 
-        @Config.Name("Indra Initial Soul Multiplier")
-        @Config.Comment("拥有因陀罗血脉时，初始灵魂能量上限和当前值相对默认值的倍率。")
+        @Config.Name("Indra Initial Soul Bonus Max")
+        @Config.Comment("拥有因陀罗血脉时，额外发放的初始灵魂能量上限固定值。")
         @Config.RangeDouble(min = 0.0, max = 1000.0)
-        public double indraInitialSoulMultiplier = 2.0;
+        public double indraInitialSoulBonusMax = 100.0;
+
+        @Config.Name("Indra Initial Soul Bonus Current")
+        @Config.Comment("拥有因陀罗血脉时，额外发放的初始灵魂能量当前值固定值。")
+        @Config.RangeDouble(min = 0.0, max = 1000.0)
+        public double indraInitialSoulBonusCurrent = 100.0;
 
         @Config.Name("Indra Soul Recovery Multiplier")
         @Config.Comment("拥有因陀罗血脉时，灵魂能量恢复速度倍率。")
@@ -300,6 +335,11 @@ public class Configs {
         @Config.RangeDouble(min = 0.0, max = 1.0)
         public double armorPerBody = 0.01;
 
+        @Config.Name("Max Armor")
+        @Config.Comment("肉体能量提供的护甲值上限。")
+        @Config.RangeDouble(min = 0.0, max = 100.0)
+        public double maxArmor = 30.0;
+
         @Config.Name("HP Regen Per Body")
         @Config.Comment("每 1 点肉体能量每游戏刻恢复的生命值。")
         @Config.RangeDouble(min = 0.0, max = 1.0)
@@ -310,15 +350,30 @@ public class Configs {
         @Config.RangeDouble(min = 0.0, max = 1.0)
         public double moveSpeedPerBody = 0.0005;
 
+        @Config.Name("Max Move Speed Multiplier")
+        @Config.Comment("肉体能量提供的移动速度倍率上限。")
+        @Config.RangeDouble(min = 0.0, max = 100.0)
+        public double maxMoveSpeedMultiplier = 2.0;
+
         @Config.Name("Attack Damage Per Body")
         @Config.Comment("每 1 点肉体能量提供的攻击力倍率。")
         @Config.RangeDouble(min = 0.0, max = 1.0)
         public double attackDamagePerBody = 0.01;
 
+        @Config.Name("Max Attack Damage Multiplier")
+        @Config.Comment("肉体能量提供的攻击力倍率上限。")
+        @Config.RangeDouble(min = 0.0, max = 100.0)
+        public double maxAttackDamageMultiplier = 10.0;
+
         @Config.Name("Attack Speed Per Body")
         @Config.Comment("每 1 点肉体能量提供的攻击速度倍率。")
         @Config.RangeDouble(min = 0.0, max = 1.0)
         public double attackSpeedPerBody = 0.005;
+
+        @Config.Name("Max Attack Speed Multiplier")
+        @Config.Comment("肉体能量提供的攻击速度倍率上限。")
+        @Config.RangeDouble(min = 0.0, max = 100.0)
+        public double maxAttackSpeedMultiplier = 3.0;
 
         @Config.Name("Body Low Threshold")
         @Config.Comment("当前肉体能量低于上限的该比例时触发负面效果和饱食度转化。")
@@ -335,6 +390,15 @@ public class Configs {
         @Config.RangeDouble(min = 0.0, max = 10000.0)
         public double foodToBodyRate = 5.0;
 
+        @Config.Name("Allow Consume Hunger")
+        @Config.Comment("是否允许消耗饱食度（foodLevel）恢复肉体能量。默认 true：统一消耗 foodLevel，受 minFoodLevel 保护其剩余值。")
+        public boolean allowConsumeHunger = true;
+
+        @Config.Name("Min Food Level for Low Body")
+        @Config.Comment("低肉体能量阈值模式下，饱食度最低保留值（0-20），默认 2.0 保留一格。")
+        @Config.RangeDouble(min = 0.0, max = 20.0)
+        public double minFoodLevelForLowBody = 2.0;
+
         @Config.Name("Military Rations Body Restore")
         @Config.Comment("普通兵粮丸食用后恢复的肉体能量。")
         @Config.RangeDouble(min = 0.0, max = 100000.0)
@@ -345,31 +409,158 @@ public class Configs {
         @Config.RangeDouble(min = 0.0, max = 100000.0)
         public double goldMilitaryRationsBodyRestore = 100.0;
 
-        @Config.Name("Asura Initial Body Multiplier")
-        @Config.Comment("拥有阿修罗血脉时，初始肉体能量上限和当前值相对默认值的倍率。")
+        @Config.Name("Asura Initial Body Bonus Max")
+        @Config.Comment("拥有阿修罗血脉时，额外发放的初始肉体能量上限固定值。")
         @Config.RangeDouble(min = 0.0, max = 1000.0)
-        public double asuraInitialBodyMultiplier = 2.0;
+        public double asuraInitialBodyBonusMax = 100.0;
+
+        @Config.Name("Asura Initial Body Bonus Current")
+        @Config.Comment("拥有阿修罗血脉时，额外发放的初始肉体能量当前值固定值。")
+        @Config.RangeDouble(min = 0.0, max = 1000.0)
+        public double asuraInitialBodyBonusCurrent = 100.0;
 
         @Config.Name("Asura Body Recovery Multiplier")
         @Config.Comment("拥有阿修罗血脉时，肉体能量恢复速度倍率。")
         @Config.RangeDouble(min = 0.0, max = 1000.0)
         public double asuraBodyRecoveryMultiplier = 2.0;
+
+        @Config.Name("Enable Compact Health Bar")
+        @Config.Comment("启用紧凑型血量条（替换心形渲染），关闭则使用原版心形渲染。")
+        public boolean enableCompactHealthBar = true;
+    }
+
+
+    @Config.Name("Crouch Chakra Exchange Settings")
+    @Config.Comment("玩家静止下蹲时消耗灵魂/肉体能量恢复查克拉的配置。替换旧版无成本静止查克拉自然恢复。")
+    public static final CrouchChakraExchangeConfig chakraCrouchExchange = new CrouchChakraExchangeConfig();
+
+    public static class CrouchChakraExchangeConfig {
+        @Config.Name("Enabled")
+        @Config.Comment("启用静止下蹲查克拉转化。")
+        public boolean enabled = true;
+
+        @Config.Name("Required Stationary Ticks")
+        @Config.Comment("玩家需要连续静止多少游戏刻后开始触发查克拉转化。")
+        @Config.RangeInt(min = 0, max = 72000)
+        public int requiredTicks = 40;
+
+        @Config.Name("Trigger Interval Ticks")
+        @Config.Comment("每次触发之间的间隔游戏刻数。")
+        @Config.RangeInt(min = 1, max = 72000)
+        public int triggerIntervalTicks = 20;
+
+        @Config.Name("Soul Cost Per Trigger")
+        @Config.Comment("每次触发消耗当前灵魂能量的百分比（0~1 表示 0%~100%）。")
+        @Config.RangeDouble(min = 0.0, max = 1.0)
+        public double soulCostPercentPerTrigger = 0.01;
+
+        @Config.Name("Body Cost Per Trigger")
+        @Config.Comment("每次触发消耗当前肉体能量的百分比（0~1 表示 0%~100%）。")
+        @Config.RangeDouble(min = 0.0, max = 1.0)
+        public double bodyCostPercentPerTrigger = 0.03;
+
+        @Config.Name("Chakra Gain Per Trigger")
+        @Config.Comment("每次触发恢复查克拉上限的百分比（0~1 表示 0%~100%）。")
+        @Config.RangeDouble(min = 0.0, max = 1.0)
+        public double chakraGainPercentPerTrigger = 0.05;
+
+        @Config.Name("Insufficient Policy")
+        @Config.Comment("能量不足时的处理策略：SKIP（跳过本次触发）、SCALE（按实际可消耗比例缩放回复）。")
+        public InsufficientPolicy insufficientPolicy = InsufficientPolicy.SKIP;
+
+        public enum InsufficientPolicy {
+            SKIP,
+            SCALE
+        }
+    }
+
+    @Config.Name("Sleep Recovery Settings")
+    @Config.Comment("玩家睡觉醒来时一次性恢复灵魂能量和肉体能量的配置。")
+    public static final SleepRecoveryConfig sleep = new SleepRecoveryConfig();
+
+    public static class SleepRecoveryConfig {
+        @Config.Name("Soul Recovery Percent")
+        @Config.Comment("睡觉醒来时恢复的灵魂能量百分比（基于上限）。0 表示不恢复。")
+        @Config.RangeDouble(min = 0.0, max = 1.0)
+        public double soulRecoveryPercent = 0.30;
+
+        @Config.Name("Body Recovery Percent")
+        @Config.Comment("睡觉醒来时恢复的肉体能量百分比（基于上限）。0 表示不恢复。")
+        @Config.RangeDouble(min = 0.0, max = 1.0)
+        public double bodyRecoveryPercent = 0.10;
+
+    }
+
+    @Config.Name("Creative Mode Body Recovery Settings")
+    @Config.Comment("创造模式下肉体能量独立恢复的配置。不消耗饱食度。")
+    public static final CreativeBodyRecoveryConfig creativeBody = new CreativeBodyRecoveryConfig();
+
+    public static class CreativeBodyRecoveryConfig {
+        @Config.Name("Creative Body Recovery Per Tick")
+        @Config.Comment("创造模式下每游戏刻恢复的肉体能量量。")
+        @Config.RangeDouble(min = 0.0, max = 10000.0)
+        public double perTick = 0.5;
     }
 
     @Config.Name("XP Conversion Settings")
-    @Config.Comment("根据灵魂能量当前值和肉体能量当前值中的较小值，将两种能量转化为忍者经验的配置。")
+    @Config.Comment("根据灵魂能量当前值和肉体能量当前值中的较小值的增长贡献/派生忍者经验。派生路径不消耗灵魂或肉体能量。")
     public static final XpConversionConfig xpConversion = new XpConversionConfig();
 
     public static class XpConversionConfig {
+        /** @deprecated Use {@link #ninjaXpContributionRate} instead. Kept for config file compatibility. */
+        @Deprecated
         @Config.Name("Ninja XP Conversion Rate")
-        @Config.Comment("每个间隔内，灵魂能量当前值和肉体能量当前值中的较小值转化为忍者经验的比例。")
+        @Config.Comment("旧字段，保留用于兼容旧配置文件。请使用 Ninja XP Contribution Rate。")
         @Config.RangeDouble(min = 0.0, max = 1.0)
         public double ninjaXpConversionRate = 0.1;
 
+        @Config.Name("Ninja XP Contribution Rate")
+        @Config.Comment("每个检测间隔内，根据灵魂能量和肉体能量当前值中较小值的增长派生忍者经验的比例。派生路径不消耗灵魂或肉体能量。")
+        @Config.RangeDouble(min = 0.0, max = 1.0)
+        public double ninjaXpContributionRate = 0.1;
+
+        /** @deprecated Use {@link #ninjaXpContributionIntervalTicks} instead. Kept for config file compatibility. */
+        @Deprecated
         @Config.Name("XP Conversion Interval")
-        @Config.Comment("每次忍者经验转化之间的游戏刻间隔。")
+        @Config.Comment("旧字段，保留用于兼容旧配置文件。请使用 XP Contribution Interval。")
         @Config.RangeInt(min = 1, max = 1200)
         public int ninjaXpConversionIntervalTicks = 20;
+
+        @Config.Name("XP Contribution Interval")
+        @Config.Comment("每次忍者经验贡献检测之间的游戏刻间隔。")
+        @Config.RangeInt(min = 1, max = 1200)
+        public int ninjaXpContributionIntervalTicks = 20;
+
+        /**
+         * @return The effective contribution rate, preferring the new field.
+         * If the new field is at default (0.1) and the old deprecated field was customized,
+         * the old field's value is used instead.
+         */
+        public double getEffectiveContributionRate() {
+            if (this.ninjaXpContributionRate != 0.1D)
+                return this.ninjaXpContributionRate;
+            if (this.ninjaXpConversionRate != 0.1D) {
+                LOGGER.info("Migrating old config 'Ninja XP Conversion Rate'={} to new 'Ninja XP Contribution Rate'", this.ninjaXpConversionRate);
+                this.ninjaXpContributionRate = this.ninjaXpConversionRate;
+                return this.ninjaXpContributionRate;
+            }
+            return 0.1D;
+        }
+
+        /**
+         * @return The effective contribution interval in ticks, preferring the new field.
+         * Falls back to old deprecated field if the new one is at default.
+         */
+        public int getEffectiveContributionInterval() {
+            if (this.ninjaXpContributionIntervalTicks != 20)
+                return this.ninjaXpContributionIntervalTicks;
+            if (this.ninjaXpConversionIntervalTicks != 20) {
+                LOGGER.info("Migrating old config 'XP Conversion Interval'={} to new 'XP Contribution Interval'", this.ninjaXpConversionIntervalTicks);
+                this.ninjaXpContributionIntervalTicks = this.ninjaXpConversionIntervalTicks;
+                return this.ninjaXpContributionIntervalTicks;
+            }
+            return 20;
+        }
     }
 
     @Mod.EventBusSubscriber()

@@ -45,16 +45,16 @@ public class BodyAttributeHandler {
                 body * Configs.body.hpMultiplierPerBody, 2);
         this.applyModifier(player.getEntityAttribute(SharedMonsterAttributes.ARMOR),
                 ARMOR_MODIFIER_ID, "narutofix.body.armor",
-                body * Configs.body.armorPerBody, 0);
+                Math.min(body * Configs.body.armorPerBody, Configs.body.maxArmor), 0);
         this.applyModifier(player.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED),
                 MOVE_SPEED_MODIFIER_ID, "narutofix.body.move_speed",
-                body * Configs.body.moveSpeedPerBody, 2);
+                Math.min(body * Configs.body.moveSpeedPerBody, Configs.body.maxMoveSpeedMultiplier), 2);
         this.applyModifier(player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE),
                 ATTACK_DAMAGE_MODIFIER_ID, "narutofix.body.attack_damage",
-                body * Configs.body.attackDamagePerBody, 2);
+                Math.min(body * Configs.body.attackDamagePerBody, Configs.body.maxAttackDamageMultiplier), 2);
         this.applyModifier(player.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED),
                 ATTACK_SPEED_MODIFIER_ID, "narutofix.body.attack_speed",
-                body * Configs.body.attackSpeedPerBody, 2);
+                Math.min(body * Configs.body.attackSpeedPerBody, Configs.body.maxAttackSpeedMultiplier), 2);
 
         if (player.getHealth() > player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());

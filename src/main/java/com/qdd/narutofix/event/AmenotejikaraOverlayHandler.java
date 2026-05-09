@@ -10,8 +10,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.narutomod.PlayerTracker;
 import net.narutomod.entity.EntityAltCamView;
-import net.narutomod.gui.overlay.OverlayByakuganView;
-import net.narutomod.item.ItemByakugan;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -21,14 +19,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.List;
 
 /**
- * Client-side overlay handler for Amenotejikara's Byakugan-like visual effect.
- * Renders independently of the original OverlayByakuganView by checking
- * the byakuganActivated flag directly, without needing to hack the armor slot check.
- *
- * When byakuganActivated is true but the player does NOT have an actual Byakugan helmet,
- * this handler renders the same white overlay + entity glow + camera offset as the original.
- * The original OverlayByakuganView.eventHandler will skip rendering (armor check fails)
- * so there is no double-rendering.
+ * Client-side overlay handler for Amenotejikara's own short-lived visual effect.
+ * The effect is driven by narutofix state instead of narutomod's Byakugan overlay.
  */
 @SideOnly(Side.CLIENT)
 public class AmenotejikaraOverlayHandler {
@@ -49,10 +41,7 @@ public class AmenotejikaraOverlayHandler {
             return;
         }
 
-        boolean isAmenotejikaraEffect = OverlayByakuganView.byakuganActivated
-                && player.inventory.armorInventory.get(3).getItem() != ItemByakugan.helmet;
-
-        if (isAmenotejikaraEffect) {
+        if (AmenotejikaraOverlayState.isActive()) {
             renderOverlay(event, mc, player);
         } else {
             cleanUp(mc, player);
@@ -87,10 +76,8 @@ public class AmenotejikaraOverlayHandler {
             this.cameraActive = true;
         }
         if (this.camEntity != null) {
-            float fov = OverlayByakuganView.byakuganActivated ? 110.0F : 0.0F;
             Vec3d vec = player.getPositionEyes(1.0F)
-                    .add(player.getLookVec().scale(
-                            (110.0F - fov) * Math.min((float) xp, 70.0F) / 10.0F + 1.0F));
+                    .add(player.getLookVec().scale(1.0D));
             this.camEntity.setLocationAndAngles(vec.x, vec.y, vec.z,
                     player.rotationYaw, player.rotationPitch);
         }

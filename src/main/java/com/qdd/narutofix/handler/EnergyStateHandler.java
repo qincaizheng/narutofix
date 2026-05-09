@@ -1,7 +1,6 @@
 package com.qdd.narutofix.handler;
 
 import com.qdd.narutofix.Configs;
-import com.qdd.narutofix.awakening.Bloodline;
 import com.qdd.narutofix.cap.awakening.IPlayerAwakeningData;
 import com.qdd.narutofix.cap.awakening.PlayerAwakeningDataProvider;
 import com.qdd.narutofix.cap.body.BodyEnergyDataProvider;
@@ -9,9 +8,11 @@ import com.qdd.narutofix.cap.body.IBodyEnergyData;
 import com.qdd.narutofix.cap.soul.ISoulEnergyData;
 import com.qdd.narutofix.cap.soul.SoulEnergyDataProvider;
 import com.qdd.narutofix.network.PacketSyncBodyEnergy;
-import com.qdd.narutofix.network.PacketSyncChakra;
 import com.qdd.narutofix.network.PacketSyncSoulEnergy;
+import com.qdd.narutofix.util.BloodlineEnergyBonusApplier;
 import com.qdd.narutofix.util.ChakraSyncHelper;
+import com.qdd.narutofix.util.EnergyRecoveryCalculator;
+import com.qdd.narutofix.util.EnergyRecoverySnapshot;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -21,6 +22,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.narutomod.Chakra;
@@ -35,9 +37,6 @@ public class EnergyStateHandler {
     private static final String LAST_Z = "narutofixEnergyLastZ";
     private static final String POSITION_INITIALIZED = "narutofixEnergyPositionInitialized";
     private static final String STATIONARY_TICKS = "narutofixEnergyStationaryTicks";
-    private static final String BODY_FOOD_DEBT = "narutofixBodyFoodDebt";
-    private static final String INDRA_INITIAL_APPLIED = "narutofixIndraInitialSoulApplied";
-    private static final String ASURA_INITIAL_APPLIED = "narutofixAsuraInitialBodyApplied";
 
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
@@ -53,11 +52,17 @@ public class EnergyStateHandler {
             return;
         }
 
-        this.applyBloodlineInitialEnergy(player, awakening, soul, body);
+        this.applyBloodlineInitialEnergy(player);
         int stationaryTicks = this.updateStationaryTicks(player);
-        this.handleLowSoul(player, awakening, soul, stationaryTicks);
-        this.handleLowBody(player, awakening, body);
-        this.handleLowChakra(player, soul, body);
+        Chakra.Pathway<?> pathway = Chakra.pathway(player);
+        EnergyRecoverySnapshot snapshot = EnergyRecoveryCalculator.calculate(player, awakening, soul, body, pathway, stationaryTicks);
+
+        this.handleLowSoul(player, soul, snapshot);
+        this.handleLowBody(player, body, snapshot);
+        this.handleLowChakra(player, soul, body, pathway, snapshot);
+        // P1: Crouch stationary exchange — execute if conditions met
+        this.handleCrouchExchange(player, soul, body, pathway, snapshot);
+        // P3: Sleep recovery detection
     }
 
     @SubscribeEvent
@@ -90,121 +95,150 @@ public class EnergyStateHandler {
         ChakraSyncHelper.refresh(player);
     }
 
-    private void applyBloodlineInitialEnergy(EntityPlayerMP player, IPlayerAwakeningData awakening, ISoulEnergyData soul, IBodyEnergyData body) {
-        if (awakening == null) {
-            return;
+    /**
+     * 血脉初始能量兜底对齐。
+     */
+    private void applyBloodlineInitialEnergy(EntityPlayerMP player) {
+        BloodlineEnergyBonusApplier.applyFallback(player);
+    }
+
+    private void handleLowSoul(EntityPlayerMP player, ISoulEnergyData soul, EnergyRecoverySnapshot snapshot) {
+        if (snapshot.getSoul().isLow()) {
+            player.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, EFFECT_DURATION, 0, false, false));
+            double restore = snapshot.getSoul().getRecoveryPerTick();
+            if (restore > 0.0D) {
+                soul.addCurrent(restore);
+                PacketSyncSoulEnergy.sync(player);
+                ChakraSyncHelper.refresh(player);
+            }
+        }
+    }
+
+    private void handleLowBody(EntityPlayerMP player, IBodyEnergyData body, EnergyRecoverySnapshot snapshot) {
+        if (snapshot.getBody().isLow()) {
+            player.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, EFFECT_DURATION, 0, false, false));
+            player.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, EFFECT_DURATION, 0, false, false));
+            player.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, EFFECT_DURATION, 0, false, false));
         }
 
-        NBTTagCompound persistent = this.getPersistentData(player);
-        if (awakening.hasBloodline(Bloodline.INDRA) && !persistent.getBoolean(INDRA_INITIAL_APPLIED)) {
-            double targetMax = Configs.soul.soulInitialMax * Configs.soul.indraInitialSoulMultiplier;
-            double targetCurrent = Configs.soul.soulInitialCurrent * Configs.soul.indraInitialSoulMultiplier;
-            if (soul.getMax() < targetMax) {
-                soul.setMax(targetMax);
-            }
-            if (soul.getCurrent() < targetCurrent) {
-                soul.setCurrent(targetCurrent);
-            }
-            persistent.setBoolean(INDRA_INITIAL_APPLIED, true);
-            PacketSyncSoulEnergy.sync(player);
-            ChakraSyncHelper.refresh(player);
-        }
-
-        if (awakening.hasBloodline(Bloodline.ASURA) && !persistent.getBoolean(ASURA_INITIAL_APPLIED)) {
-            double targetMax = Configs.body.bodyInitialMax * Configs.body.asuraInitialBodyMultiplier;
-            double targetCurrent = Configs.body.bodyInitialCurrent * Configs.body.asuraInitialBodyMultiplier;
-            if (body.getMax() < targetMax) {
-                body.setMax(targetMax);
-            }
-            if (body.getCurrent() < targetCurrent) {
-                body.setCurrent(targetCurrent);
-            }
-            persistent.setBoolean(ASURA_INITIAL_APPLIED, true);
+        double restore = snapshot.getBody().getRecoveryPerTick();
+        if (restore > 0.0D) {
+            this.applyFoodConsumption(player, snapshot);
+            body.addCurrent(restore);
             PacketSyncBodyEnergy.sync(player);
             ChakraSyncHelper.refresh(player);
         }
-    }
 
-    private void handleLowSoul(EntityPlayerMP player, IPlayerAwakeningData awakening, ISoulEnergyData soul, int stationaryTicks) {
-        if (!this.isBelowRatio(soul.getCurrent(), soul.getMax(), Configs.soul.soulLowThreshold)) {
-            return;
-        }
-
-        player.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, EFFECT_DURATION, 0, false, false));
-        double restore = 0.0D;
-        if (player.isPlayerSleeping()) {
-            restore = Configs.soul.soulSleepRecoveryPerTick;
-        } else if (stationaryTicks >= Configs.soul.soulIdleRequiredTicks) {
-            restore = Configs.soul.soulIdleRecoveryPerTick;
-        }
-
-        if (awakening != null && awakening.hasBloodline(Bloodline.INDRA)) {
-            restore *= Configs.soul.indraSoulRecoveryMultiplier;
-        }
-
-        if (restore > 0.0D && soul.getCurrent() < soul.getMax()) {
-            soul.addCurrent(restore);
-            PacketSyncSoulEnergy.sync(player);
-            ChakraSyncHelper.refresh(player);
+        // P2: Always write back food debt even when restore=0, so debt doesn't accumulate invisibly
+        if (!player.capabilities.isCreativeMode) {
+            player.getEntityData().setDouble(EnergyRecoveryCalculator.BODY_FOOD_DEBT, snapshot.getBodyFoodDebtAfter());
         }
     }
 
-    private void handleLowBody(EntityPlayerMP player, IPlayerAwakeningData awakening, IBodyEnergyData body) {
-        if (!this.isBelowRatio(body.getCurrent(), body.getMax(), Configs.body.bodyLowThreshold)) {
+    private void handleLowChakra(EntityPlayerMP player, ISoulEnergyData soul, IBodyEnergyData body,
+                                 Chakra.Pathway<?> pathway, EnergyRecoverySnapshot snapshot) {
+        if (pathway == null) {
             return;
         }
 
-        player.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, EFFECT_DURATION, 0, false, false));
-        player.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, EFFECT_DURATION, 0, false, false));
-        player.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, EFFECT_DURATION, 0, false, false));
-
-        double multiplier = awakening != null && awakening.hasBloodline(Bloodline.ASURA)
-                ? Configs.body.asuraBodyRecoveryMultiplier : 1.0D;
-        double conversion = Configs.body.foodToBodyRate * multiplier;
-        if (conversion <= 0.0D || body.getCurrent() >= body.getMax()) {
-            return;
+        // P0: Emergency recovery only (chakra low) — consume soul/body
+        if (snapshot.getChakra().isLow()) {
+            double energyCost = snapshot.getChakraEnergyCostPerTick();
+            // P0: Use dedicated emergency recovery field, NOT getChakra().getRecoveryPerTick()
+            // which may include crouch exchange display values.
+            double emergencyRecovery = snapshot.getChakraEmergencyRecoveryPerTick();
+            if (energyCost > 0.0D) {
+                soul.addCurrent(-energyCost);
+                body.addCurrent(-energyCost);
+                pathway.consume(-emergencyRecovery);
+                PacketSyncSoulEnergy.sync(player);
+                PacketSyncBodyEnergy.sync(player);
+                ChakraSyncHelper.refresh(player);
+            }
         }
-
-        double neededFood = (body.getMax() - body.getCurrent()) / conversion;
-        double requestedFood = Math.min(Configs.body.bodyFoodCostPerTick, neededFood);
-        double consumedFood = this.consumeFood(player, requestedFood);
-        if (consumedFood > 0.0D) {
-            body.addCurrent(consumedFood * conversion);
-            PacketSyncBodyEnergy.sync(player);
-            ChakraSyncHelper.refresh(player);
-        }
+        // P0: No free stationary natural recovery. The crouch exchange (P1) replaces it.
     }
 
-    private void handleLowChakra(EntityPlayerMP player, ISoulEnergyData soul, IBodyEnergyData body) {
-        if (!Chakra.isInitialized(player)) {
+    /**
+     * P1: Execute crouch stationary chakra exchange.
+     */
+    private void handleCrouchExchange(EntityPlayerMP player, ISoulEnergyData soul, IBodyEnergyData body,
+                                      Chakra.Pathway<?> pathway, EnergyRecoverySnapshot snapshot) {
+        if (pathway == null) {
+            return;
+        }
+        // Use triggered (not eligible) — only execute on interval ticks
+        if (!snapshot.isCrouchExchangeTriggered()) {
             return;
         }
 
-        Chakra.Pathway pathway = Chakra.pathway(player);
-        if (pathway == null || !this.isBelowRatio(pathway.getAmount(), pathway.getMax(), Configs.chakraEmergency.chakraEmergencyThreshold)) {
+        double soulCost = snapshot.getCrouchExchangeSoulCost();
+        double bodyCost = snapshot.getCrouchExchangeBodyCost();
+        double chakraGain = snapshot.getCrouchExchangeChakraGain();
+
+        if (soulCost <= 0.0D && bodyCost <= 0.0D) {
             return;
         }
 
-        double rateSum = Configs.chakraEmergency.soulToChakraRate + Configs.chakraEmergency.bodyToChakraRate;
-        if (rateSum <= 0.0D || Configs.chakraEmergency.chakraEmergencyEnergyCostPerTick <= 0.0D) {
+        // Verify we still have enough energy at execution time
+        double availableSoul = soul != null ? soul.getCurrent() : 0.0D;
+        double availableBody = body != null ? body.getCurrent() : 0.0D;
+        if (availableSoul < soulCost || availableBody < bodyCost) {
             return;
         }
 
-        double targetChakra = pathway.getMax() * Configs.chakraEmergency.chakraEmergencyThreshold;
-        double neededChakra = Math.max(0.0D, targetChakra - pathway.getAmount());
-        double costNeeded = neededChakra / rateSum;
-        double energyCost = Math.min(Configs.chakraEmergency.chakraEmergencyEnergyCostPerTick, costNeeded);
-        energyCost = Math.min(energyCost, Math.min(soul.getCurrent(), body.getCurrent()));
-        if (energyCost <= 0.0D) {
-            return;
-        }
+        if (soul != null) soul.addCurrent(-soulCost);
+        if (body != null) body.addCurrent(-bodyCost);
+        pathway.consume(-chakraGain);
 
-        soul.addCurrent(-energyCost);
-        body.addCurrent(-energyCost);
-        pathway.consume(-(energyCost * rateSum));
         PacketSyncSoulEnergy.sync(player);
         PacketSyncBodyEnergy.sync(player);
-        PacketSyncChakra.sync(player);
+        ChakraSyncHelper.refresh(player);
+    }
+
+    @SubscribeEvent
+    public void onPlayerWakeUp(PlayerWakeUpEvent event) {
+        EntityPlayer player = event.getEntityPlayer();
+        if (player.world.isRemote || !(player instanceof EntityPlayerMP)) {
+            return;
+        }
+
+        // wakeImmediately=true means canceled sleep (right-click/ESC).
+        // wakeImmediately=false means natural wake-up after a full night.
+        if (event.wakeImmediately()) {
+            return;
+        }
+
+        EntityPlayerMP mp = (EntityPlayerMP) player;
+        ISoulEnergyData soul = SoulEnergyDataProvider.get(mp);
+        IBodyEnergyData body = BodyEnergyDataProvider.get(mp);
+
+        double soulRestore = 0.0D;
+        double bodyRestore = 0.0D;
+
+        if (Configs.sleep.soulRecoveryPercent > 0.0D && soul != null && soul.getMax() > 0.0D) {
+            double rawSoul = soul.getMax() * Configs.sleep.soulRecoveryPercent;
+            double soulRoom = Math.max(0.0D, soul.getMax() - soul.getCurrent());
+            soulRestore = Math.min(rawSoul, soulRoom);
+            if (soulRestore > 0.0D) {
+                soul.addCurrent(soulRestore);
+                PacketSyncSoulEnergy.sync(mp);
+            }
+        }
+
+        if (Configs.sleep.bodyRecoveryPercent > 0.0D && body != null && body.getMax() > 0.0D) {
+            double rawBody = body.getMax() * Configs.sleep.bodyRecoveryPercent;
+            double bodyRoom = Math.max(0.0D, body.getMax() - body.getCurrent());
+            bodyRestore = Math.min(rawBody, bodyRoom);
+            if (bodyRestore > 0.0D) {
+                body.addCurrent(bodyRestore);
+                PacketSyncBodyEnergy.sync(mp);
+            }
+        }
+
+        if (soulRestore > 0.0D || bodyRestore > 0.0D) {
+            ChakraSyncHelper.refresh(mp);
+        }
     }
 
     private int updateStationaryTicks(EntityPlayer player) {
@@ -230,49 +264,37 @@ public class EnergyStateHandler {
         return ticks;
     }
 
-    private double consumeFood(EntityPlayerMP player, double amount) {
-        if (amount <= 0.0D || player.capabilities.isCreativeMode) {
-            return 0.0D;
+    private void applyFoodConsumption(EntityPlayerMP player, EnergyRecoverySnapshot snapshot) {
+        double requested = snapshot.getBodyFoodRequestedPerTick();
+        if (requested <= 0.0D || player.capabilities.isCreativeMode) {
+            return;
         }
 
+        double minFoodLevel = snapshot.getBody().isLow()
+                ? Configs.body.minFoodLevelForLowBody
+                : 18.0D;
+
         FoodStats stats = player.getFoodStats();
-        double consumed = 0.0D;
-        double remaining = amount;
+        double remaining = requested;
+
+        // Always consume saturation first
         float saturation = stats.getSaturationLevel();
         if (saturation > 0.0F) {
             float saturationCost = (float) Math.min(saturation, remaining);
             stats.setFoodSaturationLevel(saturation - saturationCost);
-            consumed += saturationCost;
             remaining -= saturationCost;
         }
 
         if (remaining > 0.0D) {
-            NBTTagCompound data = player.getEntityData();
-            double debt = data.getDouble(BODY_FOOD_DEBT) + remaining;
-            int food = stats.getFoodLevel();
-            int foodCost = Math.min(food, (int) Math.floor(debt));
+            double debtBefore = snapshot.getBodyFoodDebtBefore();
+            double totalDebt = debtBefore + remaining;
+            int foodLevel = stats.getFoodLevel();
+            int availableFood = Math.max(0, (int)(foodLevel - minFoodLevel));
+            int foodCost = Math.min(availableFood, (int) Math.floor(totalDebt));
             if (foodCost > 0) {
-                stats.setFoodLevel(food - foodCost);
-                debt -= foodCost;
-                consumed += foodCost;
-            } else if (food <= 0) {
-                debt = Math.min(debt, 1.0D);
+                stats.setFoodLevel(foodLevel - foodCost);
             }
-            data.setDouble(BODY_FOOD_DEBT, debt);
         }
-
-        return consumed;
     }
 
-    private boolean isBelowRatio(double current, double max, double ratio) {
-        return ratio > 0.0D && max > 0.0D && current / max < ratio;
-    }
-
-    private NBTTagCompound getPersistentData(EntityPlayer player) {
-        NBTTagCompound entityData = player.getEntityData();
-        if (!entityData.hasKey(EntityPlayer.PERSISTED_NBT_TAG)) {
-            entityData.setTag(EntityPlayer.PERSISTED_NBT_TAG, new NBTTagCompound());
-        }
-        return entityData.getCompoundTag(EntityPlayer.PERSISTED_NBT_TAG);
-    }
 }

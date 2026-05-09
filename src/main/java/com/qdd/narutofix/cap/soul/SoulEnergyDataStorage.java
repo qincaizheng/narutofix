@@ -15,6 +15,8 @@ public class SoulEnergyDataStorage implements Capability.IStorage<ISoulEnergyDat
         NBTTagCompound compound = new NBTTagCompound();
         compound.setDouble("current", instance.getCurrent());
         compound.setDouble("max", instance.getMax());
+        compound.setInteger("dataVersion", instance.getDataVersion());
+        compound.setInteger("bloodlineAppliedVersion", instance.getBloodlineAppliedVersion());
         return compound;
     }
 
@@ -29,6 +31,10 @@ public class SoulEnergyDataStorage implements Capability.IStorage<ISoulEnergyDat
             instance.setMax(max);
             double current = compound.hasKey("current") ? compound.getDouble("current") : Configs.soul.soulInitialCurrent;
             instance.setCurrent(current);
+            int dataVersion = compound.hasKey("dataVersion") ? compound.getInteger("dataVersion") : 0;
+            instance.setDataVersion(dataVersion);
+            int bloodlineAppliedVersion = compound.hasKey("bloodlineAppliedVersion") ? compound.getInteger("bloodlineAppliedVersion") : 0;
+            instance.setBloodlineAppliedVersion(bloodlineAppliedVersion);
         }
     }
 }

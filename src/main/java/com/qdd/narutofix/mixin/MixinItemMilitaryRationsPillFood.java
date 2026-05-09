@@ -1,14 +1,22 @@
 package com.qdd.narutofix.mixin;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.world.World;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.util.text.translation.I18n;
 import net.narutomod.Chakra;
 import net.narutomod.item.ItemMilitaryRationsPill;
 import net.narutomod.item.ItemMilitaryRationsPillGold;
 import net.narutomod.potion.PotionChakraRegeneration;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.List;
 
 @Mixin({ItemMilitaryRationsPill.ItemFoodCustom.class, ItemMilitaryRationsPillGold.ItemFoodCustom.class})
 public class MixinItemMilitaryRationsPillFood {
@@ -24,5 +32,13 @@ public class MixinItemMilitaryRationsPillFood {
         if (effect.getPotion() != PotionChakraRegeneration.potion) {
             player.addPotionEffect(effect);
         }
+    }
+
+    @Inject(method = "addInformation", at = @At("TAIL"))
+    private void narutofix$appendMilitaryRationsPillTooltip(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn, CallbackInfo ci) {
+        tooltip.remove(I18n.translateToLocal("tooltip.mrp.browntip"));
+        tooltip.remove(I18n.translateToLocal("tooltip.mrp.goldtip"));
+        tooltip.add(I18n.translateToLocal("tooltip.narutofix.military_rations_pill.info"));
+        tooltip.add(I18n.translateToLocal("tooltip.narutofix.military_rations_pill.info2"));
     }
 }

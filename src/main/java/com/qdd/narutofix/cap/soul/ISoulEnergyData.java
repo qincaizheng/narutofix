@@ -10,4 +10,10 @@ public interface ISoulEnergyData {
     void addMax(double delta);
 
     void copyFrom(ISoulEnergyData other);
+
+    int getDataVersion();
+    void setDataVersion(int version);
+
+    int getBloodlineAppliedVersion();
+    void setBloodlineAppliedVersion(int version);
 }

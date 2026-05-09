@@ -17,6 +17,8 @@ public class KeyLoader {
     public static KeyBinding Izanagi;
     public static KeyBinding switcheyes;
 
+
+
     @SideOnly(Side.CLIENT)
     public KeyLoader()
     {

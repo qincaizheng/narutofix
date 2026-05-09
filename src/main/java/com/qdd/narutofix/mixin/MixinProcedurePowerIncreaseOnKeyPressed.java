@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.narutomod.item.ItemDojutsu;
+import net.narutomod.item.ItemSharingan;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.procedure.ProcedurePowerIncreaseOnKeyPressed;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,8 +24,9 @@ import java.util.Map;
 
 @Mixin(ProcedurePowerIncreaseOnKeyPressed.class)
 public abstract class MixinProcedurePowerIncreaseOnKeyPressed {
+
     @Inject(method = "executeProcedure", at = @At("HEAD"), cancellable = true, remap = false)
-    private static void narutofix$useVirtualTomoeRinnegan(Map<String, Object> dependencies, CallbackInfo ci) {
+    private static void narutofix$handleKey(Map<String, Object> dependencies, CallbackInfo ci) {
         Entity entity = (Entity) dependencies.get("entity");
         Object pressed = dependencies.get("is_pressed");
         Object world = dependencies.get("world");
@@ -33,21 +35,21 @@ public abstract class MixinProcedurePowerIncreaseOnKeyPressed {
         }
 
         EntityPlayer player = (EntityPlayer) entity;
-        if (player.getHeldItemMainhand().getItem() instanceof ItemJutsu.Base
-                || player.getHeldItemOffhand().getItem() instanceof ItemJutsu.Base) {
-            return;
+
+        // --- Six-Tomoe Rinnegan logic (preserved from original) ---
+        if (!(player.getHeldItemMainhand().getItem() instanceof ItemJutsu.Base
+                || player.getHeldItemOffhand().getItem() instanceof ItemJutsu.Base)) {
+            if (DojutsuEyeHelper.hasEitherEye(player, ModItems.SIX_TOMOE_RINNEGAN)) {
+                ItemStack stack = DojutsuEyeHelper.getMatchingEye(player, ModItems.SIX_TOMOE_RINNEGAN);
+                if (!stack.isEmpty()) {
+                    SixTomoeRinneganLogic.onSwitchJutsuKey((Boolean) pressed, stack, player);
+                    ci.cancel();
+                    return;
+                }
+            }
         }
 
-        if (!DojutsuEyeHelper.hasEitherEye(player, ModItems.SIX_TOMOE_RINNEGAN)) {
-            return;
-        }
-
-        ItemStack stack = DojutsuEyeHelper.getMatchingEye(player, ModItems.SIX_TOMOE_RINNEGAN);
-        if (stack.isEmpty()) {
-            return;
-        }
-        SixTomoeRinneganLogic.onSwitchJutsuKey((Boolean) pressed, stack, player);
-        ci.cancel();
+        // --- narutofix Susanoo upgrade handled in mixinKeyBindingPowerIncrease ---
     }
 
     @Redirect(method = "executeProcedure", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/NonNullList;get(I)Ljava/lang/Object;"))

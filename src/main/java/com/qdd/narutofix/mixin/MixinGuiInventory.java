@@ -26,4 +26,5 @@ public abstract class MixinGuiInventory extends GuiContainer {
         Gui.drawRect(x + 2, y + 2, x + 16, y + 16, 0xFF141414);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
+
 }

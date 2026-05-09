@@ -17,10 +17,6 @@
     "mixinSpawnTailedBeasts",
     "MixinEntityHakkeshoKeiten",
     "MixinEntityPretaShield",
-    "MixinEntitySusanooBase",
-    "MixinEntitySusanooClothed",
-    "MixinEntitySusanooSkeleton",
-    "MixinEntitySusanooWinged",
     "MixinItemMilitaryRationsPillFood",
     "MixinItemBlackReceiverRangedItem",
     "MixinItemByakugan",
@@ -42,14 +38,13 @@
     "MixinProcedureKamuiJikukanIdo",
     "MixinProcedureNarakaPath",
     "MixinProcedureOnPlayerDeath",
-    "MixinProcedureOnPlayerPostTick",
+    "MixinChakraPlayerHookOnDeath",
     "MixinProcedurePowerIncreaseOnKeyPressed",
     "MixinProcedureChakraRegenerationOnPotionActiveTick",
     "MixinProcedureSharinganHelmetTickEvent",
     "MixinProcedureSpecialJutsu1OnKeyPressed",
     "MixinProcedureSpecialJutsu2OnKeyPressed",
     "MixinProcedureSpecialJutsu3OnKeyPressed",
-    "MixinProcedureSusanoo",
     "MixinProcedureSyncInventory",
     "MixinProcedureUchihaBodyTickEvent",
     "MixinProcedureUtils",
@@ -59,6 +54,5 @@
     "MixinOverlayChakraDisplay",
     "mixinKeyBindingPowerIncrease"
   ],
-  "server": [
-  ]
+  "server": []
 }

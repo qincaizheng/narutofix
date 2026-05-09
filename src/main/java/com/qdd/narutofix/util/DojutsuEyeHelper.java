@@ -19,9 +19,11 @@ import net.narutomod.item.ItemMangekyoSharinganObito;
 import net.narutomod.procedure.ProcedureUtils;
 
 import java.util.UUID;
+import net.minecraftforge.oredict.OreDictionary;
 
 public final class DojutsuEyeHelper {
     private static final String LAST_WORN_FOREIGN_DOJUTSU = "lastWornForeignDojutsu";
+    public static final String SUSANOO_EYE_ORE = "dojutsuSusanoo";
 
     private DojutsuEyeHelper() {
     }
@@ -103,24 +105,47 @@ public final class DojutsuEyeHelper {
     }
 
     public static ItemStack getCompatibleSusanooEye(EntityLivingBase entity) {
-        ItemStack directEye = getMatchingEye(entity,
-                ItemMangekyoSharingan.helmet,
-                ItemMangekyoSharinganObito.helmet,
-                ItemMangekyoSharinganEternal.helmet);
-        if (!directEye.isEmpty()) {
-            return directEye;
+        ItemStack head = getHeadEye(entity);
+        if (isSusanooCompatible(head)) {
+            return head;
         }
+        ItemStack virtual = getVirtualEye(entity);
+        if (isSusanooCompatible(virtual)) {
+            return virtual;
+        }
+        return ItemStack.EMPTY;
+    }
 
-        ItemStack sixTomoe = getMatchingEye(entity, ModItems.SIX_TOMOE_RINNEGAN);
-        if (sixTomoe.isEmpty()) {
-            return ItemStack.EMPTY;
+    private static boolean isSusanooCompatible(ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        // Primary: OreDictionary check — any mod can add entries via registerSusanooEyeOres
+        for (int id : OreDictionary.getOreIDs(stack)) {
+            if (SUSANOO_EYE_ORE.equals(OreDictionary.getOreName(id))) {
+                return true;
+            }
         }
+        // Fallback: direct class check — always works even if ore registration
+        // hasn't run yet or items haven't been registered under the ore name.
+        Item item = stack.getItem();
+        return item == ItemMangekyoSharingan.helmet
+            || item == ItemMangekyoSharinganObito.helmet
+            || item == ItemMangekyoSharinganEternal.helmet
+            || item == ModItems.SIX_TOMOE_RINNEGAN;
+    }
 
-        ItemStack compatibleEye = new ItemStack(ItemMangekyoSharingan.helmet);
-        if (sixTomoe.hasTagCompound()) {
-            compatibleEye.setTagCompound(sixTomoe.getTagCompound().copy());
+    /**
+     * Register all known narutomod items that can activate Susanoo
+     * under the common ore dictionary entry {@value #SUSANOO_EYE_ORE}.
+     * Any mod can add its own items to this ore entry to make them
+     * compatible with the narutofix Susanoo system.
+     */
+    public static void registerSusanooEyeOres() {
+        OreDictionary.registerOre(SUSANOO_EYE_ORE, ItemMangekyoSharingan.helmet);
+        OreDictionary.registerOre(SUSANOO_EYE_ORE, ItemMangekyoSharinganObito.helmet);
+        OreDictionary.registerOre(SUSANOO_EYE_ORE, ItemMangekyoSharinganEternal.helmet);
+        if (ModItems.SIX_TOMOE_RINNEGAN != null) {
+            OreDictionary.registerOre(SUSANOO_EYE_ORE, ModItems.SIX_TOMOE_RINNEGAN);
         }
-        return compatibleEye;
     }
 
     public static void applyWornDojutsuState(EntityPlayer player, ItemStack stack) {

@@ -29,7 +29,7 @@ tooltip.sharingan1.descr=伤害小于
 narutofix.miss1=单勾玉写轮眼闪避上限
 narutofix.miss2=双勾玉写轮眼闪避上限
 narutofix.susanoo.unride=是否可以不骑乘须佐
-narutofix.sharingan.upgrade=写轮眼进化所需查克拉
+narutofix.sharingan.evolution.source=写轮眼进化来源
 item.narutofix.eightgatestrue.name=真·八门
 key.narutofix.switcheyes=切换眼睛
 item.narutofix.ogi.name=奥义
@@ -71,6 +71,20 @@ chattext.cooldown.formatted=冷却时间：%s 秒
 narutofix.hud.soul=灵魂
 narutofix.hud.body=肉体
 narutofix.hud.chakra=查克拉
+narutofix.inventory.bloodline.line=血脉: %s
+narutofix.inventory.bloodline.compact=血脉 %s
+narutofix.inventory.bloodline.none=无
+narutofix.inventory.bloodline.indra=因陀罗
+narutofix.inventory.bloodline.asura=阿修罗
+narutofix.inventory.bloodline.both=因陀罗/阿修罗
+narutofix.inventory.energy.full=%s: %s/%s (%s/s)
+narutofix.inventory.energy.compact=%s %s/%s %s/s
+narutofix.inventory.energy.body=身体
+narutofix.inventory.energy.soul=灵魂
+narutofix.inventory.energy.chakra=查克拉
+narutofix.inventory.energy.body.short=体
+narutofix.inventory.energy.soul.short=魂
+narutofix.inventory.energy.chakra.short=查
 narutofix.hud.xoffset=HUD 水平微调
 narutofix.hud.yoffset=HUD 垂直微调
 narutofix.soul.settings=灵魂能量设置
@@ -101,9 +115,9 @@ narutofix.hp.regen.per.body=每点肉体能量每游戏刻恢复的生命值
 narutofix.move.speed.per.body=每点肉体能量带来的移动速度倍率
 narutofix.attack.damage.per.body=每点肉体能量带来的攻击力倍率
 narutofix.attack.speed.per.body=每点肉体能量带来的攻击速度倍率
-narutofix.xp.conversion.settings=忍者经验转化设置
-narutofix.ninja.xp.conversion.rate=忍者经验转化比例
-narutofix.xp.conversion.interval=忍者经验转化间隔
+narutofix.xp.conversion.settings=忍者经验贡献派生设置
+narutofix.ninja.xp.conversion.rate=忍者经验贡献派生比例
+narutofix.xp.conversion.interval=忍者经验贡献检测间隔
 advancements.achievement_get_indrachakra.title=获取因陀罗查克拉
 advancements.achievement_get_indrachakra.descr=你感觉到了体内多出了一股偏向阴遁的查克拉。
 advancements.achievement_get_asurachakra.title=获取阿修罗查克拉
@@ -112,3 +126,25 @@ advancements.achievement_indra_reincarnation.title=因陀罗转世
 advancements.achievement_indra_reincarnation.descr=你感觉到了体内有着另一股强大的阴遁查克拉。
 advancements.achievement_asura_reincarnation.title=阿修罗转世
 advancements.achievement_asura_reincarnation.descr=你感觉到了体内有着另一股强大的阳遁查克拉。
+
+# 兵粮丸 tooltip（Plan 13.4）
+tooltip.narutofix.military_rations_pill.info=§7直接恢复肉体能量，不直接恢复查克拉
+tooltip.narutofix.military_rations_pill.info2=§7低查克拉时可通过能量系统间接帮助查克拉恢复
+
+# P2: 肉体能量 - 允许消耗饥饿值
+narutofix.config.body.allowConsumeHunger=允许消耗饥饿值
+
+# P1: 下蹲静止查克拉转化
+narutofix.config.chakraCrouchExchange=下蹲静止查克拉转化设置
+narutofix.config.chakraCrouchExchange.enabled=启用
+narutofix.config.chakraCrouchExchange.requiredTicks=所需静止刻数
+narutofix.config.chakraCrouchExchange.triggerIntervalTicks=触发间隔（刻）
+narutofix.config.chakraCrouchExchange.soulCostPerTrigger=每次消耗灵魂能量
+narutofix.config.chakraCrouchExchange.bodyCostPerTrigger=每次消耗肉体能量
+narutofix.config.chakraCrouchExchange.chakraGainPerTrigger=每次获得查克拉
+narutofix.config.chakraCrouchExchange.insufficientPolicy=能量不足策略
+
+# P3: 睡觉恢复
+narutofix.config.sleep=睡觉恢复设置
+narutofix.config.sleep.soulRecoveryPercent=灵魂恢复百分比
+narutofix.config.sleep.bodyRecoveryPercent=肉体恢复百分比

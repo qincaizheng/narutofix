@@ -38,7 +38,7 @@ public class PacketSyncChakra implements IMessage {
     }
 
     public static void sync(EntityPlayerMP player) {
-        Chakra.Pathway pathway = Chakra.pathway(player);
+        Chakra.Pathway<?> pathway = Chakra.pathway(player);
         if (pathway != null) {
             PACKET_HANDLER.sendTo(new PacketSyncChakra(pathway.getAmount(), pathway.getMax()), player);
         }
@@ -53,7 +53,7 @@ public class PacketSyncChakra implements IMessage {
                 if (player == null) {
                     return;
                 }
-                Chakra.Pathway pathway = Chakra.pathway(player);
+                Chakra.Pathway<?> pathway = Chakra.pathway(player);
                 if (pathway == null) {
                     return;
                 }

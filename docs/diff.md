@@ -1,107 +1,56 @@
 # Todo Diff
 
-## 已完成
+本文件按“项目总需求 -> 当前实现 -> 实现情况 -> 说明”追踪差异。项目总需求来自 `docs/project.md` 历史记录、`docs/plans.md`
+计划和最新 `AGENTS.md` todo；后续 `AGENTS.md` 新增需求也应追加或合并到本表。
 
-- 拉取 `https://github.com/AHZNB/naruto_mod` 的 `0.3.1-beta` 分支到 `/root/workspace/naruto_mod_0.3.1`，commit `2c0dec2a48da09f206a447413a9847e1dc533d4d`。
-- 新增灵魂能量 capability：
-  - 当前值、最大值、NBT 持久化、玩家 clone 数据继承、死亡当前值衰减。
-- 新增肉体能量 capability：
-  - 当前值、最大值、NBT 持久化、玩家 clone 数据继承。
-- 新增配置：
-  - 灵魂能量成长/损失/倍率/写轮眼阈值。
-  - 肉体能量成长/消耗/属性倍率。
-  - ninja XP 转化率和间隔。
-  - HUD 偏移。
-- 新增指令：
-  - `/soulenergy <player> <get|set|add> <current|max> [value]`
-  - `/bodyenergy <player> <get|set|add> <current|max> [value]`
-- 新增 HUD：
-  - 灵魂能量、肉体能量、查克拉三条显示。
-  - 三条 HUD 已改用 `textures/gui/hud.png` 切片渲染，默认位于屏幕左侧与快捷栏左边缘之间。
-  - HUD 文本在左侧，数值在右侧。
-  - 已通过 Mixin 屏蔽 narutomod 原版查克拉 HUD。
-- 灵魂能量系统：
-  - 击杀非玩家生物/实体增加当前值和上限。
-  - 玩家死亡增加上限并损失当前值百分比。
-- 肉体能量系统：
-  - 攻击、受击、挖矿增加上限并消耗当前值。
-- 灵魂能量影响：
-  - 查克拉恢复速度。
-  - 忍术经验获取倍率。
-  - 忍术蓄力速度。
-- 肉体能量影响：
-  - 最大生命、护甲、生命回复、移动速度、攻击力、攻击速度。
-- 忍者经验：
-  - 禁用原版战斗获取 ninja XP。
-  - 禁用原版 ninja XP 生命加成。
-  - 禁用 `/addninjaxp` 的经验修改路径。
-  - 新增按 `min(soul.current, body.current)` 比例自动转化为 ninja XP。
-- 写轮眼进化：
-  - 原 1/2/3 勾玉进化改为灵魂能量阈值。
-  - 新增 3 勾玉到万花筒、万花筒到永恒万花筒的灵魂能量阈值进化。
-  - 覆盖头盔栏与 narutofix 虚拟瞳术槽。
-- 验证：
-  - IDEA MCP `compileJava --stacktrace` 通过。
-  - IDEA MCP `build --stacktrace` 通过。
-- 翻译：
-  - `Configs.java` 中所有 `@Config.Comment` 已统一翻译为中文。
-  - `en_us.lang` / `zh_cn.lang` 已补齐新增配置与 HUD/提示文本翻译。
-  - 翻译补齐后 IDEA MCP `compileJava --stacktrace` 通过。
-- HUD 贴图调整：
-  - `onOverlayEvent.java` 使用 `hud.png` 渲染三条能量条。
-  - `Configs.java` 的 HUD 偏移项作为相对快捷栏锚点的微调值。
-  - 调整后 IDEA MCP `compileJava --stacktrace` 与 `build --stacktrace` 均通过。
-- 最新 todo 修复：
-  - HUD 改为按原版快捷栏锚点计算，默认位于屏幕左侧与快捷栏左边缘之间，配置项作为微调偏移。
-  - HUD 当前值进度条改在贴图边框内部绘制，避免填充条偏下。
-  - ninja XP 转化不再周期性扣减灵魂/肉体当前值，只在两种能量较小当前值增长后按增长差值增加 ninja XP。
-  - 新增查克拉同步包，灵魂/肉体能量或 ninja XP 变化后同步客户端查克拉显示。
-  - 灵魂/肉体能量新增初始当前值配置，默认均为 `100.0`；初始上限也默认为 `100.0`。
-  - 最新 todo 调整后 IDEA MCP `compileJava --stacktrace` 与 `build --stacktrace` 均通过。
-- 2026-04-29 最新 todo 补充：
-  - HUD 三条能量条默认上移，避免查克拉条被快捷栏吞掉。
-  - HUD 会按“屏幕左边框到快捷栏左边缘”的可用宽度判断是否渲染文本；空间不足时只渲染三条条形进度。
-  - 通过 `MixinPathwayPlayer` 禁用原版 `Chakra.PathwayPlayer.onUpdate()` 中睡觉和静止触发的查克拉自然恢复。
-  - 新增低查克拉恢复：查克拉低于可配置比例时，同时消耗灵魂能量和肉体能量恢复查克拉，阈值、单 tick 消耗量、两种转化率均可配置。
-  - 新增低灵魂能量状态：低于可配置比例时施加反胃；睡觉或连续静止后缓慢恢复，睡觉/静止速度和静止 tick 均可配置。
-  - 新增低肉体能量状态：低于可配置比例时施加缓慢、挖掘疲劳、虚弱；快速消耗饱和度/饱食度恢复肉体能量，消耗速度和转化率可配置。
-  - 普通/金色兵粮丸现在恢复肉体能量；通过 `MixinItemMilitaryRationsPillFood` 禁用直接查克拉恢复，通过 `MixinProcedureChakraRegenerationOnPotionActiveTick` 禁用兵粮丸药水带来的间接查克拉恢复。
-  - 因陀罗血脉按配置将初始灵魂能量上限/当前值提高到默认值倍率，阿修罗血脉按配置将初始肉体能量上限/当前值提高到默认值倍率；对应低能量恢复倍率也可配置。
-  - `BloodlineAbilityHandler` 不再给因陀罗直接每秒恢复查克拉，避免绕过新的低查克拉能量转化规则。
-  - IDEA MCP `compileJava --stacktrace --rerun-tasks` 通过。
-  - IDEA MCP `build --stacktrace --rerun-tasks` 通过。
-- HUD 微调：
-  - 底部到快捷栏的默认净距按 `HUD_HOTBAR_VERTICAL_GAP - hudYOffset` 从约 10px 调整到约 20px，整体上移 10px。
-  - 快捷栏左侧安全距离从 4px 调整到 16px，避免能量条过于贴近快捷栏。
-  - HUD 在左侧可用空隙内不再取 1/2 居中，而是取剩余空隙的 2/5 作为左边距，整体向左但仍保留边距。
-  - 文本到能量条距离改为“当前语言最长 HUD 标签宽度 + 6px”，替代原固定 42px 文本列，中文环境下“查克拉”到条的间距约为 6px。
-  - HUD 条高度按贴图切片 V 坐标 `0/10/20/30` 从 8px 调整为 10px，避免每条底部 2px 被裁掉；12px 行距保留 2px 条间间隔。
-  - HUD 条宽度从 80px 调整为 82px，补足右侧被截断的 2px；内部满值填充宽度仍按左右各 1px 边框计算为 80px。
-  - IDEA MCP `compileJava --stacktrace --rerun-tasks` 通过。
-  - IDEA MCP `build --stacktrace` 通过。
-- 文档补充：
-  - 新增 `docs/new-features.md`，集中说明能量系统、HUD、低能量循环、兵粮丸、血脉倍率、ninja XP 和写轮眼进化等新增功能。
-  - 文档补齐管理指令、配置范围、技术实现范围、验证状态和上线前验收重点，方便后续 runClient 实机验收与合并回 `2836` 前评估。
-  - 新增文档后 IDEA MCP `build --stacktrace` 再次通过，Gradle 任务均为 up-to-date。
+| 项目总需求                                                                                          | 当前实现                                                                                                                   | 实现情况      | 说明                                                       |
+|------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|-----------|----------------------------------------------------------|
+| 项目基础：Minecraft 1.12.2 Forge mod，Java 8；保留 Gradle 运行时 `narutomod` 依赖；新功能先在功能分支完成，验证后再合回 `2836`。 | 当前分支为 `feature/energy-system`；`build.gradle` 仍保留运行时 narutomod 运行依赖；本地参考源码已拉取到 `/root/workspace/naruto_mod_0.3.1`。      | 进行中       | 功能分支尚未合回 `2836`，原因是缺少最终客户端画面验收。                          |
+| 新增灵魂能量系统：配置、Forge capability、当前值和最大值、NBT 持久化、玩家 clone 数据继承、死亡衰减、击杀增长。                          | 已新增灵魂能量配置与 capability；支持当前值、最大值、NBT、clone、死亡当前值衰减、击杀非玩家实体增长当前值和上限；初始当前值和上限默认 100 且可配置。                                 | 已实现，待实机验收 | 自动编译和构建已通过；仍需在客户端流程确认击杀、死亡、同步与 HUD/背包显示联动。               |
+| 新增肉体能量系统：配置、Forge capability、当前值和最大值、NBT 持久化、玩家 clone 数据继承、攻击/受击/挖矿增长上限并消耗当前值。                 | 已新增肉体能量配置与 capability；支持当前值、最大值、NBT、clone；攻击、受击、挖矿会按配置增长上限并消耗当前值；初始当前值和上限默认 100 且可配置。                                  | 已实现，待实机验收 | 自动编译和构建已通过；仍需实机确认事件触发、数值同步和显示刷新。                         |
+| 肉体能量影响玩家属性：最大生命、护甲、生命回复、移动速度、攻击力、攻击速度。                                                         | 已实现肉体能量驱动的属性加成与生命回复逻辑。                                                                                                 | 已实现，待实机验收 | 需要在游戏内属性面板、战斗、移动和回血体验中确认数值效果。                            |
+| 灵魂能量影响查克拉恢复、忍术经验倍率、忍术蓄力速度。                                                                     | 已通过事件、Mixin 和统一逻辑接入灵魂能量对查克拉与忍术相关行为的影响。                                                                                 | 已实现，待实机验收 | 需要在实际忍术使用和查克拉变化中确认倍率体验。                                  |
+| 禁用 narutomod 原版查克拉自然恢复中睡觉和静止带来的绕过路径；低查克拉时改为消耗灵魂和肉体能量恢复查克拉。                                     | 已通过 `MixinPathwayPlayer` 禁用原版睡觉和静止自然恢复；已新增低查克拉恢复逻辑，按配置同时消耗灵魂和肉体能量并恢复查克拉。                                               | 已实现，待实机验收 | 编译通过；需要实机确认低查克拉阈值、消耗量、恢复量和客户端同步。                         |
+| HUD 改造：显示灵魂、肉体、查克拉三条 HUD；屏蔽 narutomod 原版查克拉 HUD；位置适配原版快捷栏区域。                                   | 已用 `textures/gui/hud.png` 渲染三条能量条；默认位于屏幕左侧与快捷栏左边缘之间；空间不足时隐藏文字只保留条；已屏蔽原版查克拉 HUD。                                        | 已实现，待实机验收 | 编译和构建通过；仍需在不同分辨率、GUI Scale 和真实画面中确认位置、贴图切片与遮挡情况。         |
+| 修复 HUD 细节：HUD 上移、左侧安全距离、文本到条距离、条高和条宽、进度填充位置。                                                   | 已调整默认净距、左侧安全距离、动态文本列宽、10px 条高、82px 条宽和边框内填充。                                                                           | 已实现，待实机验收 | 这些是视觉细节，必须在客户端截图或目视中确认最终效果。                              |
+| 指令需求：新增 `/soulenergy` 和 `/bodyenergy`，支持查询、设置、增减当前值和最大值。                                       | 已新增 `/soulenergy` 与 `/bodyenergy`；支持目标玩家、get/set/add、current/max 和可选数值参数。                                              | 已实现，待实机验收 | 需要在服务器或客户端实际执行后确认权限、参数、反馈和同步。                            |
+| 禁用或废弃原版及 narutomod 的 `/addninjaxp` 经验修改路径。                                                     | 已禁用原版 `/addninjaxp` 的经验修改路径。                                                                                           | 已实现，待实机验收 | 需要进游戏确认指令不可绕过新经验系统。                                      |
+| 忍者经验系统重写：禁用原版战斗 ninja XP 获取，禁用原版 ninja XP 生命加成，改为按灵魂和肉体当前值较小值的增长差值贡献/派生。                  | 已禁用原版战斗经验和原版 ninja XP 生命加成；ninja XP 改为只在灵魂/肉体较小当前值增长后按增长差值增加，不再周期性扣减两种能量。命名从“转化(conversion)”修正为“贡献/派生(contribution)”。                                              | 已实现，待实机验收 | 自动验证通过；仍需实机确认战斗不再给原版经验、能量不会自然流逝、经验只走新贡献派生路径。               |
+| 写轮眼进化重做：1/2/3 勾玉、万花筒、永恒万花筒按灵魂能量阈值进化，覆盖头盔栏和虚拟瞳术槽。                                               | 已将写轮眼进化改为灵魂能量阈值，并覆盖头盔栏与 narutofix 虚拟瞳术槽。                                                                               | 已实现，待实机验收 | Mixin 编译通过；仍需 runClient 日志和实际进化流程确认无 runtime 注入问题。       |
+| 低灵魂能量状态：低于阈值施加反胃；睡觉或连续静止后恢复，恢复速度可配置并受血脉倍率影响。                                                   | 已新增低灵魂状态、反胃效果、睡觉/静止恢复和相关配置；因陀罗恢复倍率已接入。                                                                                 | 已实现，待实机验收 | 需要在游戏内确认状态触发、恢复条件和显示刷新。                                  |
+| 低肉体能量状态：低于阈值施加缓慢、挖掘疲劳、虚弱；消耗饱食度和饱和度恢复肉体能量。                                                      | 已新增低肉体状态、三个负面效果、饱食度/饱和度转化恢复和相关配置；阿修罗恢复倍率已接入。                                                                           | 已实现，待实机验收 | 需要在游戏内确认饥饿消耗、效果触发、恢复速率和显示刷新。                             |
+| 兵粮丸改造：普通和金色兵粮丸恢复肉体能量，不再直接或通过查克拉再生药水恢复查克拉。                                                      | 已让普通/金色兵粮丸恢复肉体能量；已通过 Mixin 禁用直接查克拉恢复和兵粮丸药水间接查克拉恢复。                                                                     | 已实现，待实机验收 | 需要实机吃药确认只恢复肉体能量，不绕过低查克拉能量转化规则。                           |
+| 血脉倍率：因陀罗提高初始灵魂能量上限/当前值和恢复倍率；阿修罗提高初始肉体能量上限/当前值和恢复倍率；避免因陀罗直接绕过新规则恢复查克拉。                          | 已按配置接入因陀罗/阿修罗初始能量倍率和恢复倍率；`BloodlineAbilityHandler` 不再给因陀罗直接每秒恢复查克拉。                                                    | 已实现，待实机验收 | 需要在拥有不同血脉的新玩家和旧玩家上确认初始化、补偿和恢复倍率。                         |
+| 查克拉同步：灵魂/肉体能量或 ninja XP 变化后同步刷新客户端查克拉显示。                                                       | 已新增 `PacketSyncChakra` 与 `ChakraSyncHelper`，在登录、维度切换、重生、指令修改、灵魂/肉体能量变化和 ninja XP 变化后刷新客户端查克拉状态。                        | 已实现，待实机验收 | 需要在客户端 HUD 与背包显示中确认同步及时且无闪烁或滞后。                          |
+| 配置与本地化：新增配置需可调，配置注释中文化；新增 HUD、提示、背包信息需中英文文本。                                                   | `Configs.java` 配置注释已中文化；`zh_cn.lang` / `en_us.lang` 已补齐新增配置、HUD、提示和背包展示文本。                                             | 已实现       | 文本层面已完成；仍需实机确认 GUI 文本是否过长或溢出。                            |
+| 功能说明文档：集中说明新增能量系统、HUD、低能量循环、兵粮丸、血脉倍率、ninja XP 和写轮眼进化等新增功能。                                     | 已新增 `docs/new-features.md`。                                                                                            | 已实现       | 详细过程和每轮记录保留在 `docs/project.md`。                          |
+| 最新 AGENTS.md 需求：在玩家背包页面顶部或底部插入血脉、身体能量、灵魂能量、查克拉能量及实时回复速度，并适配原版缩放。                               | 已新增统一实时回复快照；已新增背包前景层渲染；已显示血脉、身体/灵魂/查克拉当前值、最大值和每秒回复速度；布局支持下方、上方、紧凑、两列、短文本降级。                                            | 已实现，待实机验收 | 当前最大缺口。无显示环境下 `runClient` 停在 LWJGL 窗口初始化，无法进入世界打开背包确认画面。 |
+| 产品上线验证：`compileJava`、`build`、`runClient`、客户端背包 GUI、HUD、指令、事件、低能量、血脉、写轮眼等全链路冒烟通过后才能合回 `2836`。   | IDEA MCP 文件检查、`compileJava --stacktrace --rerun-tasks`、`build --stacktrace` 均通过；`runClient` 日志确认 mod 加载流程启动但无法完成窗口初始化；已新增 `docs/validation-checklist.md` 用户自验清单。 | 待用户自验 | 用户按 `docs/validation-checklist.md` 清单自行在客户端实机验证全部项目。全部通过后视为具备合回 `2836` 条件。代理不再代行 `runClient`。 |
+| 用户自验清单文档化（Plan 13.7）                                                                                             | 已新增 `docs/validation-checklist.md`，覆盖背包 GUI/HUD/血脉/能量/查克拉/兵粮丸/写轮眼/指令/旧存档兼容等章节，每条含操作步骤/预期现象/异常反馈要点。                          | 已实现       | 文档已落地，未执行 `runClient`。代理侧上线状态不变。用户须凭此清单自行完成客户端实机验证。                     |
+| 血脉初始加成立即发放与版本化对齐（Plan 13.1）— 觉醒事件立即发放 max+current 全额加成；旧存档仅 max 对齐、不覆盖 current；版本字段写入 Soul/Body capability NBT | 已新增 `BloodlineEnergyBonusApplier` 统一入口；觉醒时即时调用 `applyForNewAwakening`；`EnergyStateHandler` tick 兜底改为 `applyFallback`（仅 max 对齐）；Soul/Body capability 新增 `dataVersion` / `bloodlineAppliedVersion` 字段及 NBT 读写；版本常量 `CURRENT_VERSION=1`，缺字段默认 0 兼容旧存档；`PlayerAwakeningActions.unlockBloodline` 接入发行路径（含第二血脉白绝觉醒） | 已实现，待实机验收 | `compileJava --stacktrace --rerun-tasks` 通过。需用户 `runClient` 验证新觉醒即时生效、旧存档登录后只 max 对齐、已有版本标记不重复发放。 |
+| ninja XP 派生命名修正、旧配置兼容与指令 reset baseline（Plan 13.2） | 已修复 Configs.java 分类名回 `XP Conversion Settings` 以保证旧配置 section 可读；已保留旧字段 `ninjaXpConversionRate`/`ninjaXpConversionIntervalTicks` 作为 deprecated fallback；effective getter 新增迁移日志；`NinjaXpConversionHandler.resetBaseline` 已实现；`/soulenergy` `/bodyenergy` 指令 set/add 后已调用 resetBaseline；派生路径不扣减 soul/body | 已实现，待实机验收 | `compileJava --stacktrace --rerun-tasks` 通过。需用户 `runClient` 确认旧配置加载、指令 set 后 ninja XP 不巨量补发。 |
+| 静止自然回复查克拉与创造模式 body 独立恢复（Plan 13.3）— 玩家静止时非低查克拉状态自然恢复查克拉；创造模式 body 未满即按独立速率恢复，不消耗饱食度 | 已移除旧版无成本静止自然查克拉恢复，替换为下蹲静止查克拉转化；创造模式 body 独立恢复保留且不受影响 | 已替换 (P0/P1) | `chakraStationary` 配置标注为 deprecated 保留兼容，不再默认生效。创造模式 body 恢复仍走 `creativeBody` 配置。 |
+| 兵粮丸 BODY_ONLY 语义文案修正（Plan 13.4）— 保留兵粮丸"只直接恢复肉体能量"的现有行为，通过 tooltip / lang / docs 明确语义，消除玩家预期误差 | 已在 `MixinItemMilitaryRationsPillFood` 的 `addInformation` TAIL 注入中，先移除 narutomod 原版查克拉恢复 tooltip（按 lang key 翻译值精准匹配删除），再追加 narutofix 两行更正 tooltip；`zh_cn.lang` / `en_us.lang` 新增 `tooltip.narutofix.military_rations_pill.info` 与 `.info2` 中英文双语 key | 已实现，待实机验收 | `compileJava --stacktrace --rerun-tasks` 已通过。需 `runClient` 确认旧误导文本不再显示，narutofix 修正文本正确呈现于 tooltip。 |
+| 写轮眼进化来源配置化（Plan 13.5）— 新增配置 `sharinganEvolutionSource`，取值 VANILLA（仅原版 narutomod 规则）/ SOUL（仅灵魂能量阈值并屏蔽原版进化）/ BOTH（原版规则或灵魂阈值任一满足即可触发），默认 BOTH 兼容现状 | 已新增 Configs.SharinganEvolutionSource 枚举与配置项；`mixinPathway.onUpdate2` 在 VANILLA 时跳过 soul 进化，在 SOUL/BOTH 时运行 soul 进化；`MixinProcedureSharinganHelmetTickEvent` 在 SOUL 时 @Inject HEAD cancellable 取消整个原版进化过程并仅在 SOUL 下兜底拦截 BATTLEXP；VANILLA/BOTH 均不拦截原版 BATTLEXP 读取；中英文 lang 新增配置 key | 已实现，待实机验收 | `compileJava --stacktrace --rerun-tasks` 已通过。需 `runClient` 确认三种取值下写轮眼进化行为符合预期。 |
+| ChakraSyncHelper 脏标记合并同步（Plan 13.6）— 脏标记合并同步避免同 tick 多次发包；关键路径 flushNow、普通路径 tick 末 flush | 已新增 dirty flag Set（UUID）；`refresh()` 只设脏标记不立即发包；`flushNow()` 用于登录/切维度等关键路径立即同步；`flushDirtyPlayers()` 在 `ServerTickEvent.Phase.END` 统一发送；玩家下线 `removePlayer()` 清理脏标记防止内存泄漏 | 已实现，待实机验收 | ServerTickEvent 脏标记合并已在多个 tick 间隔压缩重复刷新请求。需 `runClient` 确认登录、维度切换、能量变化后同步及时无闪烁。 |
+| 最新 AGENTS.md 需求：将代码中，天手力引用的白眼特性转为自己的代码，不再与 narutomod 耦合；将 javadoc 的警告消除。 | 已新增 `AmenotejikaraOverlayState` 和 `PacketAmenotejikaraOverlay`；`AmenotejikaraOverlayHandler` 仅读取 narutofix 自有短时状态；`SixTomoeRinneganLogic` 的天手力激活/关闭改为自有 packet；`PacketSyncChakra` 的 raw type warning 已修为参数化类型；`DojutsuEyeHandler`、`EyeInventoryManager`、`BloodlineEnergyBonusApplier` 补齐 Javadoc `@param`，`javadoc --rerun-tasks` 已通过。 | 已实现，待实机验收 | 天手力视觉不再直接依赖 `OverlayByakuganView.byakuganActivated` 或 `OverlayByakuganView.sendCustomData(...)`；仍需 `runClient` 实机确认视觉时长、清理和相机效果。 |
+| P0: 修复 10/s 查克拉回复显示与实际不生效的口径 — HUD/背包只显示实际可执行的 recovery，余额不足/条件不满足时 recovery=0；修复服务端 pathway 获取为 null 导致恢复不执行 | 已移除旧版静止自然恢复分支；服务端 `EnergyStateHandler` 不再使用 `Chakra.isInitialized`（客户端专用）作 gate，直接调用 `Chakra.pathway(player)` 获取 Pathway；紧急恢复在查克拉低时正常执行；背包 chakra Entry 不再将 crouch gain 放到 drainPerTick | 已实现，待实机验收 | 服务端 `Chakra.isInitialized` 是 `@SideOnly(Side.CLIENT)` 方法，服务端访问始终返回 false，导致 pathway=null 且所有 P0/P1 检查恢复不执行。已改为 `Chakra.pathway(player)` 服务器端安全调用。旧 `chakraStationary` 配置保留 deprecated。 |
+| P1: 下蹲静止查克拉转化 — 背包 Entry 显示修正：chakra gain 进入 recovery，soul/body cost 进入 drain，recovering 不再误判 | 已新增 crouch exchange 执行与评估；Entry 构造改为 per-tick 等效值：triggerIntervalTicks 分摊后 chakra gain 进 recovery，soul/body cost 进 drain；soul/body recovering 不再基于 `crouchCost <= 0` | 已实现，待实机验收 | 默认每 20 tick 触发一次，扣 3 body + 1 soul 回 10 chakra。背包 chakra net 为正值。soul/body 显示 per-tick 成本。 |
+| P2: 修复 body food debt 累积 bug — 默认 allowConsumeHunger=false 时不无限累积 debt（防止后期开启后一次性扣爆）；allowConsumeHunger 配置化 | `previewFoodConsumption` 在 `!allowConsumeHunger` 时直接返回 `debtAfter=0`（不清零已消耗的 saturation，但不累积 unconsumed 部分）；`handleLowBody` 写回 debtAfter=0；`applyFoodConsumption` 在 `!allowConsumeHunger` 时不写 debt | 已实现，待实机验收 | 默认不扣 foodLevel 也不累积巨额 debt。saturation=0 时 body 不恢复、debt=0。allowConsumeHunger=true 时才累积并 floor 扣减 foodLevel。 |
+| P3: 睡觉一次性恢复 — 醒来时恢复 soul max 的 30% + body max 的 10%（`min(max*percent, max-current)`），可配置 | 已改为 `PlayerWakeUpEvent` + `!wakeImmediately()` 事件驱动，不再用 ticksExisted 差值判定；`minimumSleepTicks` 标注 @Deprecated 保留兼容；`calculateSleepRecovery` 公式已修正 | 已实现，待实机验收 | 旧公式是"补到 30%"（扣除已满部分），新公式是"回复 30%"（min of 30% and 剩余空间）。ESC 短睡不触发。ticksExisted 跳时不增，旧 tick-count 方案不可靠。 |
+| 每次重进游戏之后，肉体和灵魂当前值变成了 100，应该是同步没有做。 | `EnergySyncHandler` 已挂到事件总线，并在登录/进维度/重生及 `EntityJoinWorldEvent` 做 soul/body/chakra 的统一补同步；`PacketSyncSoulEnergy` / `PacketSyncBodyEnergy` 仍采用当前值 + 最大值覆盖客户端。 | 已实现，待实机验收 | 这条更像登录态时序问题，现阶段需要实机确认重进后不会再被默认值覆盖。 |
+| AGENTS.md Bug 2：没有消耗饱食度回复肉体能量。低阈值时全量消耗食品资源（饱和度无上限 + 饱食度吃到 minFoodLevel），非低阈值时饱和度无上限 + 饱食度吃到 18。 | `calculateBodyRecovery` 去掉了 `!low` 守卫，只有 `current >= max` 才退；`previewFoodConsumption` / `applyFoodConsumption` 统一改为始终消耗 foodLevel，底线根据 `isLow()` 动态取 `minFoodLevelForLowBody`（默认 2.0）或 18.0；`BODY_FOOD_MIN_REMAINING` 常量移除；`allowConsumeHunger` 默认改为 `true`；新增 `minFoodLevelForLowBody` 配置项默认 2.0。 | 已实现，待实机验收 | compileJava 通过。需用户 runClient 实机确认饱食度/饱和度消耗符合预期。 |
+| AGENTS.md Bug 1：下蹲快回满查克拉回不满，一直扣查克拉上限值。 | `MixinPathwayPlayer.resetMax` 公式 `soul.current + body.current` -> `soul.max + body.max`；删除 `narutofix$addSoulBodyBeforeSync`（double count）。 | 已实现，待实机验收 | compileJava 通过。需用户 runClient 实机确认下蹲转化不再降低 chakra max。 |
+| 修改因陀罗和阿修罗对初始值的增益，配置文件写成固定值，让玩家自定义。 | 因陀罗/阿修罗初始加成已从倍率改为固定值配置：`indraInitialSoulBonusMax/Current`、`asuraInitialBodyBonusMax/Current`。旧倍率字段仍留作兼容未清理。 | 已实现，待实机验收 | 新建角色的起始值现在可直接按固定值配置，但旧配置项还没完全清理。 |
+| 清理旧的配置项，那些原来无用的血脉配置清理掉。 | 已移除 `Configs.upgrade`（旧写轮眼进化阈值）、`ChakraStationaryRecoveryConfig`（废弃静止恢复）、`minimumSleepTicks`（废弃最少睡觉刻数）及其对应 lang 键。仍保留 `asuraHealthBonus`/`asuraHealPerSecond`、`dualBloodlineResistanceAmplifier` 这些还被 `BloodlineAbilityHandler` 使用的字段。 | 已实现 | 兼容字段（`ninjaXpConversionRate` 等）保持不动，因为还有 `getEffectiveXxx` 迁移逻辑依赖它们。 |
+| 死亡后查克拉丢失修复。 | 新增 `MixinChakraPlayerHookOnDeath`，拦截 `Chakra.PathwayPlayer.PlayerHook.onDeath` 的服务端分支，防止查克拉被重置为 0 并从 playerMap 中移除。 | 已实现，待实机验收 | 需要用户 runClient 确认死亡复活后查克拉保留在死亡前的值，不再归零。 |
+| 查克拉上限未根据灵魂/肉体能量变化。 | 修改 `MixinPathwayPlayer`，用 `@Redirect` 拦截 `resetMax()` 和 `onUpdate()` 中的 `setMax(D)` 调用，在参数 `d`（即 `BATTLEXP * 0.5`）上追加 `soul.current + body.current`。原公式 `BATTLEXP * 0.5` 变为 `BATTLEXP * 0.5 + soul.current + body.current`。 | 已实现，待实机验收 | 需注意：IDE 对 `@Redirect` 匹配有假阳性误报，但 Gradle Mixin AP 正确解析。需要 runClient 确认查克拉上限随灵魂/肉体能量变化而实时更新。 |
+| 六勾玉轮回眼在头盔槽无法激活须佐。 | 修改 `MixinProcedureSusanoo`，在虚拟瞳术槽为空时检查头盔槽是否有六勾玉轮回眼，有则以其为 effectiveEye 拦截并激活须佐；`hasRinneganSupport` 同步覆盖头盔槽六勾玉。 | 已实现，待实机验收 | `compileJava --stacktrace --rerun-tasks` 通过。需用户 `runClient` 确认六勾玉在头盔槽时须佐正常激活/关闭，debuff 正确。 |
+| 身体能量属性加成过高导致瞬移/秒杀等问题。 | 在 `Configs.BodyEnergyConfig` 新增 4 个上限配置（maxArmor=30, maxMoveSpeedMultiplier=2.0, maxAttackDamageMultiplier=10.0, maxAttackSpeedMultiplier=3.0）；`BodyAttributeHandler` 应用 modifier 时取 `min(计算值, cap)`。 | 已实现，待实机验收 | MAX_HEALTH 和 HP Regen 不加 cap（用户要求），其他四个属性上限均可配置。`compileJava` 通过。 |
+| 高血量时原版心形渲染溢出 HUD 区域。 | 新增 `HealthBarOverlayHandler`，拦截 `RenderGameOverlayEvent.Pre(HEALTH)`；替换为 120×8 紧凑进度条 + HP 数值文案；`Configs` 新增 `enableCompactHealthBar` 开关，关闭则走原版渲染。 | 已实现，待实机验收 | 由配置 `enableCompactHealthBar` 控制，居中显示 "当前HP/最大HP"。`compileJava` 通过。 |
+| AGENTS.md Todo: 血条渲染时护甲和饱食度也被取消 | 在 `HealthBarOverlayHandler` 中添加 GL 状态保护（pushMatrix/popMatrix + 显式 restore texture/blend/color） | 已实现，待实机验收 | `compileJava` 通过。需要在 `runClient` 中确认开/关紧凑血条时 ARMOR/FOOD 正常渲染。 |
+| AGENTS.md Todo: 新增玩家进入时就是忍者，直接达成成就 | 新增 `FirstJoinHandler` 在 `PlayerLoggedInEvent` 中检测首次进入，设置 BATTLEXP=1.0 并授予 ninjaachievement | 已实现，待实机验收 | 老玩家（BATTLEXP>0）自动跳过。`compileJava` 通过。 |
 
-## 上线前剩余风险
-
-- 尚未执行最新改动后的 `runClient` 冒烟测试，无法确认客户端 HUD 实际左上微调位置、条高和条宽是否完整显示、窄屏只渲染条逻辑、`hud.png` 三条切片视觉效果、查克拉同步包、低能量状态、兵粮丸改造、Mixin runtime 注入、虚拟瞳术槽进化和属性同步在游戏内全链路无误。
-- `MixinPathwayPlayer`、`MixinItemMilitaryRationsPillFood`、`MixinProcedureChakraRegenerationOnPotionActiveTick` 编译通过，但仍必须在 runClient 日志中确认 Mixin apply 无 runtime 警告。
-- `MixinProcedureSharinganHelmetTickEvent` 通过定点 redirect 禁用原版万花筒进化，编译通过但仍建议在 runClient 日志中确认无 Mixin apply 警告。
-- `JutsuXpGainHandler` 使用独立伤害事件给当前手持忍术/八门增加经验，实际体验数值需要进游戏按配置调试。
-
-## 与产品上线对比
-
-当前状态是“可构建但未完成实机验收”。距离上线还差一次客户端冒烟验收：
-
-1. 创建/进入世界后 HUD 显示三条能量，位于屏幕左侧与快捷栏之间，原版查克拉 HUD 不再显示。
-2. `/soulenergy`、`/bodyenergy` 指令能读写并立即同步 HUD。
-3. 击杀、死亡、攻击、受击、挖矿触发对应能量变化，静置时灵魂/肉体能量不自然下降。
-4. 肉体能量属性加成在属性面板/实际战斗中生效。
-5. 静止和睡觉不再触发原版查克拉自然恢复；查克拉低于阈值时只通过消耗灵魂/肉体能量恢复。
-6. ninja XP 只通过新转化系统增长，不再通过原版战斗增长，也不造成灵魂/肉体能量自然流逝。
-7. 灵魂能量低量时反胃并通过睡觉/静止恢复；肉体能量低量时三个负面效果并通过饱食度恢复。
-8. 兵粮丸只恢复肉体能量，不再直接或通过查克拉再生药水恢复查克拉。
-9. 因陀罗/阿修罗初始能量倍率和恢复倍率按配置生效。
-10. 写轮眼按灵魂能量从 1 勾玉到永恒万花筒完整进化。
+| 须佐能乎重写：新建独立实体体系，低耦合。 | 已新建 18 个文件约 4137 行代码，含三形态实体、AI、模型渲染、召唤逻辑 | 已实现，待实机验收 | 继承 EntityCreature 而非 narutomod 的 EntitySusanooBase，仅通过 Chakra.pathway()/PlayerTracker/DojutsuEyeHelper 三个静态点交互 |
+| 须佐入口接管 narutomod：原版 summon/upgrade 从 ProcedureSusanoo 重定向到新系统 | mixinProcedureSusanoo 使用 @Inject HEAD cancellable 彻底替换原版 execute/upgrade | 已实现 | 原版按键/事件自动路由到新实体 |
+| 六勾玉轮回眼可召唤须佐 | DojutsuEyeHelper.getCompatibleSusanooEye() 已包含 ModItems.SIX_TOMOE_RINNEGAN | 已实现 | 无需额外配置 |

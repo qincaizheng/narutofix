@@ -28,7 +28,7 @@ tooltip.sharingan1.descr=Amount less then
 narutofix.miss1=sharingan-1 miss amonut
 narutofix.miss2=sharingan-2 miss amonut
 narutofix.susanoo.unride=unrideable
-narutofix.sharingan.upgrade=upgrade Sharingan
+narutofix.sharingan.evolution.source=Sharingan Evolution Source
 item.narutofix.eightgatestrue.name=True EightGates
 key.narutofix.switcheyes=switcheyes
 narutofix.command.narutofixset=/narutofixset <player> [cd|power] <value>
@@ -71,6 +71,20 @@ chattext.cooldown.formatted=Cooldown: %s s
 narutofix.hud.soul=Soul
 narutofix.hud.body=Body
 narutofix.hud.chakra=Chakra
+narutofix.inventory.bloodline.line=Bloodline: %s
+narutofix.inventory.bloodline.compact=Blood %s
+narutofix.inventory.bloodline.none=None
+narutofix.inventory.bloodline.indra=Indra
+narutofix.inventory.bloodline.asura=Asura
+narutofix.inventory.bloodline.both=Indra/Asura
+narutofix.inventory.energy.full=%s: %s/%s (%s/s)
+narutofix.inventory.energy.compact=%s %s/%s %s/s
+narutofix.inventory.energy.body=Body
+narutofix.inventory.energy.soul=Soul
+narutofix.inventory.energy.chakra=Chakra
+narutofix.inventory.energy.body.short=B
+narutofix.inventory.energy.soul.short=S
+narutofix.inventory.energy.chakra.short=C
 narutofix.hud.xoffset=HUD X Offset
 narutofix.hud.yoffset=HUD Y Offset
 narutofix.soul.settings=Soul Energy Settings
@@ -101,9 +115,9 @@ narutofix.hp.regen.per.body=HP Regen Per Body
 narutofix.move.speed.per.body=Move Speed Per Body
 narutofix.attack.damage.per.body=Attack Damage Per Body
 narutofix.attack.speed.per.body=Attack Speed Per Body
-narutofix.xp.conversion.settings=XP Conversion Settings
-narutofix.ninja.xp.conversion.rate=Ninja XP Conversion Rate
-narutofix.xp.conversion.interval=XP Conversion Interval
+narutofix.xp.conversion.settings=XP Contribution Settings
+narutofix.ninja.xp.conversion.rate=Ninja XP Contribution Rate
+narutofix.xp.conversion.interval=XP Contribution Interval
 advancements.achievement_get_indrachakra.title=Get Indra's chakra
 advancements.achievement_get_indrachakra.descr=You feel an extra chakra leaning toward yin release inside you.
 advancements.achievement_get_asurachakra.title=Get Asura's chakra
@@ -112,3 +126,25 @@ advancements.achievement_indra_reincarnation.title=Indra reincarnation
 advancements.achievement_indra_reincarnation.descr=You feel another powerful yin chakra inside you.
 advancements.achievement_asura_reincarnation.title=Asura reincarnation
 advancements.achievement_asura_reincarnation.descr=You feel another powerful yang chakra inside you.
+
+# Military rations pill tooltip (Plan 13.4)
+tooltip.narutofix.military_rations_pill.info=§7Restores body energy directly, not chakra directly
+tooltip.narutofix.military_rations_pill.info2=§7When chakra is low, may indirectly assist chakra recovery through the energy system
+
+# P2: Body Energy - Allow Consume Hunger
+narutofix.config.body.allowConsumeHunger=Allow Consume Hunger
+
+# P1: Crouch Stationary Chakra Exchange
+narutofix.config.chakraCrouchExchange=Crouch Chakra Exchange Settings
+narutofix.config.chakraCrouchExchange.enabled=Enabled
+narutofix.config.chakraCrouchExchange.requiredTicks=Required Stationary Ticks
+narutofix.config.chakraCrouchExchange.triggerIntervalTicks=Trigger Interval Ticks
+narutofix.config.chakraCrouchExchange.soulCostPerTrigger=Soul Cost Per Trigger
+narutofix.config.chakraCrouchExchange.bodyCostPerTrigger=Body Cost Per Trigger
+narutofix.config.chakraCrouchExchange.chakraGainPerTrigger=Chakra Gain Per Trigger
+narutofix.config.chakraCrouchExchange.insufficientPolicy=Insufficient Policy
+
+# P3: Sleep Recovery
+narutofix.config.sleep=Sleep Recovery Settings
+narutofix.config.sleep.soulRecoveryPercent=Soul Recovery Percent
+narutofix.config.sleep.bodyRecoveryPercent=Body Recovery Percent

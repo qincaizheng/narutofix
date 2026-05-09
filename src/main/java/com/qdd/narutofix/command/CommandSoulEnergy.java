@@ -2,6 +2,7 @@ package com.qdd.narutofix.command;
 
 import com.qdd.narutofix.cap.soul.ISoulEnergyData;
 import com.qdd.narutofix.cap.soul.SoulEnergyDataProvider;
+import com.qdd.narutofix.handler.NinjaXpConversionHandler;
 import com.qdd.narutofix.network.PacketSyncSoulEnergy;
 import com.qdd.narutofix.util.ChakraSyncHelper;
 import net.minecraft.command.CommandBase;
@@ -83,6 +84,7 @@ public class CommandSoulEnergy extends CommandBase {
         } else {
             addValue(data, field, value);
         }
+        NinjaXpConversionHandler.resetBaseline(player);
         PacketSyncSoulEnergy.sync(player);
         ChakraSyncHelper.refresh(player);
         sender.sendMessage(new TextComponentString(player.getName() + " soul = " + (int) data.getCurrent() + "/" + (int) data.getMax()));

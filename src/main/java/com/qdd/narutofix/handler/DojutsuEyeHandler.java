@@ -2,14 +2,11 @@ package com.qdd.narutofix.handler;
 
 import com.qdd.narutofix.items.ItemSixTomoeRinnegan;
 import com.qdd.narutofix.util.DojutsuEyeHelper;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
-import net.narutomod.entity.EntitySusanooBase;
 import net.narutomod.item.ItemMangekyoSharinganEternal;
 import net.narutomod.item.ItemSharingan;
-import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -23,14 +20,6 @@ public class DojutsuEyeHandler {
         }
 
         EntityPlayer player = event.player;
-        if (event.phase == TickEvent.Phase.START) {
-            this.reattachSusanooRider(player);
-            return;
-        }
-
-        // Safety: clean up orphaned susanoo_activated state
-        // (e.g. entity died from chakra depletion or combat without proper cleanup)
-        this.cleanupOrphanedSusanoo(player);
 
         ItemStack eyeStack = DojutsuEyeHelper.getCapabilityEye(player);
         if (eyeStack.isEmpty() || eyeStack.equals(DojutsuEyeHelper.getHeadEye(player))) {
@@ -58,32 +47,6 @@ public class DojutsuEyeHandler {
     }
 
     /**
-     * Prevents all voluntary dismount from an active, living Susanoo.
-     * This reliably blocks shift-dismount (the original narutomod's approach of
-     * setSneaking(false) in onLivingUpdate has a race condition with tick order).
-     *
-     * Deactivation is done via ProcedureSusanoo.execute() which kills the
-     * entity by stored ID. The dead entity is removed next tick, auto-dismounting
-     * the rider - that auto-dismount passes through because the entity is no longer alive.
-     *
-     *
-     */
-    @SubscribeEvent
-    public void onEntityMount(EntityMountEvent event) {
-        if (event.getWorldObj().isRemote || event.isMounting()
-                || !(event.getEntityMounting() instanceof EntityPlayer)
-                || !(event.getEntityBeingMounted() instanceof EntitySusanooBase)) {
-            return;
-        }
-
-        EntityPlayer player = (EntityPlayer) event.getEntityMounting();
-        Entity mounted = event.getEntityBeingMounted();
-        if (player.getEntityData().getBoolean("susanoo_activated") && mounted.isEntityAlive()) {
-            event.setCanceled(true);
-        }
-    }
-
-    /**
      * Replicates the durability consumption from ItemSharingan.Base.onArmorTick for
      * eyes held in the capability slot. We cannot call onArmorTick for non-SixTomoe
      * eyes (it causes eye duplication), so only the durability part is reproduced here.
@@ -107,7 +70,6 @@ public class DojutsuEyeHandler {
         }
 
         boolean abilityActive = player.getEntityData().getBoolean("amaterasu_active")
-                || player.getEntityData().getBoolean("susanoo_activated")
                 || player.getEntityData().getBoolean("kamui_teleport");
         if (!abilityActive) {
             return;
@@ -116,44 +78,5 @@ public class DojutsuEyeHandler {
         int damageAmount = base.isOwner(eyeStack, player) ? 3 : 9;
         int newDamage = eyeStack.getItemDamage() + damageAmount;
         base.forceDamage(eyeStack, Math.min(newDamage, eyeStack.getMaxDamage()));
-    }
-
-    private void cleanupOrphanedSusanoo(EntityPlayer player) {
-        if (!player.getEntityData().getBoolean("susanoo_activated")) {
-            return;
-        }
-        Entity riding = player.getRidingEntity();
-        if (riding instanceof EntitySusanooBase && riding.isEntityAlive()) {
-            return;
-        }
-        // susanoo_activated is true but player is not on an alive Susanoo - clean up
-        player.getEntityData().removeTag("susanoo_activated");
-        player.getEntityData().removeTag("susanoo_ticks");
-        Entity oldEntity = player.world.getEntityByID(
-                player.getEntityData().getInteger("summonedSusanooID"));
-        player.getEntityData().removeTag("summonedSusanooID");
-        if (oldEntity != null) {
-            oldEntity.setDead();
-        }
-        if (player.isRiding()) {
-            player.dismountRidingEntity();
-        }
-    }
-
-    private void reattachSusanooRider(EntityPlayer player) {
-        if (!player.getEntityData().getBoolean("susanoo_activated") || player.getRidingEntity() instanceof EntitySusanooBase) {
-            return;
-        }
-
-        Entity summoned = player.world.getEntityByID(player.getEntityData().getInteger("summonedSusanooID"));
-        if (!(summoned instanceof EntitySusanooBase) || !summoned.isEntityAlive()) {
-            return;
-        }
-
-        if (DojutsuEyeHelper.getCompatibleSusanooEye(player).isEmpty()) {
-            return;
-        }
-
-        player.startRiding(summoned, true);
     }
 }

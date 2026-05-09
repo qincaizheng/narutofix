@@ -12,6 +12,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.narutomod.item.ItemDojutsu;
 import net.narutomod.item.ItemRinnegan;
 import com.qdd.narutofix.cap.awakening.IPlayerAwakeningData;
+import com.qdd.narutofix.util.BloodlineEnergyBonusApplier;
 
 import java.util.Random;
 
@@ -36,6 +37,9 @@ public final class PlayerAwakeningActions {
                 : reincarnation ? "message.narutofix.asura_reincarnation" : "message.narutofix.asura_awakened";
         notify(player, translationKey);
         playAwakeningSound(player);
+        if (player instanceof EntityPlayerMP) {
+            BloodlineEnergyBonusApplier.applyForNewAwakening((EntityPlayerMP) player, bloodline);
+        }
         return true;
     }
 

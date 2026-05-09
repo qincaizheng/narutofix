@@ -44,7 +44,7 @@ public final class EventLoader {
 //        System.out.println(event.getCommand().getName());
         if (event.getCommand().getName().equals("addninjaxp")) {
             event.setCanceled(true);
-            sender.sendMessage(new net.minecraft.util.text.TextComponentString("addninjaxp is disabled. Use soul/body energy conversion instead."));
+sender.sendMessage(new net.minecraft.util.text.TextComponentString("addninjaxp is disabled. Ninja XP is now derived from soul/body energy growth instead."));
         }
         if (event.getCommand().getName().equals("locateEntity")) {
             if (parameters.length == 4 && parameters[2].equals("gedo")&&parameters[3].equals("10")) {

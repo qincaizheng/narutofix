@@ -92,6 +92,9 @@ public final class EyeInventoryManager {
 
     /**
      * Claims ownership of an eye for the player if it has no owner yet.
+     *
+     * @param player player claiming the eye
+     * @param stack eye item stack to claim
      */
     public static void claimEyeOwnership(EntityPlayer player, ItemStack stack) {
         if (!isEyeItem(stack)) {

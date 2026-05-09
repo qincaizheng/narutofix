@@ -5,23 +5,19 @@ import com.qdd.narutofix.cap.body.BodyEnergyDataProvider;
 import com.qdd.narutofix.cap.body.IBodyEnergyData;
 import com.qdd.narutofix.cap.soul.ISoulEnergyData;
 import com.qdd.narutofix.cap.soul.SoulEnergyDataProvider;
-import com.qdd.narutofix.network.PacketSyncBodyEnergy;
-import com.qdd.narutofix.network.PacketSyncSoulEnergy;
 import com.qdd.narutofix.util.NinjaXpHelper;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class NinjaXpConversionHandler {
-    private static final String LAST_CONVERT_SOURCE = "narutofixLastNinjaXpConvertSource";
-    private static final String CONVERT_SOURCE_INITIALIZED = "narutofixNinjaXpConvertSourceInitialized";
 
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.END || event.player.world.isRemote || !(event.player instanceof EntityPlayerMP)) {
             return;
         }
-        int interval = Math.max(1, Configs.xpConversion.ninjaXpConversionIntervalTicks);
+        int interval = Math.max(1, Configs.xpConversion.getEffectiveContributionInterval());
         if (event.player.ticksExisted % interval != 0) {
             return;
         }
@@ -33,27 +29,20 @@ public class NinjaXpConversionHandler {
             return;
         }
 
-        double source = Math.min(soul.getCurrent(), body.getCurrent());
-        if (!player.getEntityData().getBoolean(CONVERT_SOURCE_INITIALIZED)) {
-            player.getEntityData().setBoolean(CONVERT_SOURCE_INITIALIZED, true);
-            player.getEntityData().setDouble(LAST_CONVERT_SOURCE, source);
-            return;
+        double targetBp = Math.min(soul.getMax(), body.getMax() / 4.0) * 2.0;
+        double currentBp = NinjaXpHelper.get(player);
+        if (targetBp > currentBp) {
+            NinjaXpHelper.add(player, targetBp - currentBp, false);
         }
+    }
 
-        double previousSource = player.getEntityData().getDouble(LAST_CONVERT_SOURCE);
-        player.getEntityData().setDouble(LAST_CONVERT_SOURCE, source);
-        double growth = source - previousSource;
-        if (growth <= 0.0D) {
-            return;
-        }
-
-        double converted = growth * Configs.xpConversion.ninjaXpConversionRate;
-        if (converted <= 0.0D) {
-            return;
-        }
-
-        NinjaXpHelper.add(player, converted, false);
-        PacketSyncSoulEnergy.sync(player);
-        PacketSyncBodyEnergy.sync(player);
+    /**
+     * Reset the ninja XP contribution baseline to the player's max min(soul.max, body.max).
+     * After calling this, subsequent ticks will only derive XP from growth that occurs after this point,
+     * preventing retroactive XP grants when soul/body are modified externally (e.g. via admin commands).
+     *
+     * @param player the player whose baseline should be reset
+     */
+    public static void resetBaseline(EntityPlayerMP player) {
     }
 }

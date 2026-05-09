@@ -22,7 +22,6 @@ import net.minecraft.world.World;
 import net.narutomod.Chakra;
 import net.narutomod.Particles;
 import net.narutomod.PlayerTracker;
-import net.narutomod.gui.overlay.OverlayByakuganView;
 import net.narutomod.gui.GuiNinjaScroll;
 import net.narutomod.item.ItemDojutsu;
 import net.narutomod.item.ItemJutsu;
@@ -40,6 +39,7 @@ import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.entity.EntitySusanooBase;
 
+import com.qdd.narutofix.network.PacketAmenotejikaraOverlay;
 import javax.annotation.Nullable;
 import java.util.Map;
 
@@ -55,7 +55,7 @@ public final class SixTomoeRinneganLogic {
     private static final double AMENOTEJIKARA_CHAKRA_USAGE = 50.0D;
     private static final double AMATERASU_CHAKRA_USAGE = 100.0D;
     private static final double GENJUTSU_CHAKRA_USAGE = 300.0D;
-    private static final int BYAKUGAN_EFFECT_DURATION = 5;
+    private static final int AMENOTEJIKARA_EFFECT_DURATION = 5;
     private static final int GENJUTSU_DURATION = 200;
     private static final int GENJUTSU_COOLDOWN = 1200;
     private static final int AMENOTEJIKARA_COOLDOWN = 100;
@@ -155,6 +155,11 @@ public final class SixTomoeRinneganLogic {
             return;
         }
 
+        // Ensure NBT exists for Susanoo activation check in ProcedureSusanoo.execute()
+        if (!stack.hasTagCompound()) {
+            stack.setTagCompound(new NBTTagCompound());
+        }
+
         EntityPlayer player = (EntityPlayer) entity;
         if (!DojutsuEyeHelper.hasEffectiveEye(player, item)) {
             return;
@@ -213,7 +218,7 @@ public final class SixTomoeRinneganLogic {
         player.rotationPitch = target.rotationPitch;
         target.rotationYaw = playerYaw;
         target.rotationPitch = playerPitch;
-        activateAmenotejikaraByakugan(player);
+        activateAmenotejikaraVisual(player);
         playAmenotejikaraSound(player, playerX, playerY, playerZ);
         playAmenotejikaraSound(player, target.posX, target.posY, target.posZ);
         setCooldown(player, AMENOTEJIKARA_COOLDOWN_KEY, AMENOTEJIKARA_COOLDOWN);
@@ -327,12 +332,12 @@ public final class SixTomoeRinneganLogic {
         player.getEntityData().setLong(key, player.world.getTotalWorldTime() + ticks);
     }
 
-    private static void activateAmenotejikaraByakugan(EntityPlayer player) {
-        player.addPotionEffect(new PotionEffect(MobEffects.NIGHT_VISION, BYAKUGAN_EFFECT_DURATION, 0, false, false));
-        player.getEntityData().setLong(AMENOTEJIKARA_VISUAL_UNTIL_KEY, player.world.getTotalWorldTime() + BYAKUGAN_EFFECT_DURATION);
+    private static void activateAmenotejikaraVisual(EntityPlayer player) {
+        player.addPotionEffect(new PotionEffect(MobEffects.NIGHT_VISION, AMENOTEJIKARA_EFFECT_DURATION, 0, false, false));
+        player.getEntityData().setLong(AMENOTEJIKARA_VISUAL_UNTIL_KEY, player.world.getTotalWorldTime() + AMENOTEJIKARA_EFFECT_DURATION);
         if (player instanceof EntityPlayerMP) {
-            player.getEntityData().setLong(AMENOTEJIKARA_OVERLAY_UNTIL_KEY, player.world.getTotalWorldTime() + BYAKUGAN_EFFECT_DURATION);
-            OverlayByakuganView.sendCustomData(player, true, 0.0F);
+            player.getEntityData().setLong(AMENOTEJIKARA_OVERLAY_UNTIL_KEY, player.world.getTotalWorldTime() + AMENOTEJIKARA_EFFECT_DURATION);
+            PacketAmenotejikaraOverlay.activate((EntityPlayerMP) player, AMENOTEJIKARA_EFFECT_DURATION);
         }
     }
 
@@ -344,7 +349,7 @@ public final class SixTomoeRinneganLogic {
 
         player.getEntityData().removeTag(AMENOTEJIKARA_OVERLAY_UNTIL_KEY);
         if (player instanceof EntityPlayerMP) {
-            OverlayByakuganView.sendCustomData(player, false, 0.0F);
+            PacketAmenotejikaraOverlay.deactivate((EntityPlayerMP) player);
         }
     }
 

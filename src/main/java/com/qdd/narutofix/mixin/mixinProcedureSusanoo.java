@@ -1,21 +1,43 @@
 package com.qdd.narutofix.mixin;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import com.qdd.narutofix.NarutoFix;
 import net.narutomod.procedure.ProcedureSusanoo;
+import com.qdd.narutofix.entity.susanoo.SusanooSummonHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Redirects narutomod's Susanoo summon/upgrade to narutofix's new
+ * low-coupling entity system.
+ *
+ * <p>This mixin cancels the original {@link ProcedureSusanoo#execute}
+ * and {@link ProcedureSusanoo#upgrade}, routing them to
+ * {@link SusanooSummonHandler} which spawns
+ * our own entity classes instead of narutomod's.</p>
+ */
 @Mixin(ProcedureSusanoo.class)
 public class mixinProcedureSusanoo {
 
-    @Inject(method = "execute", at=@At(value = "INVOKE", target = "Lnet/minecraft/world/World;spawnEntity(Lnet/minecraft/entity/Entity;)Z"))
-    private static void mixinexecute(EntityPlayer player, CallbackInfo ci){
-        player.world.playSound((EntityPlayer)null, player.posX, player.posY, player.posZ,(SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation(NarutoFix.MODID, "player.susanoo")), SoundCategory.NEUTRAL,1f,1f);
+    /**
+     * Redirect summon / toggle action to our handler.
+     */
+    @Inject(method = "execute", at = @At("HEAD"), cancellable = true, remap = false)
+    private static void narutofix$redirectExecute(EntityPlayer player, CallbackInfo ci) {
+        SusanooSummonHandler.summonSusanoo(player);
+        ci.cancel();
+    }
+
+    /**
+     * Redirect upgrade action to our handler.
+     */
+    @Inject(method = "upgrade", at = @At("HEAD"), cancellable = true, remap = false)
+    private static void narutofix$redirectUpgrade(EntityPlayer player, CallbackInfo ci) {
+        // Only redirect if riding our new entity; fall through to original for old entities.
+        if (player.getRidingEntity() instanceof com.qdd.narutofix.entity.susanoo.SusanooEntityBase) {
+            SusanooSummonHandler.upgradeSusanoo(player);
+            ci.cancel();
+        }
     }
 }
