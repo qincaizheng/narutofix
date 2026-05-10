@@ -648,3 +648,46 @@
 
 ### 编译验证
 - `compileJava` → BUILD SUCCESSFUL
+
+---
+
+## 2026-05-10 — macOS M 芯片 runClient 架构修复（主代理）
+
+### 背景
+- 用户反馈 `runClient` 仍不可用；前序错误依次为：
+  - macOS ARM + Java 8 触发 Mojang narrator / JNA native 架构错误。
+  - 切到 x86_64 Java 8 后，`run/natives/lwjgl2/liblwjgl.dylib` 仍是 arm64，运行时报 `have 'arm64', need 'x86_64'`。
+- 用户确认采用 A 方案：Gradle/RetroFuturaGradle 构建阶段用 Java 25，但架构也切到 x86_64；Minecraft 运行时继续用 x86_64 Java 8。
+
+### 环境配置
+- 已安装并验证 x86_64 Java 25：
+  - `/Users/qdd/Library/Java/JavaVirtualMachines/zulu25.34.17-ca-jdk25.0.3-macosx_x64/Contents/Home`
+  - `java.version=25.0.3`，`os.arch=x86_64`
+- 保留运行时 x86_64 Java 8：
+  - `/Users/qdd/Library/Java/JavaVirtualMachines/zulu8.94.0.17-ca-jdk8.0.492-macosx_x64/Contents/Home`
+- IDEA Gradle 配置改为：
+  - `.idea/gradle.xml` 使用 `#GRADLE_LOCAL_JAVA_HOME`
+  - `.gradle/config.properties` 写入 x86_64 Java 25 的 `java.home`
+- 清理了旧的 ARM native 输出：
+  - `run/natives/lwjgl2`
+  - `build/tmp/.cache/expanded` 中的旧 arm64 `liblwjgl.dylib` 展开缓存
+
+### 验证
+- IDEA MCP `runClient`：BUILD SUCCESSFUL，exitCode=0。
+- Gradle daemon 日志确认构建 JVM：
+  - `javaHome=/Users/qdd/Library/Java/JavaVirtualMachines/zulu25.34.17-ca-jdk25.0.3-macosx_x64/Contents/Home`
+  - `javaVersion=25`
+  - `javaVendor=Azul Systems, Inc.`
+- 客户端日志确认 Minecraft 运行时：
+  - Java 8：`1.8.0_492`
+  - OS 架构：`Mac OS X:x86_64`
+  - OpenGL renderer：`Apple M4`
+  - Forge 成功加载 8 个 mod
+- 新抽取的 native 已匹配 x86_64：
+  - `run/natives/lwjgl2/liblwjgl.dylib`: x86_64
+  - `run/natives/lwjgl2/openal.dylib`: 含 x86_64
+  - `run/natives/lwjgl2/libjinput-osx.jnilib`: 含 x86_64
+
+### 上线状态
+- 环境层阻塞已解除，`runClient` 不再卡在 JNA 或 LWJGL native 架构错误。
+- 产品上线仍未完成：还需要进入世界按 `docs/validation-checklist.md` 做 HUD、背包 GUI、指令、能量恢复、血脉、写轮眼、须佐等实机功能验收；全部通过后才具备合回 `2836` 的条件。
