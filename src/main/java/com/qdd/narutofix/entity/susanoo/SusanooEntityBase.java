@@ -69,10 +69,10 @@ public abstract class SusanooEntityBase extends EntityCreature implements IRange
         this.setOwnerPlayer(player);
         if (player instanceof EntityPlayer) {
             double bxp = PlayerTracker.getBattleXp((EntityPlayer) player);
-            double hp = MathHelper.sqrt(bxp);
-            hp = Math.max(hp, 100.0D);
+            double hp = Math.max(200.0D, bxp * 0.04D + 150.0D);
             this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(hp);
-        }        this.setHealth(this.getMaxHealth());
+        }
+        this.setHealth(this.getMaxHealth());
         this.setAlwaysRenderNameTag(false);
         player.startRiding(this);
     }

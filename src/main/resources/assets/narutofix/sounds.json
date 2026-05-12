@@ -4,6 +4,11 @@
       "narutofix:music/susanoo"
     ]
   },
+  "player.susanoo2": {
+    "sounds": [
+      "narutofix:music/susanoo2"
+    ]
+  },
   "amenotejikara": {
     "sounds": ["narutofix:amenotejikara"]
   }

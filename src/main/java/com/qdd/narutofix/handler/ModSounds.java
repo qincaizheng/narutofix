@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public final class ModSounds {
     public static final SoundEvent AMENOTEJIKARA = create("amenotejikara");
     public static final SoundEvent SUSANOO = create("player.susanoo");
+    public static final SoundEvent SUSANOO2 = create("player.susanoo2");
 
     private ModSounds() {
     }
@@ -19,6 +20,7 @@ public final class ModSounds {
     public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
         event.getRegistry().register(AMENOTEJIKARA);
         event.getRegistry().register(SUSANOO);
+        event.getRegistry().register(SUSANOO2);
     }
 
     private static SoundEvent create(String path) {

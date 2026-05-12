@@ -63,9 +63,9 @@ public class SusanooSummonHandler {
         player.world.spawnEntity(entity);
         SusanooStateHelper.activate(player, entity.getEntityId());
 
-        // 6. Play summon sound
+        // 6. Play summon sound (L0 / first summon)
         player.world.playSound(null, player.posX, player.posY, player.posZ,
-                ModSounds.SUSANOO, SoundCategory.NEUTRAL, 1.0F, 1.0F);
+                ModSounds.SUSANOO2, SoundCategory.NEUTRAL, 1.0F, 1.0F);
     }
 
 
@@ -113,10 +113,13 @@ public class SusanooSummonHandler {
                     : "message.narutofix.susanoo.weapon.kagutsuchi"), true);
         }
 
-        // Play upgrade sound if any upgrade succeeded
+        // Play upgrade sound
         if (upgraded) {
+            boolean isFinalUpgrade = riding instanceof SusanooClothedEntity
+                    && ((SusanooClothedEntity) riding).hasLegs();
             player.world.playSound(null, player.posX, player.posY, player.posZ,
-                    ModSounds.SUSANOO, SoundCategory.NEUTRAL, 1.0F, 1.0F);
+                    isFinalUpgrade ? ModSounds.SUSANOO : ModSounds.SUSANOO2,
+                    SoundCategory.NEUTRAL, 1.0F, 1.0F);
         }
     }
 

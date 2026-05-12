@@ -85,6 +85,8 @@ public class SusanooClothedEntity extends SusanooEntityBase {
         this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
                 .setBaseValue(Math.min(xp, maxBxp) * 0.003D);
 
+        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
+                .setBaseValue(this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue() * 1.5D);
         this.setHealth(this.getMaxHealth());
         this.chakraUsage = hasLegs ? 70.0D : 60.0D;
         this.stepHeight = this.height / 3.0F;

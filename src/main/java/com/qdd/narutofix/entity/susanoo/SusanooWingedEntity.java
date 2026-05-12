@@ -95,6 +95,8 @@ public class SusanooWingedEntity extends SusanooEntityBase {
 
         // Equip weapons on entity for visual and right-click-fire via processInteract.
         this.syncActiveWeaponStacks();
+        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
+                .setBaseValue(this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue() * 2.0D);
         this.setHealth(this.getMaxHealth());
     }
 
