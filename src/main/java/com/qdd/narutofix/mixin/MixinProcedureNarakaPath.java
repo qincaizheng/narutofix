@@ -30,7 +30,9 @@ public abstract class MixinProcedureNarakaPath {
         }
 
         EntityPlayer player = (EntityPlayer) entity;
-        if (!DojutsuEyeHelper.hasVirtualEye(player, ModItems.SIX_TOMOE_RINNEGAN)) {
+        // Check if the player has six-tomoe rinnegan either in helmet or in virtual slot
+        ItemStack effectiveEye = DojutsuEyeHelper.getEffectiveEye(player);
+        if (effectiveEye.isEmpty() || effectiveEye.getItem() != ModItems.SIX_TOMOE_RINNEGAN) {
             return;
         }
 
@@ -39,7 +41,7 @@ public abstract class MixinProcedureNarakaPath {
             ((EntityLivingBase) player).swingArm(net.minecraft.util.EnumHand.MAIN_HAND);
         }
         if (!world.isRemote) {
-            ItemStack eyeStack = DojutsuEyeHelper.getCapabilityEye(player);
+            ItemStack eyeStack = effectiveEye;
             UUID entityId = ProcedureUtils.getUniqueId(eyeStack, "KoH_id");
             if (entityId == null) {
                 if (Chakra.pathway(player).consume(ItemRinnegan.getNarakaPathChakraUsage(player))) {
