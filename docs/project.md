@@ -694,6 +694,7 @@
 
 ---
 
+
 ## 2026-05-11 — 拉取 narutomod 0.3.1-beta 参考源码并更新路径
 
 ### 角色
@@ -974,3 +975,35 @@
 ### 与产品上线关系
 - 当前代码层已修复完全体武器“从玩家身体里发射”和“自家弹体/AOE 反杀须佐”的问题。
 - 仍需用户 runClient 实机确认：完全体右键发射的火球/神威手里剑从须佐前方出现，不再撞自己；近距离爆炸不会把自己的须佐炸死；对敌方实体仍可造成效果。
+
+
+## 2026-05-12 — 新增 /addchakra 指令 + 查克拉果实增加 soul/body
+
+### 角色
+主代理：按照用户要求实现"加查克拉"指令并应用到查克拉果实。
+
+### 实现原理
+查克拉 = 灵魂能量（阴/精神能量）+ 肉体能量（阳/身体能量）。因此"增加查克拉"的实际操作是**按比例同时增加 soul 和 body 的当前值和上限**，不直接操作原版查克拉。
+
+### 变更
+
+| 文件 | 变更 |
+|------|------|
+| `src/main/java/.../util/EnergyMath.java` | 新增 `addBodyAndSoul(EntityPlayerMP, double soulAmount, double bodyAmount)` 公用静态方法。同时增加当前值和上限，并自动同步到客户端。 |
+| `src/main/java/.../command/CommandAddChakra.java` | **新建** 指令 `/addchakra <player> <amount> [soulRatio]`。amount 按 soulRatio（默认 0.5）分摊到 soul 和 body，调用 `EnergyMath.addBodyAndSoul`。 |
+| `src/main/java/.../NarutoFix.java` | 注册 `CommandAddChakra`。 |
+| `src/main/java/.../Configs.java` | 新增 `ChakraFruitConfig`：`soulAmount=500` / `bodyAmount=500`。 |
+| `src/main/java/.../mixin/MixinProcedureChakraFruitFoodEaten.java` | **新建** TAIL 混合——查克拉果实食用后按配置增加 soul+body。 |
+| `src/main/resources/mixins.narutofix.json` | 注册 `MixinProcedureChakraFruitFoodEaten`。 |
+| `zh_cn.lang` / `en_us.lang` | 新增指令用法、反馈、配置 lang key。 |
+| `docs/diff.md` | 追加本轮需求差异条目。 |
+
+### 验证状态
+- 通过 `git diff 2836` 确认基线差分正确。
+- `2836` 分支本身存在预编译失败（`fireHeldWeaponFor(EntityPlayerMP)` 未找到），这是 `codex/fix-six-tomoe-susanoo-overlay` 未合回的问题，不涉本轮改动。
+- 分支：`codex/add-chakra-command-and-fruit`（从 2836 切出）。
+
+### 与产品上线关系
+- 需要在 `runClient` 中确认 `/addchakra` 指令正常执行、查克拉果实吃后 soul/body 增加。
+- 当前分支独立性好，可在验证通过后合回 `2836`。
+

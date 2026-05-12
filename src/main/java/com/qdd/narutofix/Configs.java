@@ -502,6 +502,22 @@ public class Configs {
         public double perTick = 0.5;
     }
 
+
+    @Config.Name("Chakra Fruit Settings")
+    @Config.Comment("查克拉果实食用后增加灵魂能量和肉体能量的配置。")
+    public static final ChakraFruitConfig chakraFruit = new ChakraFruitConfig();
+
+    public static class ChakraFruitConfig {
+        @Config.Name("Soul Amount")
+        @Config.Comment("食用查克拉果实后增加的灵魂能量（当前值和上限同时增加）。")
+        @Config.RangeDouble(min = 0.0, max = 100000.0)
+        public double soulAmount = 500.0;
+
+        @Config.Name("Body Amount")
+        @Config.Comment("食用查克拉果实后增加的肉体能量（当前值和上限同时增加）。")
+        @Config.RangeDouble(min = 0.0, max = 100000.0)
+        public double bodyAmount = 500.0;
+    }
     @Config.Name("XP Conversion Settings")
     @Config.Comment("根据灵魂能量当前值和肉体能量当前值中的较小值的增长贡献/派生忍者经验。派生路径不消耗灵魂或肉体能量。")
     public static final XpConversionConfig xpConversion = new XpConversionConfig();

@@ -150,3 +150,10 @@ narutofix.config.chakraCrouchExchange.insufficientPolicy=能量不足策略
 narutofix.config.sleep=睡觉恢复设置
 narutofix.config.sleep.soulRecoveryPercent=灵魂恢复百分比
 narutofix.config.sleep.bodyRecoveryPercent=肉体恢复百分比
+
+# P4: 查克拉指令 + 查克拉果实
+narutofix.command.addchakra.usage=/addchakra <玩家> <总量> [灵魂占比]
+narutofix.command.addchakra.done=§a已增加查克拉: +%s 灵魂, +%s 肉体
+narutofix.config.chakraFruit=查克拉果实设置
+narutofix.config.chakraFruit.soulAmount=果实增加灵魂能量
+narutofix.config.chakraFruit.bodyAmount=果实增加肉体能量

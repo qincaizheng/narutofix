@@ -1,5 +1,6 @@
 package com.qdd.narutofix;
 
+import com.qdd.narutofix.command.CommandAddChakra;
 import com.qdd.narutofix.command.SetCDandPower;
 import com.qdd.narutofix.command.SetSusanooColor;
 import com.qdd.narutofix.command.ToNinjaRealm;
@@ -64,5 +65,6 @@ public class NarutoFix {
         event.registerServerCommand(new CommandOpenWheelMenu());
         event.registerServerCommand(new CommandSoulEnergy());
         event.registerServerCommand(new CommandBodyEnergy());
+        event.registerServerCommand(new CommandAddChakra());
     }
 }

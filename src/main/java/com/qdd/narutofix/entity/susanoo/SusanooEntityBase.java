@@ -231,6 +231,13 @@ public abstract class SusanooEntityBase extends EntityCreature implements IRange
         return false;
     }
 
+    /**
+     * Called when the rider releases the use key while holding a ranged weapon (shuriken).
+     * Override in subclasses for projectile behavior (magatama, etc.).
+     */
+    public void attackEntityRanged(double x, double y, double z) {
+    }
+
     // ---- damage / immunity --------------------------------------------------
 
     @Override
