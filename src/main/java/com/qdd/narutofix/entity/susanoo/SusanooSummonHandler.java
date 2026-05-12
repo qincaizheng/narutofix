@@ -113,13 +113,14 @@ public class SusanooSummonHandler {
                     : "message.narutofix.susanoo.weapon.kagutsuchi"), true);
         }
 
-        // Play upgrade sound
+        // Play upgrade sound (only for L3->L4 final upgrade)
         if (upgraded) {
             boolean isFinalUpgrade = riding instanceof SusanooClothedEntity
                     && ((SusanooClothedEntity) riding).hasLegs();
-            player.world.playSound(null, player.posX, player.posY, player.posZ,
-                    isFinalUpgrade ? ModSounds.SUSANOO : ModSounds.SUSANOO2,
-                    SoundCategory.NEUTRAL, 1.0F, 1.0F);
+            if (isFinalUpgrade) {
+                player.world.playSound(null, player.posX, player.posY, player.posZ,
+                        ModSounds.SUSANOO, SoundCategory.NEUTRAL, 1.0F, 1.0F);
+            }
         }
     }
 
