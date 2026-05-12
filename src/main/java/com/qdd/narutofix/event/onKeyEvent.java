@@ -26,9 +26,6 @@ public class onKeyEvent {
     @SubscribeEvent
     public static void onKeyInput(InputEvent.KeyInputEvent event){
         EntityPlayer player = Minecraft.getMinecraft().player;
-        if (player != null && player.getRidingEntity() instanceof com.qdd.narutofix.entity.susanoo.SusanooEntityBase) {
-            return;
-        }
         IJutsuInventory jutsu_inv=player.getCapability(JutsuInventoryCapability.Jutsu_INV, null);
 //        System.out.println("onKeyInput");
         if (KeyLoader.LockOnEntity.isPressed())        {

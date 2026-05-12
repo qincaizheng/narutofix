@@ -27,7 +27,7 @@ public class mixinKeyBindingPowerIncrease {
     @Shadow(remap = false)
     private boolean wasKeyDown;
 
-    @Inject(method = "processKeyBind", at = @At("HEAD"), remap = false, cancellable = true)
+    @Inject(method = "processKeyBind", at = @At("HEAD"), remap = false)
     private void narutofix$upgradeOurSusanoo(CallbackInfo ci) {
         EntityPlayer player = Minecraft.getMinecraft().player;
         if (player == null) return;
@@ -38,18 +38,10 @@ public class mixinKeyBindingPowerIncrease {
         if (!isKeyDown && this.wasKeyDown) {
             NarutoFix.PACKET_HANDLER.sendToServer(new PacketNarutofixSusanooUpgrade());
         }
-
-        // Cancel original processKeyBind to prevent narutomod's own logic
-        ci.cancel();
     }
 
     @Inject(method = "onKeyInput",at= @At(value = "INVOKE", target = "Lnet/narutomod/keybind/KeyBindingPowerIncrease;processKeyBind()V"),remap = false)
     private void processKeyBind( CallbackInfo ci) {
-        // When riding narutofix Susanoo, skip the narutomod/HUD jutsu switch
-        if (Minecraft.getMinecraft().player != null
-                && Minecraft.getMinecraft().player.getRidingEntity() instanceof SusanooEntityBase) {
-            return;
-        }
         if (keys.isPressed()) {
             JutsuHandler.onKeyEvent();
         }
