@@ -51,6 +51,7 @@
     "MixinProcedureWhiteZetsuFleshFoodEaten"
   ],
   "client": [
+    "MixinOverlayByakuganView",
     "MixinOverlayChakraDisplay",
     "mixinKeyBindingPowerIncrease"
   ],

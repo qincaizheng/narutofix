@@ -1,10 +1,13 @@
 package com.qdd.narutofix.entity.susanoo;
 
+import com.qdd.narutofix.handler.ModSounds;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
@@ -59,66 +62,61 @@ public class SusanooSummonHandler {
         SusanooSkeletonEntity entity = new SusanooSkeletonEntity(player, false);
         player.world.spawnEntity(entity);
         SusanooStateHelper.activate(player, entity.getEntityId());
+
+        // 6. Play summon sound
+        player.world.playSound(null, player.posX, player.posY, player.posZ,
+                ModSounds.SUSANOO, SoundCategory.NEUTRAL, 1.0F, 1.0F);
     }
 
 
     public static void upgradeSusanoo(EntityPlayer player) {
         Entity riding = player.getRidingEntity();
-        System.out.println("[narutofix] upgrade: riding=" + riding + " " + (riding != null ? riding.getClass().getName() : "null"));
         if (riding == null) return;
 
         double bxp = PlayerTracker.getBattleXp(player);
-        System.out.println("[narutofix] upgrade: bxp=" + bxp + " requiredL1=" + Configs.susanoo.bxpRequiredL1 + " requiredL2=" + Configs.susanoo.bxpRequiredL2);
+
+        boolean upgraded = false;
 
         if (riding instanceof SusanooSkeletonEntity) {
             SusanooSkeletonEntity skeleton = (SusanooSkeletonEntity) riding;
-            System.out.println("[narutofix] upgrade: skeleton fullBody=" + skeleton.isFullBody());
 
             if (!skeleton.isFullBody() && bxp >= Configs.susanoo.bxpRequiredL1) {
-                System.out.println("[narutofix] upgrade: L0->L1 attempt, chakra=" + Chakra.pathway(player).getAmount());
                 if (Chakra.pathway(player).consume(Configs.susanoo.baseChakraUsage)) {
-                    System.out.println("[narutofix] upgrade: L0->L1 success");
                     changeEntity(player, skeleton, new SusanooSkeletonEntity(player, true));
-                } else {
-                    System.out.println("[narutofix] upgrade: L0->L1 failed - insufficient chakra");
+                    upgraded = true;
                 }
             } else if (skeleton.isFullBody() && bxp >= Configs.susanoo.bxpRequiredL2) {
-                System.out.println("[narutofix] upgrade: L1->L2 attempt");
                 if (Chakra.pathway(player).consume(Configs.susanoo.baseChakraUsage)) {
-                    System.out.println("[narutofix] upgrade: L1->L2 success");
                     changeEntity(player, skeleton, new SusanooClothedEntity(player, false));
-                } else {
-                    System.out.println("[narutofix] upgrade: L1->L2 failed - insufficient chakra");
+                    upgraded = true;
                 }
-            } else {
-                System.out.println("[narutofix] upgrade: skeleton condition not met - fullBody=" + skeleton.isFullBody() + " bxp=" + bxp + "/" + Configs.susanoo.bxpRequiredL1);
             }
 
         } else if (riding instanceof SusanooClothedEntity) {
             SusanooClothedEntity clothed = (SusanooClothedEntity) riding;
-            System.out.println("[narutofix] upgrade: clothed hasLegs=" + clothed.hasLegs());
 
             if (!clothed.hasLegs() && bxp >= Configs.susanoo.bxpRequiredL3) {
-                System.out.println("[narutofix] upgrade: L2->L3 attempt");
                 if (Chakra.pathway(player).consume(Configs.susanoo.baseChakraUsage)) {
-                    System.out.println("[narutofix] upgrade: L2->L3 success");
                     changeEntity(player, clothed, new SusanooClothedEntity(player, true));
-                } else {
-                    System.out.println("[narutofix] upgrade: L2->L3 failed - insufficient chakra");
+                    upgraded = true;
                 }
             } else if (clothed.hasLegs() && bxp >= Configs.susanoo.bxpRequiredL4) {
-                System.out.println("[narutofix] upgrade: L3->L4 attempt");
                 if (Chakra.pathway(player).consume(Configs.susanoo.baseChakraUsage)) {
-                    System.out.println("[narutofix] upgrade: L3->L4 success");
                     changeEntity(player, clothed, new SusanooWingedEntity(player));
-                } else {
-                    System.out.println("[narutofix] upgrade: L3->L4 failed - insufficient chakra");
+                    upgraded = true;
                 }
-            } else {
-                System.out.println("[narutofix] upgrade: clothed condition not met - hasLegs=" + clothed.hasLegs() + " bxp=" + bxp);
             }
-        } else {
-            System.out.println("[narutofix] upgrade: unknown entity type " + (riding != null ? riding.getClass().getName() : "null"));
+        } else if (riding instanceof SusanooWingedEntity) {
+            boolean usingKamui = ((SusanooWingedEntity) riding).toggleActiveWeapon();
+            player.sendStatusMessage(new TextComponentTranslation(usingKamui
+                    ? "message.narutofix.susanoo.weapon.kamui"
+                    : "message.narutofix.susanoo.weapon.kagutsuchi"), true);
+        }
+
+        // Play upgrade sound if any upgrade succeeded
+        if (upgraded) {
+            player.world.playSound(null, player.posX, player.posY, player.posZ,
+                    ModSounds.SUSANOO, SoundCategory.NEUTRAL, 1.0F, 1.0F);
         }
     }
 

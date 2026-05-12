@@ -1,6 +1,6 @@
 ## 介绍
 这是一个minecraft 1.12.2 forge mod项目，使用java8
-narutomod路径在/home/qdd/codex/workspace/naruto_mod_0.3.1_beta
+narutomod路径在/Users/qdd/codex/workspace/naruto_mod_0.3.1_beta
 
 
 ## todo

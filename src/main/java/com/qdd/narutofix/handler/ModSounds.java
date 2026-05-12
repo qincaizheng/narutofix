@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @Mod.EventBusSubscriber(modid = NarutoFix.MODID)
 public final class ModSounds {
     public static final SoundEvent AMENOTEJIKARA = create("amenotejikara");
+    public static final SoundEvent SUSANOO = create("player.susanoo");
 
     private ModSounds() {
     }
@@ -17,6 +18,7 @@ public final class ModSounds {
     @SubscribeEvent
     public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
         event.getRegistry().register(AMENOTEJIKARA);
+        event.getRegistry().register(SUSANOO);
     }
 
     private static SoundEvent create(String path) {

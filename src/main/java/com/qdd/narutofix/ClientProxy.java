@@ -2,6 +2,7 @@ package com.qdd.narutofix;
 
 import com.qdd.narutofix.event.AmenotejikaraOverlayHandler;
 import com.qdd.narutofix.event.EquippedEyeRenderLayer;
+import com.qdd.narutofix.event.SusanooMouseFireHandler;
 import com.qdd.narutofix.keybind.EyeKeyHandler;
 import com.qdd.narutofix.keybind.KeyLoader;
 import com.qdd.narutofix.entity.susanoo.RenderSusanooSkeleton;
@@ -38,6 +39,7 @@ public class ClientProxy extends CommonProxy {
         this.eyeKeyHandler.register();
         MinecraftForge.EVENT_BUS.register(this.eyeKeyHandler);
         MinecraftForge.EVENT_BUS.register(new AmenotejikaraOverlayHandler());
+        MinecraftForge.EVENT_BUS.register(new SusanooMouseFireHandler());
     }
 
     @Override
