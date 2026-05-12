@@ -32,6 +32,7 @@
     "MixinProcedureNarakaPath",
     "MixinProcedureOnPlayerDeath",
     "MixinProcedurePowerIncreaseOnKeyPressed",
+    "MixinProcedureRinneganHelmetTickEvent",
     "MixinProcedureSharinganHelmetTickEvent",
     "MixinProcedureSpecialJutsu1OnKeyPressed",
     "MixinProcedureSpecialJutsu2OnKeyPressed",
