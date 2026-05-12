@@ -53,10 +53,14 @@ public abstract class MixinProcedurePowerIncreaseOnKeyPressed {
     }
 
     @Redirect(method = "executeProcedure", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/NonNullList;get(I)Ljava/lang/Object;"))
-    private static Object narutofix$getHelmet(NonNullList<ItemStack> inventory, int index, @Local(name="entity") Entity player) {
-        if(inventory.get(index).getItem() instanceof ItemDojutsu.Base) {
+    private static ItemStack narutofix$getHelmet(NonNullList<ItemStack> inventory, int index, @Local(name="entity") Entity player) {
+        if (index != 3 || player == null) {
             return inventory.get(index);
         }
-        return DojutsuEyeHelper.getVirtualEye((EntityLivingBase) player);
+        if (inventory.get(index).getItem() instanceof ItemDojutsu.Base) {
+            return inventory.get(index);
+        }
+        ItemStack virtual = DojutsuEyeHelper.getVirtualEye((EntityLivingBase) player);
+        return virtual.isEmpty() ? inventory.get(index) : virtual;
     }
 }
