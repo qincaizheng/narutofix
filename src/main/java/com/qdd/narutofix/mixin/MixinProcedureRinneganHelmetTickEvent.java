@@ -1,6 +1,5 @@
 package com.qdd.narutofix.mixin;
 
-import com.qdd.narutofix.items.ModItems;
 import com.qdd.narutofix.util.DojutsuEyeHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -8,7 +7,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.narutomod.item.ItemAsuraCanon;
 import net.narutomod.item.ItemAsuraPathArmor;
-import net.narutomod.item.ItemRinnegan;
 import net.narutomod.procedure.ProcedureRinneganHelmetTickEvent;
 import net.narutomod.procedure.ProcedureUtils;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -22,20 +20,23 @@ import java.util.Map;
 @Mixin(ProcedureRinneganHelmetTickEvent.class)
 public abstract class MixinProcedureRinneganHelmetTickEvent {
     @Inject(method = "executeProcedure", at = @At("HEAD"), cancellable = true, remap = false)
-    private static void narutofix$handleSixTomoeAsuraPath(Map<String, Object> dependencies, CallbackInfo ci) {
+    private static void narutofix$handleVirtualEye(Map<String, Object> dependencies, CallbackInfo ci) {
         Entity entity = (Entity) dependencies.get("entity");
         if (!(entity instanceof EntityPlayer)) {
             return;
         }
         EntityPlayer player = (EntityPlayer) entity;
-        ItemStack effectiveEye = DojutsuEyeHelper.getEffectiveEye(player);
-        if (effectiveEye.isEmpty() || effectiveEye.getItem() != ModItems.SIX_TOMOE_RINNEGAN) {
+        // Check if player has any virtual dojutsu (not wearing on head)
+        ItemStack virtualEye = DojutsuEyeHelper.getVirtualEye(player);
+        if (virtualEye.isEmpty()) {
             return;
         }
 
-        // Replicate the Asura Path auto-equip (which_path == 1) from the original procedure
-        double which_path = effectiveEye.hasTagCompound()
-                ? effectiveEye.getTagCompound().getDouble("which_path") : -1;
+        // Read which_path from the virtual eye NBT (set by wheel menu)
+        double which_path = virtualEye.hasTagCompound()
+                ? virtualEye.getTagCompound().getDouble("which_path") : -1;
+
+        // Asura Path auto-equip
         if (which_path == 1) {
             if (player.inventory.armorInventory.get(2).getItem() != ItemAsuraPathArmor.body) {
                 ProcedureUtils.swapItemToSlot(player, EntityEquipmentSlot.CHEST, new ItemStack(ItemAsuraPathArmor.body));
@@ -46,7 +47,7 @@ public abstract class MixinProcedureRinneganHelmetTickEvent {
             player.inventory.clearMatchingItems(ItemAsuraCanon.block, -1, -1, null);
         }
 
-        // Fall damage immunity (same as original)
+        // Fall damage immunity (same as original procedure)
         entity.fallDistance = 0.0F;
     }
 }
