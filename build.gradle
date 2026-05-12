@@ -141,6 +141,17 @@ jar {
 }
 
 publishing {
+    repositories {
+        maven {
+            name = "reposilite"
+            url = uri("$repoHost/releases")
+            allowInsecureProtocol = true // 如果是 http，必须加
+            credentials {
+                username = repoUser
+                password = repoToken
+            }
+        }
+    }
     publications {
         mavenJava(MavenPublication) {
             from components.java

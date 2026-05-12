@@ -3,5 +3,8 @@
     "sounds": [
       "narutofix:music/susanoo"
     ]
+  },
+  "amenotejikara": {
+    "sounds": ["narutofix:amenotejikara"]
   }
 }

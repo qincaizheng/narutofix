@@ -1,8 +1,5 @@
 package com.qdd.narutofix.network;
 
-import com.qdd.narutofix.network.ActivateSixTomoeSkillMessage;
-import com.qdd.narutofix.network.CycleEquippedEyeMessage;
-import com.qdd.narutofix.network.OpenEyeStorageMessage;
 import net.minecraftforge.fml.relauncher.Side;
 
 import static com.qdd.narutofix.NarutoFix.PACKET_HANDLER;
@@ -27,5 +24,6 @@ public class PacketRegister {
         PACKET_HANDLER.registerMessage(PacketSyncChakra.Handler.class, PacketSyncChakra.class, nextID++, Side.CLIENT);
         PACKET_HANDLER.registerMessage(PacketAmenotejikaraOverlay.Handler.class, PacketAmenotejikaraOverlay.class, nextID++, Side.CLIENT);
         PACKET_HANDLER.registerMessage(PacketNarutofixSusanooUpgrade.class, PacketNarutofixSusanooUpgrade.class, nextID++, Side.SERVER);
+        PACKET_HANDLER.registerMessage(PacketNarutofixSusanooFire.class, PacketNarutofixSusanooFire.class, nextID++, Side.SERVER);
     }
 }

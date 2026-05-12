@@ -29,7 +29,7 @@ public class onOverlayEvent {
     private static final ResourceLocation DEFUALT = new ResourceLocation(NarutoFix.MODID,"textures/gui/default.png");
     private static final ResourceLocation ENERGY_HUD = new ResourceLocation(NarutoFix.MODID, "textures/gui/hud.png");
     private static final int HUD_BAR_WIDTH = 82;
-    private static final int HUD_BAR_HEIGHT = 10;
+    private static final int HUD_BAR_HEIGHT = 11;
     private static final int HUD_ROW_HEIGHT = 12;
     private static final int HUD_LABEL_GAP = 6;
     private static final int HUD_VALUE_GAP = 6;
@@ -39,9 +39,13 @@ public class onOverlayEvent {
     private static final int HUD_HOTBAR_HORIZONTAL_GAP = 16;
     private static final int HUD_HOTBAR_VERTICAL_GAP = HUD_ROW_HEIGHT + 2;
     private static final int HUD_FRAME_V = 0;
-    private static final int HUD_BODY_V = 10;
-    private static final int HUD_SOUL_V = 20;
-    private static final int HUD_CHAKRA_V = 30;
+    private static final int HUD_BODY_V = 20;    // yellow
+    private static final int HUD_SOUL_V = 30;    // blue
+    private static final int HUD_CHAKRA_V = 40;  // green
+
+    private static final int FILL_BODY_V = 22;
+    private static final int FILL_SOUL_V = 31;
+    private static final int FILL_CHAKRA_V = 40;
 
     private static class EnergyHudLayout {
         private final int x;
@@ -152,13 +156,13 @@ public class onOverlayEvent {
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        drawEnergyBar(mc, soulLabel, layout.x, y, HUD_SOUL_V,
+        drawEnergyBar(mc, soulLabel, layout.x, y, FILL_SOUL_V,
                 soul == null ? 0.0D : soul.getCurrent(),
                 soul == null ? 0.0D : soul.getMax(), layout);
-        drawEnergyBar(mc, bodyLabel, layout.x, y + HUD_ROW_HEIGHT, HUD_BODY_V,
+        drawEnergyBar(mc, bodyLabel, layout.x, y + HUD_ROW_HEIGHT, FILL_BODY_V,
                 body == null ? 0.0D : body.getCurrent(),
                 body == null ? 0.0D : body.getMax(), layout);
-        drawEnergyBar(mc, chakraLabel, layout.x, y + HUD_ROW_HEIGHT * 2, HUD_CHAKRA_V,
+        drawEnergyBar(mc, chakraLabel, layout.x, y + HUD_ROW_HEIGHT * 2, FILL_CHAKRA_V,
                 chakra == null ? 0.0D : chakra.getAmount(),
                 chakra == null ? 0.0D : chakra.getMax(), layout);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -189,12 +193,12 @@ public class onOverlayEvent {
         return Math.max(0, hotbarTop - totalHeight - HUD_HOTBAR_VERTICAL_GAP + Configs.hudYOffset);
     }
 
-    private static void drawEnergyBar(Minecraft mc, String label, int x, int y, int textureV, double current, double max, EnergyHudLayout layout) {
+    private static void drawEnergyBar(Minecraft mc, String label, int x, int y, int fillV, double current, double max, EnergyHudLayout layout) {
         double ratio = max <= 0.0D ? 0.0D : Math.max(0.0D, Math.min(1.0D, current / max));
         int barX = layout.showText ? x + layout.labelColumnWidth : x;
         int valueStartX = barX + HUD_BAR_WIDTH + HUD_VALUE_GAP;
-        int textY = y;
-        int fillWidth = (int) ((HUD_BAR_WIDTH - 2) * ratio);
+        int textY = y + 2;
+        int fillWidth = (int) ((HUD_BAR_WIDTH - 4) * ratio);
         String value = (int) current + "/" + (int) max;
         int valueX = valueStartX + Math.max(0, HUD_VALUE_WIDTH - mc.fontRenderer.getStringWidth(value));
 
@@ -202,7 +206,7 @@ public class onOverlayEvent {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.ingameGUI.drawTexturedModalRect(barX, y, 0, HUD_FRAME_V, HUD_BAR_WIDTH, HUD_BAR_HEIGHT);
         if (fillWidth > 0) {
-            mc.ingameGUI.drawTexturedModalRect(barX + 1, y + 1, 1, textureV + 1, fillWidth, HUD_BAR_HEIGHT - 2);
+            mc.ingameGUI.drawTexturedModalRect(barX + 2, y + 2, 2, fillV, fillWidth, 7);
         }
         mc.ingameGUI.drawTexturedModalRect(barX, y, 0, HUD_FRAME_V, HUD_BAR_WIDTH, HUD_BAR_HEIGHT);
 

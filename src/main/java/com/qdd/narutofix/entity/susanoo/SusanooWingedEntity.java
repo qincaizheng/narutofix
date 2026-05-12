@@ -5,35 +5,19 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import net.narutomod.PlayerTracker;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemKagutsuchiSwordRanged;
 import net.narutomod.item.ItemKamuiShuriken;
-import net.narutomod.item.ItemMangekyoSharingan;
-import net.narutomod.item.ItemMangekyoSharinganEternal;
-import net.narutomod.item.ItemMangekyoSharinganObito;
-import net.narutomod.item.ItemTotsukaSword;
-import net.narutomod.potion.PotionAmaterasuFlame;
-import net.narutomod.procedure.ProcedureKagutsuchiSwordToolInUseTick;
-import net.narutomod.procedure.ProcedureTotsukaSwordToolInHandTick;
-
-import java.util.HashMap;
 
 /**
  * Susanoo Winged (Complete Body) — L4 with wings, flight and special weapons.
@@ -45,6 +29,8 @@ public class SusanooWingedEntity extends SusanooEntityBase {
     private static final DataParameter<Boolean> SWINGING_ARMS = EntityDataManager
             .<Boolean>createKey(SusanooWingedEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> SHOW_SWORD = EntityDataManager
+            .<Boolean>createKey(SusanooWingedEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> USING_KAMUI_WEAPON = EntityDataManager
             .<Boolean>createKey(SusanooWingedEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Float> MOTION_X = EntityDataManager
             .<Float>createKey(SusanooWingedEntity.class, DataSerializers.FLOAT);
@@ -108,8 +94,7 @@ public class SusanooWingedEntity extends SusanooEntityBase {
         this.getEntityData().setDouble("entityModelScale", (double) MODELSCALE);
 
         // Equip weapons on entity for visual and right-click-fire via processInteract.
-        this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, _kagutsuchi());
-        this.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, _kamui());
+        this.syncActiveWeaponStacks();
         this.setHealth(this.getMaxHealth());
     }
 
@@ -121,6 +106,7 @@ public class SusanooWingedEntity extends SusanooEntityBase {
         this.dataManager.register(WINGSWING, Float.valueOf(0.0F));
         this.dataManager.register(SWINGING_ARMS, Boolean.FALSE);
         this.dataManager.register(SHOW_SWORD, Boolean.FALSE);
+        this.dataManager.register(USING_KAMUI_WEAPON, Boolean.FALSE);
         this.dataManager.register(MOTION_X, Float.valueOf(0.0F));
         this.dataManager.register(MOTION_Z, Float.valueOf(0.0F));
         this.dataManager.register(HEAD_YAW, Float.valueOf(0.0F));
@@ -190,6 +176,26 @@ public class SusanooWingedEntity extends SusanooEntityBase {
         return this.dataManager.get(SWINGING_ARMS);
     }
 
+    public boolean isUsingKamuiWeapon() {
+        return this.dataManager.get(USING_KAMUI_WEAPON);
+    }
+
+    public boolean toggleActiveWeapon() {
+        this.dataManager.set(USING_KAMUI_WEAPON, Boolean.valueOf(!this.isUsingKamuiWeapon()));
+        this.syncActiveWeaponStacks();
+        return this.isUsingKamuiWeapon();
+    }
+
+    private void syncActiveWeaponStacks() {
+        if (this.isUsingKamuiWeapon()) {
+            this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, _kamui());
+            this.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, _kagutsuchi());
+        } else {
+            this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, _kagutsuchi());
+            this.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, _kamui());
+        }
+    }
+
     @Override
     public double getMountedYOffset() {
         return 14.0D;
@@ -238,6 +244,7 @@ public class SusanooWingedEntity extends SusanooEntityBase {
         this.bulletEntity.shoot(x, y, z, 0.99F, 0.0F);
         this.bulletEntity = null;
         this.setSwingingArms(false);
+        this.syncActiveWeaponStacks();
     }
 
     public void createBullet(float size) {
@@ -257,28 +264,57 @@ public class SusanooWingedEntity extends SusanooEntityBase {
             this.bulletEntity = null;
         }
         this.setSwingingArms(false);
+        if (!this.isDead) {
+            this.syncActiveWeaponStacks();
+        }
     }
 
     @Override
     protected void fireHeldWeapon() {
-        ItemStack held = this.getHeldItemMainhand();
         EntityLivingBase owner = this.getOwnerPlayer();
         if (owner == null) return;
-        if (held.getItem() == _kagutsuchi().getItem()) {
-            net.narutomod.item.ItemKagutsuchiSwordRanged.EntityBlackFireball fireball =
-                new net.narutomod.item.ItemKagutsuchiSwordRanged.EntityBlackFireball(
-                    this.world,
-                    this.posX, this.posY + (double)this.height * 0.5D, this.posZ,
-                    owner.getLookVec().x * 3.0D,
-                    owner.getLookVec().y * 3.0D,
-                    owner.getLookVec().z * 3.0D);
-            this.world.spawnEntity(fireball);
-        } else if (held.getItem() == _kamui().getItem()) {
+        Vec3d look = owner.getLookVec();
+        Vec3d spawn = this.getWeaponSpawnPosition(look);
+        if (this.isUsingKamuiWeapon()) {
             net.narutomod.item.ItemKamuiShuriken.EntityKamuiShuriken shuriken =
                 new net.narutomod.item.ItemKamuiShuriken.EntityKamuiShuriken(this.world, owner);
-            shuriken.shoot(owner, owner.rotationPitch, owner.rotationYaw, 0.0F, 2.0F, 0.0F);
+            shuriken.setScale((float) this.getEntityData().getDouble("entityModelScale"));
+            shuriken.setPosition(spawn.x, spawn.y, spawn.z);
+            shuriken.ignoreEntity = this;
+            shuriken.getEntityData().setInteger("narutofix_susanoo_owner", this.getEntityId());
+            shuriken.shoot(look.x, look.y, look.z, 1.0F, 0.0F);
             this.world.spawnEntity(shuriken);
+        } else {
+            Vec3d origin = new Vec3d(this.posX, spawn.y, this.posZ);
+            Vec3d[] targets = new Vec3d[] {
+                    origin.add(look.scale(40.0D)),
+                    origin.add(Vec3d.fromPitchYaw(owner.rotationPitch, owner.rotationYaw - 20.0F).scale(40.0D)),
+                    origin.add(Vec3d.fromPitchYaw(owner.rotationPitch, owner.rotationYaw + 20.0F).scale(40.0D))
+            };
+            for (Vec3d target : targets) {
+                net.narutomod.item.ItemKagutsuchiSwordRanged.EntityBigBlackFireball fireball =
+                        new net.narutomod.item.ItemKagutsuchiSwordRanged.EntityBigBlackFireball(
+                                this.world, this, target.x - spawn.x, target.y - spawn.y, target.z - spawn.z);
+                fireball.posX = spawn.x;
+                fireball.posY = spawn.y;
+                fireball.posZ = spawn.z;
+                fireball.setPosition(spawn.x, spawn.y, spawn.z);
+                fireball.getEntityData().setInteger("narutofix_susanoo_owner", this.getEntityId());
+                this.world.spawnEntity(fireball);
+            }
         }
+    }
+
+    private Vec3d getWeaponSpawnPosition(Vec3d look) {
+        Vec3d horizontal = new Vec3d(look.x, 0.0D, look.z);
+        if (horizontal.length() < 0.0001D) {
+            horizontal = Vec3d.fromPitchYaw(0.0F, this.rotationYaw);
+        } else {
+            horizontal = horizontal.normalize();
+        }
+        double forwardOffset = Math.max(this.width * 0.5D + 6.0D, MODELSCALE + 1.0D);
+        double y = this.posY + (double) this.height * 0.58D;
+        return new Vec3d(this.posX, y, this.posZ).add(horizontal.scale(forwardOffset));
     }
 
     @Override
@@ -290,8 +326,10 @@ public class SusanooWingedEntity extends SusanooEntityBase {
     @Override
     public void travel(float strafe, float vertical, float forward) {
         if (this.isBeingRidden()) {
-            EntityLivingBase entity = (EntityLivingBase) this.getControllingPassenger();
-            if ((!this.onGround || entity.rotationPitch < 0.0F) && entity.moveForward > 0.0F) {
+            Entity entity = this.getControllingPassenger();
+            if (entity instanceof EntityLivingBase
+                    && (!this.onGround || entity.rotationPitch < 0.0F)
+                    && ((EntityLivingBase) entity).moveForward > 0.0F) {
                 this.motionY -= entity.rotationPitch / 45.0D;
             }
             if (!this.onGround) {

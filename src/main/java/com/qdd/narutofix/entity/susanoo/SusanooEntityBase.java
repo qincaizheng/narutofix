@@ -11,12 +11,15 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.MobEffects;
+import net.minecraft.util.math.MathHelper;
+import net.narutomod.PlayerTracker;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
@@ -40,7 +43,7 @@ public abstract class SusanooEntityBase extends EntityCreature implements IRange
             .<Integer>createKey(SusanooEntityBase.class, DataSerializers.VARINT);
 
     /** Amaterasu damage source – bypasses armor and counts as magic damage. */
-    public static final DamageSource AMATERASU = new DamageSource("amaterasu")
+    private static final DamageSource AMATERASU = new DamageSource("amaterasu")
             .setDamageBypassesArmor().setMagicDamage();
 
     /** Chakra consumed per second (every 20 ticks). */
@@ -64,7 +67,12 @@ public abstract class SusanooEntityBase extends EntityCreature implements IRange
         this.setLocationAndAngles(player.posX, player.posY, player.posZ,
                 player.rotationYaw, 0.0F);
         this.setOwnerPlayer(player);
-        this.setHealth(this.getMaxHealth());
+        if (player instanceof EntityPlayer) {
+            double bxp = PlayerTracker.getBattleXp((EntityPlayer) player);
+            double hp = MathHelper.sqrt(bxp);
+            hp = Math.max(hp, 100.0D);
+            this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(hp);
+        }        this.setHealth(this.getMaxHealth());
         this.setAlwaysRenderNameTag(false);
         player.startRiding(this);
     }
@@ -215,10 +223,21 @@ public abstract class SusanooEntityBase extends EntityCreature implements IRange
     protected void fireHeldWeapon() {
     }
 
+    public boolean fireHeldWeaponFor(EntityPlayer player) {
+        if (!this.world.isRemote && player != null && player.equals(this.getOwnerPlayer())) {
+            this.fireHeldWeapon();
+            return true;
+        }
+        return false;
+    }
+
     // ---- damage / immunity --------------------------------------------------
 
     @Override
     public boolean attackEntityFrom(DamageSource source, float amount) {
+        if (this.isOwnProjectileDamage(source)) {
+            return false;
+        }
         // Immunity: rider's own attacks
         if (source.getImmediateSource() instanceof EntityPlayer
                 && source.getImmediateSource().equals(this.getControllingPassenger())) {
@@ -243,7 +262,7 @@ public abstract class SusanooEntityBase extends EntityCreature implements IRange
                 || source == DamageSource.DROWN
                 || source == DamageSource.MAGIC
                 || source == DamageSource.WITHER
-                || source == AMATERASU) {
+                || source == net.narutomod.procedure.ProcedureUtils.AMATERASU) {
             return false;
         }
 
@@ -256,6 +275,25 @@ public abstract class SusanooEntityBase extends EntityCreature implements IRange
                             amount, (float) this.getTotalArmorValue(), 0.0F) - oldHealth);
         }
         return flag;
+    }
+
+    private boolean isOwnProjectileDamage(DamageSource source) {
+        Entity immediate = source.getImmediateSource();
+        Entity trueSource = source.getTrueSource();
+        Entity passenger = this.getControllingPassenger();
+        Entity owner = this.getOwnerPlayer();
+
+        if (trueSource == this || trueSource == passenger || trueSource == owner) {
+            return source.isProjectile() || source.isExplosion()
+                    || immediate instanceof net.minecraft.entity.projectile.EntityFireball
+                    || immediate instanceof net.minecraft.entity.projectile.EntityThrowable;
+        }
+        if (immediate instanceof net.minecraft.entity.projectile.EntityFireball
+                && ((net.minecraft.entity.projectile.EntityFireball) immediate).shootingEntity == this) {
+            return true;
+        }
+        return source instanceof EntityDamageSourceIndirect && immediate != null
+                && immediate.getEntityData().getInteger("narutofix_susanoo_owner") == this.getEntityId();
     }
 
     @Override

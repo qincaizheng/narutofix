@@ -36,7 +36,6 @@ public class mixinKeyBindingPowerIncrease {
         // Key released (was down, now up) = upgrade trigger
         boolean isKeyDown = this.keys.isKeyDown();
         if (!isKeyDown && this.wasKeyDown) {
-            System.out.println("[narutofix] KEY UP released! Sending upgrade packet");
             NarutoFix.PACKET_HANDLER.sendToServer(new PacketNarutofixSusanooUpgrade());
         }
     }

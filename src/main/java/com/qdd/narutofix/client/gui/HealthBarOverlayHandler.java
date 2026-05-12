@@ -5,19 +5,22 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 /**
  * Replaces the vanilla heart rendering with a compact progress bar.
- * Uses Forge's Pre(HEALTH) event: cancelling it prevents heart rendering
- * without affecting armor/food/mount-health (they have separate element events).
- * Only draws the bar - no covering rects that could interfere with other elements.
+ * Uses Pre(HEALTH) to cancel hearts, then draws a bar from hud.png.
+ * GL state is restored for subsequent ARMOR/FOOD elements.
  */
 @net.minecraftforge.fml.common.Mod.EventBusSubscriber(value = Side.CLIENT)
 public class HealthBarOverlayHandler {
+
+    private static final ResourceLocation HUD_TEX = new ResourceLocation("narutofix:textures/gui/hud.png");
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
@@ -25,70 +28,69 @@ public class HealthBarOverlayHandler {
         if (event.getType() != RenderGameOverlayEvent.ElementType.HEALTH) {
             return;
         }
-
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.player;
         if (player == null) return;
         if (!Configs.body.enableCompactHealthBar) return;
 
-        // Cancel vanilla heart rendering (only affects HEALTH element)
         event.setCanceled(true);
 
-        // Draw compact health bar
-        int width = event.getResolution().getScaledWidth();
-        int height = event.getResolution().getScaledHeight();
+        net.minecraftforge.client.GuiIngameForge.left_height += 11;
 
-        int barWidth = 80;
-        int barHeight = 8;
-        int x = width / 2 - 91;
-        int y = height - 39;
+        int barWidth = 82;
+        int barHeight = 11;
+        int x = event.getResolution().getScaledWidth() / 2 - 91;
+        int y = event.getResolution().getScaledHeight() - 39;
 
         float health = player.getHealth();
         float maxHealth = player.getMaxHealth();
         float ratio = Math.min(1.0f, health / maxHealth);
+        int fillWidth = Math.max(0, (int) ((barWidth - 4) * ratio));
 
-        // Save GL state before custom drawing to avoid leaking
-        // blend/texture/color state to subsequent overlay elements (ARMOR, FOOD, etc.)
         GlStateManager.pushMatrix();
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(
+                GlStateManager.SourceFactor.SRC_ALPHA,
+                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+                GlStateManager.SourceFactor.ONE,
+                GlStateManager.DestFactor.ZERO);
 
-        // Bar background
-        Gui.drawRect(x, y, x + barWidth, y + barHeight, 0xFF555555);
+        mc.renderEngine.bindTexture(HUD_TEX);
 
-        // Health fill - green/yellow/red
-        int color;
-        if (ratio > 0.6f) {
-            color = 0xFF00FF00;
-        } else if (ratio > 0.3f) {
-            color = 0xFFFFAA00;
-        } else {
-            color = 0xFFFF0000;
-        }
+        // Background frame (V=0)
+        mc.ingameGUI.drawTexturedModalRect(x, y, 0, 0, barWidth, barHeight);
 
-        int fillWidth = (int) ((barWidth - 2) * ratio);
+        // Red fill inside the frame (V=40)
         if (fillWidth > 0) {
-            Gui.drawRect(x + 1, y + 1, x + 1 + fillWidth, y + barHeight - 1, color);
+            mc.ingameGUI.drawTexturedModalRect(x + 2, y + 2, 2, 13, fillWidth, 7);
         }
 
-        // Border
-        Gui.drawRect(x, y, x + barWidth, y + 1, 0xFF000000);
-        Gui.drawRect(x, y + barHeight - 1, x + barWidth, y + barHeight, 0xFF000000);
-        Gui.drawRect(x, y, x + 1, y + barHeight, 0xFF000000);
-        Gui.drawRect(x + barWidth - 1, y, x + barWidth, y + barHeight, 0xFF000000);
+        // Re-draw frame on top to keep border
+        mc.ingameGUI.drawTexturedModalRect(x, y, 0, 0, barWidth, barHeight);
 
-        // HP text (moved up: y - 1)
+        // HP text
         String hpText = String.format("%.0f / %.0f", health, maxHealth);
         int textWidth = mc.fontRenderer.getStringWidth(hpText);
         mc.fontRenderer.drawStringWithShadow(hpText,
                 x + (barWidth - textWidth) / 2f,
-                y - 1,
+                y + 1,
                 0xFFFFFFFF);
+
+        GlStateManager.enableBlend();
 
         GlStateManager.popMatrix();
 
-        // Restore GL states that may have been polluted by Gui.drawRect
-        // and fontRenderer.drawStringWithShadow
+        // Restore GL state for subsequent ARMOR/FOOD
         GlStateManager.enableTexture2D();
-        GlStateManager.disableBlend();
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(
+                GlStateManager.SourceFactor.SRC_ALPHA,
+                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+                GlStateManager.SourceFactor.ONE,
+                GlStateManager.DestFactor.ZERO);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+        mc.renderEngine.bindTexture(Gui.ICONS);
     }
 }

@@ -691,3 +691,286 @@
 ### 上线状态
 - 环境层阻塞已解除，`runClient` 不再卡在 JNA 或 LWJGL native 架构错误。
 - 产品上线仍未完成：还需要进入世界按 `docs/validation-checklist.md` 做 HUD、背包 GUI、指令、能量恢复、血脉、写轮眼、须佐等实机功能验收；全部通过后才具备合回 `2836` 的条件。
+
+---
+
+## 2026-05-11 — 拉取 narutomod 0.3.1-beta 参考源码并更新路径
+
+### 角色
+主代理：按用户要求拉取参考源码并更新项目路径记录。
+
+### 变更
+- 已将 AHZNB/naruto_mod 的 `0.3.1-beta` 分支拉到本地：`/Users/qdd/codex/workspace/naruto_mod_0.3.1_beta`。
+- 本地参考仓库分支确认：`0.3.1-beta`，短提交：`2c0dec2`。
+- `AGENTS.md` 中的 narutomod 路径已从 Linux 旧路径更新为 macOS 当前路径。
+- `docs/diff.md` 同步更新项目基础行中的参考源码路径和当前分支状态。
+
+### 验证
+- 已确认 `/Users/qdd/codex/workspace/naruto_mod_0.3.1_beta/.git` 存在。
+- 已确认参考源码存在 `src/main/java/net/narutomod`。
+
+### 与产品上线关系
+- 本轮是开发环境与参考源码路径修正，不直接改变功能上线状态。
+- 后续修复六勾玉轮回眼 overlay 崩溃和须佐最高级武器右键失败时，应优先参考该本地源码，减少运行时接口签名误判。
+
+---
+
+## 2026-05-11 — 六勾玉 overlay 崩溃与须佐最高级武器修复（子代理）
+
+### 角色
+子代理：按主代理委托继续修复两个运行时问题；未执行 git 操作，未回滚既有未提交改动。
+
+### 变更
+- 新增 `src/main/java/com/qdd/narutofix/mixin/MixinOverlayByakuganView.java`：
+  - target 为 `net.narutomod.gui.overlay.OverlayByakuganView$GUIRenderEventClass`。
+  - 在 `eventHandler(RenderGameOverlayEvent)` HEAD 注入，`cancellable = true`。
+  - 当客户端玩家头盔为 `ItemSixTomoeRinnegan` 且 overlay 类型为 `HELMET` 时直接 `ci.cancel()`，避免 narutomod 白眼 overlay 继续执行并触发运行时 `ItemDojutsu$Base.getType()` 缺失崩溃。
+- 更新 `src/main/resources/mixins.narutofix.json`：
+  - 将 `MixinOverlayByakuganView` 加入 `client` mixin 列表。
+- 整理 `src/main/java/com/qdd/narutofix/items/ObsidianChokuto.java`：
+  - 骑乘旧 `EntitySusanooBase` 或新 `SusanooEntityBase` 时继续防止物品自毁。
+  - 右键空气和对方块右键在骑乘新须佐时双端消费；服务端调用 `((SusanooEntityBase) riding).fireHeldWeaponFor(player)`。
+- 整理 `src/main/java/com/qdd/narutofix/event/ObsidianChokutoEvent.java`：
+  - 移除无用导入并格式化。
+  - 挂载判断兼容旧 `EntitySusanooBase` 与新 `SusanooWingedEntity`。
+  - 发放黑曜石直刀逻辑明确只在服务端执行，避免客户端侧伪发放。
+
+### 验证
+- IDEA MCP `get_file_problems`：
+  - `MixinOverlayByakuganView.java`：无 error。
+  - `ObsidianChokutoEvent.java`：无 error。
+  - `mixins.narutofix.json`：无 error。
+  - `ObsidianChokuto.java`：无 error，仅保留既有 1.12.2 API 弃用/注解类 warning。
+- IDEA MCP `compileJava --stacktrace --rerun-tasks`：BUILD SUCCESSFUL。
+
+### 与产品上线关系
+- 本轮已完成静态编译层防护，但上线仍不能只凭编译放行。
+- 仍需 `runClient` 实机确认：
+  - 佩戴六勾玉轮回眼时不再触发 `OverlayByakuganView` 崩溃，天手力自有 overlay 仍正常。
+  - 骑乘新完全体须佐时黑曜石直刀不会自毁。
+  - 挂载发放主/副手武器正常。
+  - 右键空气和对方块右键能实际触发完全体须佐武器发射。
+  - 上述通过后，才可继续评估是否合回 `2836`。
+
+---
+
+## 2026-05-11 — 六勾玉 overlay / 须佐武器修复主代理复验
+
+### 角色
+主代理：接续上一轮修复，对关键改动做最终静态复核和 IDEA MCP 编译验证。
+
+### 复核结果
+- 已重新读取 `AGENTS.md`、`docs/diff.md`、`docs/project.md`，当前 todo 和强制约束未新增变化。
+- 当前分支仍为 `codex/fix-six-tomoe-susanoo-overlay`，未合回 `2836`。
+- `MixinOverlayByakuganView` 位于 client mixin 列表，避免服务端加载 `Minecraft` 客户端类。
+- `ObsidianChokuto` 的右键空气 / 右键方块入口均会在骑乘新 `SusanooEntityBase` 时消费交互，并仅在服务端调用实体武器发射。
+- `ObsidianChokutoEvent` 的挂载发放逻辑现在兼容旧 narutomod 须佐和新完全体须佐，并只在服务端发放。
+
+### 验证
+- IDEA MCP `get_file_problems`：
+  - `MixinOverlayByakuganView.java`：无 error。
+  - `ObsidianChokutoEvent.java`：无 error。
+  - `mixins.narutofix.json`：无 error。
+  - `ObsidianChokuto.java` / `SusanooEntityBase.java`：无 error，仅保留既有 1.12.2 Forge 弃用、注解、冗余转换等 warning。
+- IDEA MCP `compileJava --stacktrace --rerun-tasks`：BUILD SUCCESSFUL。
+
+### 与产品上线关系
+- 代理侧静态验证已通过，本轮两个问题已达到“可进客户端实机验收”的状态。
+- 仍不能直接合回 `2836`：需要用户进游戏确认六勾玉轮回眼头盔不再崩溃、天手力 overlay 不回退、完全体须佐黑曜石直刀不自毁、右键空气/方块能实际发射武器。
+
+---
+
+## 2026-05-11 — 清理白眼 overlay 耦合 + 恢复新须佐音效（子代理）
+
+### 角色
+子代理：按主代理委托完成本轮实现；不执行 git 操作，不回滚无关脏文件。
+
+### 变更文件
+
+| 文件 | 变更 |
+|------|------|
+| `src/main/java/com/qdd/narutofix/mixin/MixinProcedureKamuiJikukanIdo.java` | 移除 `import net.narutomod.gui.overlay.OverlayByakuganView`；移除 `OverlayByakuganView.sendCustomData(entity, false, 70)` 调用；只保留 `entity.getEntityData().setBoolean("kamui_teleport", false)`。 |
+| `src/main/java/com/qdd/narutofix/mixin/MixinOverlayByakuganView.java` | 移除 `import net.narutomod.gui.overlay.OverlayByakuganView`；`@Mixin` 改为字符串 target `@Mixin(targets = "net.narutomod.gui.overlay.OverlayByakuganView$GUIRenderEventClass")` 避免源码层 import。 |
+| `src/main/java/com/qdd/narutofix/handler/ModSounds.java` | 新增 `SUSANOO = create("player.susanoo")`；`registerSounds` 同时注册 `AMENOTEJIKARA` 和 `SUSANOO`。 |
+| `src/main/java/com/qdd/narutofix/handler/ModSoundHandler.java` | **删除**。`SUSANOO` 已由 `ModSounds` 统一注册，不存在其他引用，避免双注册同一个 SoundEvent。 |
+| `src/main/java/com/qdd/narutofix/entity/susanoo/SusanooSummonHandler.java` | 新增 `import ModSounds` 和 `import SoundCategory`；`summonSusanoo` 召唤 L0 成功后播放 `player.world.playSound(null, ..., ModSounds.SUSANOO, SoundCategory.NEUTRAL, 1.0F, 1.0F)`；`upgradeSusanoo` 成功升级到下一形态后（本地 `upgraded` flag）播放同一音效；`dismissSusanoo` 不播放。 |
+| `src/main/resources/assets/narutofix/sounds.json` | 新增 `amenotejikara: { "sounds": ["narutofix:amenotejikara"] }` 条目。 |
+| `docs/diff.md` | 更新 MixinOverlayByakuganView 行说明；新增一行汇总本轮变更。 |
+| `docs/project.md` | 追加本轮记录。 |
+
+### 验证状态
+
+- `compileJava --stacktrace --rerun-tasks`：BUILD SUCCESSFUL。
+- 唯一新增 warning：`MixinOverlayByakuganView.java:14: 警告: Mixin target net.narutomod... is public and should be specified in value` — 这是字符串 target 方式的预期 Mixin AP 提醒，不影响运行时。
+
+### 与产品上线关系
+
+代码层面已通过编译。仍需用户 runClient 实机确认：
+- 佩戴万花筒/永恒万花筒写轮眼时神威传送正常（不依赖 OverlayByakuganView）。
+- 须佐能乎召唤和升级时播放 susanoo 音效。
+- 使用天手力时播放 amenotejikara 音效。
+- 以上全部通过后，才具备合回 `2836` 的条件。
+
+## 2026-05-11 — 清理须佐调试输出与音效复验（主代理）
+
+### 角色
+主代理：接续子代理变更，完成文档清理、代码噪声清理和 IDEA MCP 复验。
+
+### 变更
+- `docs/diff.md`：删除一条残缺重复的“清理白眼 overlay 残留耦合 + 恢复新须佐音效”表格行，保留完整记录。
+- `SusanooSummonHandler`：移除升级流程中的临时 `System.out.println("[narutofix] upgrade...")` 调试输出，保留召唤成功和升级成功后的 `ModSounds.SUSANOO` 播放。
+- `mixinKeyBindingPowerIncrease`：移除升级按键发包时的临时调试输出，发包逻辑不变。
+
+### 复验
+- `OverlayByakuganView` 在 Java 源码中只剩 `MixinOverlayByakuganView` 的字符串 target，用于拦截 narutomod 全局白眼 overlay 崩溃路径；`MixinProcedureKamuiJikukanIdo` 不再 import 或调用 `OverlayByakuganView.sendCustomData`。
+- `ModSounds` 统一注册 `AMENOTEJIKARA` 和 `SUSANOO`，`ModSoundHandler` 已删除，避免重复注册 `narutofix:player.susanoo`。
+- `sounds.json` 保留 `player.susanoo -> narutofix:music/susanoo`，并补充 `amenotejikara -> narutofix:amenotejikara`。
+- IDEA MCP `compileJava --stacktrace --rerun-tasks`：BUILD SUCCESSFUL。唯一相关 warning 是 `MixinOverlayByakuganView` 字符串 target 的 Mixin AP 提醒，属于本轮为避免源码层 import 而保留的预期提示。
+
+### 与产品上线关系
+- 本轮是清理与静态复验，目标是让修复更接近可实机验收状态。
+- 仍需 `runClient` 进入世界确认：六勾玉轮回眼头盔不再触发白眼 overlay 崩溃、神威传送不退化、须佐召唤/升级音效播放、天手力音效播放、完全体须佐武器右键仍可释放。
+
+## 2026-05-11 — 须佐能乎之拳阶段逻辑调整（主代理）
+
+### 角色
+主代理：按用户要求修改“须佐能乎之拳”发放/清理规则。
+
+### 变更
+- 新增 `SusanooFistHelper`，统一判断旧 narutomod 须佐和新 narutofix 须佐是否处于无武器阶段。
+- `ObsidianChokutoEvent`：
+  - 玩家挂载任意须佐时先清理已有 `obsidianchokuto`，避免旧拳残留。
+  - 只有骨架须佐阶段才重新发放“须佐能乎之拳”。
+  - L0 半身骨架只发主手，L1 完整骨架可补副手；着衣须佐和完全体须佐不再发放。
+- `ObsidianChokuto`：
+  - 物品自身 tick 改为只在骨架须佐阶段保留。
+  - 玩家升级到有武器阶段或离开须佐后，拳头物品会自动 `shrink(1)` 消失。
+
+### 与产品上线关系
+- 本轮完成了静态逻辑调整，仍需 `runClient` 实机确认：L0/L1 有拳，L2/L3/L4 无拳且不会残留，完全体须佐自身武器右键释放仍正常。
+
+## 2026-05-11 — 完全体须佐双武器切换与神威手里剑释放修复（主代理）
+
+### 角色
+主代理：按用户反馈修复完全体须佐最高级双武器释放问题。
+
+### 问题定位
+- 完全体 `SusanooWingedEntity` 构造时主手固定为 `ItemKagutsuchiSwordRanged`，副手固定为 `ItemKamuiShuriken`。
+- 原 `fireHeldWeapon()` 只读取主手判断武器类型，因此神威手里剑分支永远进不去，只能发射刀对应的黑炎火球。
+
+### 变更
+- `SusanooWingedEntity` 新增 `USING_KAMUI_WEAPON` 同步状态，默认使用加具土命之剑。
+- `fireHeldWeapon()` 改为按当前武器状态发射：刀模式生成 `EntityBlackFireball`，神威模式生成 `EntityKamuiShuriken`。
+- 完全体须佐在满级后再次按升级键时，不再尝试升级，而是调用 `toggleActiveWeapon()` 在刀和神威手里剑之间切换。
+- 切换后会同步主副手显示并给玩家 action bar 提示当前武器。
+- 勾玉弹 `createBullet()` 临时清空副手后，在发射完成或清理时恢复当前武器显示，避免副手武器长期消失。
+- 中英文 lang 新增当前武器提示文本。
+
+### 与产品上线关系
+- IDEA MCP 文件错误检查通过；`compileJava --stacktrace --rerun-tasks` 已通过。
+- 仍需 `runClient` 实机确认：完全体默认右键发射刀，升级键切换后右键发射神威手里剑，再按升级键可切回刀；切换不触发升级音效，不影响 L0-L4 正常升级链路。
+
+## 2026-05-11 — 完全体须佐右键发射入口补齐（主代理）
+
+### 角色
+主代理：根据用户实机反馈“可以切换了，但是发射不了了”继续修复。
+
+### 问题定位
+- 武器切换包已经生效，说明完全体当前武器模式同步没有问题。
+- 发射失败的直接原因是前一轮按需求让有武器阶段的“须佐能乎之拳”自动消失；但旧的完全体发射入口依赖玩家手里的 `ObsidianChokuto` 右键调用 `fireHeldWeaponFor(player)`。
+- 进入完全体后拳头消失，玩家没有该物品入口，因此能切换武器但无法触发发射。
+
+### 变更
+- 新增 `PacketNarutofixSusanooFire`：服务端收到后检查玩家是否骑乘 `SusanooEntityBase`，确认后调用 `fireHeldWeaponFor(player)`。
+- 新增 client mixin `MixinMinecraftRightClickSusanoo`：拦截 `Minecraft.rightClickMouse()`；玩家骑乘新须佐时设置原版 4 tick 右键延迟、发射服务端包、播放主手挥动并取消原版右键流程。
+- `PacketRegister` 注册 `PacketNarutofixSusanooFire` 到服务端。
+- `mixins.narutofix.json` 将 `MixinMinecraftRightClickSusanoo` 加入 client mixin 列表。
+
+### 与产品上线关系
+- IDEA MCP 文件错误检查通过；`compileJava --stacktrace --rerun-tasks` 已通过。
+- 仍需 `runClient` 实机确认：完全体没有“须佐能乎之拳”时，右键仍能发射当前切换的刀/神威手里剑；L0/L1 拳头发放与 L2/L3/L4 拳头消失逻辑不被破坏。
+
+## 2026-05-11 — 完全体须佐右键发射入口二次修复（主代理）
+
+### 角色
+主代理：根据用户实测“仍然没有发射”继续定位并修正。
+
+### 问题定位
+- `run/logs/latest.log` 和 `run/logs/debug.log` 明确出现：
+  - `Critical problem: mixins.narutofix.json:MixinMinecraftRightClickSusanoo ... target net.minecraft.client.Minecraft was loaded too early.`
+- 因此上一轮拦截 `Minecraft.rightClickMouse()` 的 client mixin 加载时序不可靠，实机中没有稳定接管右键。
+
+### 变更
+- 删除 `MixinMinecraftRightClickSusanoo`，并从 `mixins.narutofix.json` 的 client 列表移除。
+- 新增 `SusanooMouseFireHandler`，使用 Forge 客户端 `MouseEvent` 监听右键按下：
+  - 仅在游戏聚焦、无 GUI、玩家骑乘新 `SusanooEntityBase` 时处理。
+  - 取消本次鼠标事件，发送 `PacketNarutofixSusanooFire` 到服务端。
+  - 自带 4 tick 冷却，避免按住右键每 tick 发包。
+  - 客户端播放主手挥动。
+- `ClientProxy` 初始化时注册 `SusanooMouseFireHandler` 到 `MinecraftForge.EVENT_BUS`。
+
+### 与产品上线关系
+- IDEA MCP 文件错误检查已通过；下一步执行 `compileJava`。
+- 需用户 runClient 实机确认：日志不再出现 `MixinMinecraftRightClickSusanoo loaded too early`，骑完全体空手右键能发射当前武器。
+
+## 2026-05-11 — 完全体须佐发射入口三次修复（主代理）
+
+### 角色
+主代理：根据用户实测“切换正常但仍没有发射”继续定位并修正。
+
+### 问题定位
+- 上一版使用 Forge `MouseEvent` 的右键按下事件发包，但 Forge 1.12.2 的鼠标事件发生在 `KeyBinding.setKeyBindState` 前；取消鼠标事件可能阻止 MC 自己更新 `keyBindUseItem` 状态。
+- `MouseEvent` 只覆盖鼠标边沿事件，不覆盖玩家改键或按住右键的持续触发，因此作为完全体须佐武器入口不够稳。
+- 原版神威手里剑和加具土命之剑都是 bow-style 使用逻辑；完全体实体直接发射时也应同步设置神威手里剑 scale，并让刀模式使用原版须佐的大黑炎火球逻辑。
+
+### 变更
+- `SusanooMouseFireHandler` 改为只在 `ClientTickEvent.Phase.END` 轮询 `Minecraft.gameSettings.keyBindUseItem.isKeyDown()`。
+- 玩家无 GUI、游戏聚焦、骑乘新 `SusanooEntityBase` 且按住使用键时，每 4 tick 发送一次 `PacketNarutofixSusanooFire`，并播放主手挥动。
+- 移除 `MouseEvent` 取消逻辑，避免阻断 MC 自己的按键状态更新，也支持用户改键。
+- `SusanooWingedEntity.fireHeldWeapon()` 对齐原版须佐武器行为：
+  - 加具土命之剑模式生成三枚 `EntityBigBlackFireball`，以完全体须佐自身作为发射者。
+  - 神威手里剑模式生成 `EntityKamuiShuriken` 后设置为完全体模型比例，并按玩家视线方向发射。
+- `SusanooWingedEntity.travel()` 增加 controlling passenger 类型保护，避免骑乘状态瞬间变化时空指针。
+
+### 验证
+- IDEA MCP 文件检查：
+  - `SusanooMouseFireHandler.java`：无 error。
+  - `SusanooWingedEntity.java`：无 error。
+  - `PacketNarutofixSusanooFire.java`：无 error。
+- IDEA MCP `compileJava --stacktrace --rerun-tasks`：BUILD SUCCESSFUL。
+- 唯一相关 warning 仍是 `MixinOverlayByakuganView` 字符串 target 的 Mixin AP 提醒，属于既有预期。
+
+### 与产品上线关系
+- 当前代码层已修正“输入未稳定发包”和“神威/刀弹体直接释放不完全对齐原版”两个风险点。
+- 仍需用户 runClient 实机确认：完全体须佐空手/非拳头状态按住右键能发射当前武器，升级键切换到神威后能发射放大的神威手里剑，再切回刀后能发三枚大黑炎火球。
+
+## 2026-05-11 — 完全体须佐发射点与自伤修复（主代理）
+
+### 角色
+主代理：根据用户实测“发射像玩家发射，弹体打在须佐身上并炸死须佐”继续修复。
+
+### 问题定位
+- 上一轮虽然服务端包能触发发射，但完全体武器的出生点仍按玩家眼睛位置计算；完全体须佐体积很大，玩家位于须佐内部，弹体容易先撞到须佐碰撞箱。
+- 加具土命大黑炎火球命中后的 `ProcedureAoeCommand.damageEntities` 会按范围伤害实体；如果爆炸发生在须佐附近且不排除自身，须佐会被自己武器炸死。
+
+### 变更
+- `SusanooWingedEntity.fireHeldWeapon()` 改为从须佐本体水平前方外侧生成弹体：
+  - 使用玩家视线决定飞行方向。
+  - 使用水平朝向将出生点推出须佐碰撞箱外侧，避免仰俯角导致水平偏移不足。
+  - 出生高度取完全体高度约 58%，更接近须佐上身/武器区域，而不是玩家眼睛。
+- 神威手里剑创建后显式 `setPosition` 到须佐前方，设置 `ignoreEntity = this`，并写入 `narutofix_susanoo_owner` 标记。
+- 大黑炎火球创建后同样放到须佐前方，并写入 `narutofix_susanoo_owner` 标记。
+- `SusanooEntityBase.attackEntityFrom()` 新增 `isOwnProjectileDamage` 防护：
+  - 免疫自身、骑乘者或 owner 发出的投射物/爆炸/火球/throwable 伤害。
+  - 免疫带有 `narutofix_susanoo_owner` 标记且归属当前须佐的间接伤害。
+
+### 验证
+- IDEA MCP 文件检查：
+  - `SusanooWingedEntity.java`：无 error。
+  - `SusanooEntityBase.java`：无 error。
+- IDEA MCP `compileJava --stacktrace --rerun-tasks`：BUILD SUCCESSFUL。
+- 唯一相关 warning 仍是 `MixinOverlayByakuganView` 字符串 target 的 Mixin AP 提醒，属于既有预期。
+
+### 与产品上线关系
+- 当前代码层已修复完全体武器“从玩家身体里发射”和“自家弹体/AOE 反杀须佐”的问题。
+- 仍需用户 runClient 实机确认：完全体右键发射的火球/神威手里剑从须佐前方出现，不再撞自己；近距离爆炸不会把自己的须佐炸死；对敌方实体仍可造成效果。
