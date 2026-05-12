@@ -51,7 +51,7 @@ public class CommandAddChakra extends CommandBase {
             throw new CommandException("commands.addchakra.positive", amount);
         }
 
-        double soulRatio = 0.5D;
+        double soulRatio = 0.25D;
         if (args.length == 3) {
             soulRatio = parseDouble(args[2]);
             if (soulRatio < 0.0D || soulRatio > 1.0D) {

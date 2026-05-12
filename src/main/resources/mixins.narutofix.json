@@ -22,6 +22,7 @@
     "MixinProcedureAmaterasu",
     "MixinProcedureAmaterasuFlameOnPotionActiveTick",
     "MixinProcedureAnimalPath",
+    "MixinProcedureAsuraPathArmorBodyTickEvent",
     "MixinProcedureChakraFruitFoodEaten",
     "MixinProcedureChakraRegenerationOnPotionActiveTick",
     "MixinProcedureEightTrigrams64Palms",
