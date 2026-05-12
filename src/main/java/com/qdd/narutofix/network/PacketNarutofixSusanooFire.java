@@ -10,15 +10,23 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketNarutofixSusanooFire implements IMessage, IMessageHandler<PacketNarutofixSusanooFire, IMessage> {
 
+    private int chargeTicks;
+
     public PacketNarutofixSusanooFire() {
+    }
+
+    public PacketNarutofixSusanooFire(int chargeTicks) {
+        this.chargeTicks = chargeTicks;
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
+        buf.writeInt(this.chargeTicks);
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
+        this.chargeTicks = buf.readInt();
     }
 
     @Override
@@ -27,6 +35,7 @@ public class PacketNarutofixSusanooFire implements IMessage, IMessageHandler<Pac
         player.getServerWorld().addScheduledTask(() -> {
             Entity riding = player.getRidingEntity();
             if (riding instanceof SusanooEntityBase) {
+                ((SusanooEntityBase) riding).getEntityData().setInteger("narutofix_chargeTicks", message.chargeTicks);
                 ((SusanooEntityBase) riding).fireHeldWeaponFor(player);
             }
         });

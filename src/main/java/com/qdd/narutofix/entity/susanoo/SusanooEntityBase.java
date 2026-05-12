@@ -577,7 +577,11 @@ public abstract class SusanooEntityBase extends EntityCreature implements IRange
         if (!this.world.isRemote && owner != null) {
             this.setShowSword(owner.getHeldItemMainhand().getItem() == net.narutomod.item.ItemChokuto.block);
             if (owner.getHeldItemMainhand().getItem() == net.narutomod.item.ItemShuriken.block) {
-                this.createBullet((float)this.getEntityData().getDouble("entityModelScale") * 0.5f);
+                if (owner.isHandActive()) {
+                    this.createBullet((float)this.getEntityData().getDouble("entityModelScale") * 0.5f);
+                } else {
+                    this.killBullet();
+                }
             } else {
                 this.killBullet();
             }

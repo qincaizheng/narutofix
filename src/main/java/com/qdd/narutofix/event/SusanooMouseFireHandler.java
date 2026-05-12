@@ -12,6 +12,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 public class SusanooMouseFireHandler {
 
     private int rightClickCooldown;
+    private boolean wasKeyDown;
+    private int chargeTicks;
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
@@ -26,17 +28,37 @@ public class SusanooMouseFireHandler {
         Minecraft minecraft = Minecraft.getMinecraft();
         EntityPlayerSP player = minecraft.player;
         if (player == null || minecraft.currentScreen != null || !minecraft.inGameHasFocus) {
+            this.wasKeyDown = false;
+            this.chargeTicks = 0;
             return;
         }
         if (!(player.getRidingEntity() instanceof SusanooEntityBase)) {
-            return;
-        }
-        if (this.rightClickCooldown > 0 || !minecraft.gameSettings.keyBindUseItem.isKeyDown()) {
+            this.wasKeyDown = false;
+            this.chargeTicks = 0;
             return;
         }
 
-        this.rightClickCooldown = 4;
-        NarutoFix.PACKET_HANDLER.sendToServer(new PacketNarutofixSusanooFire());
-        player.swingArm(EnumHand.MAIN_HAND);
+        boolean isKeyDown = minecraft.gameSettings.keyBindUseItem.isKeyDown();
+
+        // Key just pressed start charging
+        if (isKeyDown && !this.wasKeyDown) {
+            this.chargeTicks = 0;
+        }
+
+        if (isKeyDown) {
+            ++this.chargeTicks;
+        }
+
+        // Key released: fire with accumulated charge ticks
+        if (!isKeyDown && this.wasKeyDown) {
+            if (this.rightClickCooldown <= 0) {
+                this.rightClickCooldown = 4;
+                NarutoFix.PACKET_HANDLER.sendToServer(new PacketNarutofixSusanooFire(this.chargeTicks));
+                player.swingArm(EnumHand.MAIN_HAND);
+            }
+            this.chargeTicks = 0;
+        }
+
+        this.wasKeyDown = isKeyDown;
     }
 }
