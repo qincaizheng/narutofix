@@ -41,6 +41,14 @@ public class EyeKeyHandler {
     }
 
     private void processKeys() {
+        if (Minecraft.getMinecraft().player != null
+                && Minecraft.getMinecraft().player.getRidingEntity() instanceof com.qdd.narutofix.entity.susanoo.SusanooEntityBase) {
+            this.lastCycleState = this.cycleEyeKey.isKeyDown();
+            this.lastOpenState = this.openEyeStorageKey.isKeyDown();
+            this.lastSusanooState = this.sixTomoeSusanooKey.isKeyDown();
+            this.lastGenjutsuState = this.sixTomoeGenjutsuKey.isKeyDown();
+            return;
+        }
         boolean cycleDown = this.cycleEyeKey.isKeyDown();
         if (cycleDown && !this.lastCycleState) {
             NarutoFix.PACKET_HANDLER.sendToServer(new CycleEquippedEyeMessage());
