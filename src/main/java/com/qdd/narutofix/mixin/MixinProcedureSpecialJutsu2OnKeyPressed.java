@@ -1,24 +1,26 @@
 package com.qdd.narutofix.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
-import com.qdd.narutofix.items.ModItems;
-import com.qdd.narutofix.items.SixTomoeRinneganLogic;
 import com.qdd.narutofix.util.DojutsuEyeHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.narutomod.item.ItemDojutsu;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
+import net.narutomod.item.ItemAsuraCanon;
+import net.narutomod.item.ItemAsuraPathArmor;
+import net.narutomod.item.ItemRinnegan;
+import net.narutomod.item.ItemTenseigan;
 import net.narutomod.procedure.ProcedureAnimalPath;
+import net.narutomod.procedure.ProcedureChibakuTenseiOnKeyPressed;
 import net.narutomod.procedure.ProcedureNarakaPath;
 import net.narutomod.procedure.ProcedureOuterPath;
 import net.narutomod.procedure.ProcedurePretaPath;
 import net.narutomod.procedure.ProcedureSpecialJutsu2OnKeyPressed;
+import net.narutomod.procedure.ProcedureUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Map;
@@ -27,7 +29,7 @@ import java.util.HashMap;
 @Mixin(ProcedureSpecialJutsu2OnKeyPressed.class)
 public abstract class MixinProcedureSpecialJutsu2OnKeyPressed {
     @Inject(method = "executeProcedure", at = @At("HEAD"), cancellable = true, remap = false)
-    private static void narutofix$reroutePathsForSixTomoe(Map<String, Object> dependencies, CallbackInfo ci) {
+    private static void narutofix$routeForVirtualEye(Map<String, Object> dependencies, CallbackInfo ci) {
         Entity entity = (Entity) dependencies.get("entity");
         Object pressed = dependencies.get("is_pressed");
         if (!(entity instanceof EntityPlayer) || !(pressed instanceof Boolean)) {
@@ -36,62 +38,74 @@ public abstract class MixinProcedureSpecialJutsu2OnKeyPressed {
         EntityPlayer player = (EntityPlayer) entity;
         boolean is_pressed = (boolean) pressed;
 
-        // Check if player has six-tomoe rinnegan as their effective eye
-        ItemStack effectiveEye = DojutsuEyeHelper.getEffectiveEye(player);
-        if (effectiveEye.isEmpty() || effectiveEye.getItem() != ModItems.SIX_TOMOE_RINNEGAN) {
+        ItemStack virtualEye = DojutsuEyeHelper.getVirtualEye(player);
+        if (virtualEye.isEmpty()) return;
+        if (virtualEye.getItem() != ItemRinnegan.helmet && virtualEye.getItem() != ItemTenseigan.helmet) return;
+
+        if (is_pressed) {
+            ci.cancel();
             return;
         }
 
-        // Six-tomoe routing uses its own skill group system (SixTomoeRinneganLogic)
-        // For six path skills (Naraka/Preta/Animal/Asura), route directly here when not pressing
-        if (!is_pressed) {
-            double which_path = effectiveEye.hasTagCompound()
-                    ? effectiveEye.getTagCompound().getDouble("which_path") : -1;
-            net.minecraft.world.World world = (net.minecraft.world.World) dependencies.get("world");
-            int x = (int) dependencies.get("x");
-            int y = (int) dependencies.get("y");
-            int z = (int) dependencies.get("z");
+        double which_path = virtualEye.hasTagCompound()
+                ? virtualEye.getTagCompound().getDouble("which_path") : -1;
+        World world = (World) dependencies.get("world");
+        int x = (int) dependencies.get("x");
+        int y = (int) dependencies.get("y");
+        int z = (int) dependencies.get("z");
 
-            if (which_path == 4) {
-                // Naraka Path (地狱道/阎王)
-                Map<String, Object> pathDeps = new HashMap<>();
+        // Handle Asura Path (which_path == 1) — equip/clear armor
+        if (which_path == 1) {
+            if (player.inventory.armorInventory.get(2).getItem() != ItemAsuraPathArmor.body) {
+                ProcedureUtils.swapItemToSlot(player, EntityEquipmentSlot.CHEST, new ItemStack(ItemAsuraPathArmor.body));
+                ProcedureUtils.swapItemToSlot(player, EntityEquipmentSlot.OFFHAND, new ItemStack(ItemAsuraCanon.block));
+            }
+        } else {
+            player.inventory.clearMatchingItems(ItemAsuraPathArmor.body, -1, -1, null);
+            player.inventory.clearMatchingItems(ItemAsuraCanon.block, -1, -1, null);
+        }
+
+        Map<String, Object> pathDeps;
+        switch ((int) which_path) {
+            case 4: // Naraka Path
+                pathDeps = new HashMap<>();
                 pathDeps.put("entity", entity);
                 pathDeps.put("world", world);
                 ProcedureNarakaPath.executeProcedure(pathDeps);
-            } else if (which_path == 3) {
-                // Preta Path (饿鬼道/吸收护盾)
-                Map<String, Object> pathDeps = new HashMap<>();
+                break;
+            case 3: // Preta Path
+                pathDeps = new HashMap<>();
                 pathDeps.put("entity", entity);
                 pathDeps.put("world", world);
                 ProcedurePretaPath.executeProcedure(pathDeps);
-            } else if (which_path == 2) {
-                // Animal Path (通灵狗)
-                Map<String, Object> pathDeps = new HashMap<>();
+                break;
+            case 2: // Animal Path
+                pathDeps = new HashMap<>();
                 pathDeps.put("entity", entity);
                 pathDeps.put("world", world);
                 ProcedureAnimalPath.executeProcedure(pathDeps);
-            } else if (which_path == 5) {
-                // Outer Path (外道魔像)
-                Map<String, Object> pathDeps = new HashMap<>();
-                pathDeps.put("is_pressed", is_pressed);
+                break;
+            case 5: // Outer Path
+                pathDeps = new HashMap<>();
+                pathDeps.put("is_pressed", false);
                 pathDeps.put("entity", entity);
                 pathDeps.put("world", world);
                 pathDeps.put("x", x);
                 pathDeps.put("y", y);
                 pathDeps.put("z", z);
                 ProcedureOuterPath.executeProcedure(pathDeps);
-            }
-            // which_path == 1 (Asura Path) is handled by ProcedureRinneganHelmetTickEvent
-            // which_path == 0 (Chibaku Tensei) is handled by SixTomoeRinneganLogic skill groups
+                break;
+            case 0: // Chibaku Tensei
+                pathDeps = new HashMap<>();
+                pathDeps.put("is_pressed", false);
+                pathDeps.put("entity", entity);
+                pathDeps.put("world", world);
+                pathDeps.put("x", x);
+                pathDeps.put("y", y);
+                pathDeps.put("z", z);
+                ProcedureChibakuTenseiOnKeyPressed.executeProcedure(pathDeps);
+                break;
         }
         ci.cancel();
-    }
-
-    @Redirect(method = "executeProcedure", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/NonNullList;get(I)Ljava/lang/Object;"))
-    private static Object narutofix$getHelmet(NonNullList<ItemStack> inventory, int index, @Local(name="entity") Entity player) {
-        if(inventory.get(index).getItem() instanceof ItemDojutsu.Base) {
-            return inventory.get(index);
-        }
-        return DojutsuEyeHelper.getVirtualEye((EntityLivingBase) player);
     }
 }

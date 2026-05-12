@@ -1,23 +1,21 @@
 package com.qdd.narutofix.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import com.qdd.narutofix.items.ModItems;
 import com.qdd.narutofix.items.SixTomoeRinneganLogic;
 import com.qdd.narutofix.util.DojutsuEyeHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import net.narutomod.item.ItemDojutsu;
-import net.narutomod.item.ItemSharingan;
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.item.ItemRinnegan;
+import net.narutomod.item.ItemTenseigan;
 import net.narutomod.procedure.ProcedurePowerIncreaseOnKeyPressed;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Map;
@@ -35,32 +33,41 @@ public abstract class MixinProcedurePowerIncreaseOnKeyPressed {
         }
 
         EntityPlayer player = (EntityPlayer) entity;
+        boolean isPressed = (Boolean) pressed;
 
-        // --- Six-Tomoe Rinnegan logic (preserved from original) ---
+        // Six-Tomoe Rinnegan logic (existing)
         if (!(player.getHeldItemMainhand().getItem() instanceof ItemJutsu.Base
                 || player.getHeldItemOffhand().getItem() instanceof ItemJutsu.Base)) {
             if (DojutsuEyeHelper.hasEitherEye(player, ModItems.SIX_TOMOE_RINNEGAN)) {
                 ItemStack stack = DojutsuEyeHelper.getMatchingEye(player, ModItems.SIX_TOMOE_RINNEGAN);
                 if (!stack.isEmpty()) {
-                    SixTomoeRinneganLogic.onSwitchJutsuKey((Boolean) pressed, stack, player);
+                    SixTomoeRinneganLogic.onSwitchJutsuKey(isPressed, stack, player);
                     ci.cancel();
                     return;
                 }
             }
         }
 
-        // --- narutofix Susanoo upgrade handled in mixinKeyBindingPowerIncrease ---
-    }
+        // Virtual vanilla Rinnegan/Tenseigan which_path cycling
+        ItemStack virtualEye = DojutsuEyeHelper.getVirtualEye(player);
+        if (virtualEye.isEmpty()) return;
+        if (virtualEye.getItem() != ItemRinnegan.helmet && virtualEye.getItem() != ItemTenseigan.helmet) return;
 
-    @Redirect(method = "executeProcedure", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/NonNullList;get(I)Ljava/lang/Object;"))
-    private static ItemStack narutofix$getHelmet(NonNullList<ItemStack> inventory, int index, @Local(name="entity") Entity player) {
-        if (index != 3 || player == null) {
-            return inventory.get(index);
+        if (player.getHeldItemMainhand().getItem() instanceof ItemJutsu.Base
+                || player.getHeldItemOffhand().getItem() instanceof ItemJutsu.Base) return;
+
+        if (!isPressed) {
+            if (!virtualEye.hasTagCompound()) {
+                virtualEye.setTagCompound(new NBTTagCompound());
+            }
+            double which_path = (virtualEye.getTagCompound().getDouble("which_path") + 1) % 6;
+            virtualEye.getTagCompound().setDouble("which_path", which_path);
+            if (!player.world.isRemote) {
+                player.sendStatusMessage(new TextComponentString(
+                        net.minecraft.util.text.translation.I18n.translateToLocal(
+                                String.format("chattext.rinnegan.path%d", (int) which_path))), true);
+            }
         }
-        if (inventory.get(index).getItem() instanceof ItemDojutsu.Base) {
-            return inventory.get(index);
-        }
-        ItemStack virtual = DojutsuEyeHelper.getVirtualEye((EntityLivingBase) player);
-        return virtual.isEmpty() ? inventory.get(index) : virtual;
+        ci.cancel();
     }
 }
