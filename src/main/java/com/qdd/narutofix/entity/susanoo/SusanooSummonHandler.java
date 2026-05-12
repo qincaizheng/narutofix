@@ -107,7 +107,10 @@ public class SusanooSummonHandler {
                 }
             }
         } else if (riding instanceof SusanooWingedEntity) {
-            // Already at max level — pressing the upgrade key does nothing here.
+            boolean usingKamui = ((SusanooWingedEntity) riding).toggleActiveWeapon();
+            player.sendStatusMessage(new TextComponentTranslation(usingKamui
+                    ? "message.narutofix.susanoo.weapon.kamui"
+                    : "message.narutofix.susanoo.weapon.kagutsuchi"), true);
         }
 
         // Play upgrade sound (only for L3->L4 final upgrade)
