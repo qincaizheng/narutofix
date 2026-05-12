@@ -691,3 +691,35 @@
 ### 上线状态
 - 环境层阻塞已解除，`runClient` 不再卡在 JNA 或 LWJGL native 架构错误。
 - 产品上线仍未完成：还需要进入世界按 `docs/validation-checklist.md` 做 HUD、背包 GUI、指令、能量恢复、血脉、写轮眼、须佐等实机功能验收；全部通过后才具备合回 `2836` 的条件。
+
+---
+
+## 2026-05-12 — 新增 /addchakra 指令 + 查克拉果实增加 soul/body
+
+### 角色
+主代理：按照用户要求实现"加查克拉"指令并应用到查克拉果实。
+
+### 实现原理
+查克拉 = 灵魂能量（阴/精神能量）+ 肉体能量（阳/身体能量）。因此"增加查克拉"的实际操作是**按比例同时增加 soul 和 body 的当前值和上限**，不直接操作原版查克拉。
+
+### 变更
+
+| 文件 | 变更 |
+|------|------|
+| `src/main/java/.../util/EnergyMath.java` | 新增 `addBodyAndSoul(EntityPlayerMP, double soulAmount, double bodyAmount)` 公用静态方法。同时增加当前值和上限，并自动同步到客户端。 |
+| `src/main/java/.../command/CommandAddChakra.java` | **新建** 指令 `/addchakra <player> <amount> [soulRatio]`。amount 按 soulRatio（默认 0.5）分摊到 soul 和 body，调用 `EnergyMath.addBodyAndSoul`。 |
+| `src/main/java/.../NarutoFix.java` | 注册 `CommandAddChakra`。 |
+| `src/main/java/.../Configs.java` | 新增 `ChakraFruitConfig`：`soulAmount=500` / `bodyAmount=500`。 |
+| `src/main/java/.../mixin/MixinProcedureChakraFruitFoodEaten.java` | **新建** TAIL 混合——查克拉果实食用后按配置增加 soul+body。 |
+| `src/main/resources/mixins.narutofix.json` | 注册 `MixinProcedureChakraFruitFoodEaten`。 |
+| `zh_cn.lang` / `en_us.lang` | 新增指令用法、反馈、配置 lang key。 |
+| `docs/diff.md` | 追加本轮需求差异条目。 |
+
+### 验证状态
+- 通过 `git diff 2836` 确认基线差分正确。
+- `2836` 分支本身存在预编译失败（`fireHeldWeaponFor(EntityPlayerMP)` 未找到），这是 `codex/fix-six-tomoe-susanoo-overlay` 未合回的问题，不涉本轮改动。
+- 分支：`codex/add-chakra-command-and-fruit`（从 2836 切出）。
+
+### 与产品上线关系
+- 需要在 `runClient` 中确认 `/addchakra` 指令正常执行、查克拉果实吃后 soul/body 增加。
+- 当前分支独立性好，可在验证通过后合回 `2836`。

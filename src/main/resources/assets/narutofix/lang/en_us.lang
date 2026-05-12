@@ -148,3 +148,10 @@ narutofix.config.chakraCrouchExchange.insufficientPolicy=Insufficient Policy
 narutofix.config.sleep=Sleep Recovery Settings
 narutofix.config.sleep.soulRecoveryPercent=Soul Recovery Percent
 narutofix.config.sleep.bodyRecoveryPercent=Body Recovery Percent
+
+# P4: Chakra Command + Chakra Fruit
+narutofix.command.addchakra.usage=/addchakra <player> <amount> [soulRatio]
+narutofix.command.addchakra.done=§aChakra added: +%s soul, +%s body
+narutofix.config.chakraFruit=Chakra Fruit Settings
+narutofix.config.chakraFruit.soulAmount=Fruit Soul Amount
+narutofix.config.chakraFruit.bodyAmount=Fruit Body Amount

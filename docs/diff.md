@@ -54,3 +54,8 @@
 | 须佐能乎重写：新建独立实体体系，低耦合。 | 已新建 18 个文件约 4137 行代码，含三形态实体、AI、模型渲染、召唤逻辑 | 已实现，待实机验收 | 继承 EntityCreature 而非 narutomod 的 EntitySusanooBase，仅通过 Chakra.pathway()/PlayerTracker/DojutsuEyeHelper 三个静态点交互 |
 | 须佐入口接管 narutomod：原版 summon/upgrade 从 ProcedureSusanoo 重定向到新系统 | mixinProcedureSusanoo 使用 @Inject HEAD cancellable 彻底替换原版 execute/upgrade | 已实现 | 原版按键/事件自动路由到新实体 |
 | 六勾玉轮回眼可召唤须佐 | DojutsuEyeHelper.getCompatibleSusanooEye() 已包含 ModItems.SIX_TOMOE_RINNEGAN | 已实现 | 无需额外配置 |
+
+| 新增 `/addchakra` 指令：按比例增加玩家 soul 和 body 的当前值和上限，不直接操作查克拉。 | 已新增 `CommandAddChakra.java`，用法 `/addchakra <player> <amount> [soulRatio]`（默认 0.5）。 | 已实现 | 指令仅操作 soul+body，查克拉通过 `ChakraSyncHelper.refresh()` 间接同步显示。 |
+| 抽象公用方法 `EnergyMath.addBodyAndSoul(EntityPlayerMP, double, double)`，同时增加 soul 和 body 的当前值和上限，并同步到客户端。 | 已新增，支持调用方只传玩家和两个数量。 | 已实现 | 供指令和查克拉果实共用。 |
+| 查克拉果实（`ItemChakraFruit` → `ProcedureChakraFruitFoodEaten`）食用后也调用公用方法增加 soul+body。 | 已新增 `MixinProcedureChakraFruitFoodEaten`（TAIL 注入），数量由配置 `chakraFruit.soulAmount/bodyAmount` 控制，默认各 500。 | 已实现 | 不修改原版 narutomod 的 `ProcedureChakraFruitFoodEaten`，沿用其原有转生眼/轮回眼/经验球分发逻辑。 |
+| 查克拉果实配置化：soulAmount / bodyAmount 进入 `Configs.java`。 | 已在 `Configs.java` 新增 `ChakraFruitConfig` 配置块，默认各 500。 | 已实现 | 玩家可在配置文件中调整。 |
