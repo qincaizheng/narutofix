@@ -27,7 +27,7 @@ public class mixinKeyBindingPowerIncrease {
     @Shadow(remap = false)
     private boolean wasKeyDown;
 
-    @Inject(method = "processKeyBind", at = @At("HEAD"), remap = false)
+    @Inject(method = "processKeyBind", at = @At("HEAD"), remap = false, cancellable = true)
     private void narutofix$upgradeOurSusanoo(CallbackInfo ci) {
         EntityPlayer player = Minecraft.getMinecraft().player;
         if (player == null) return;
@@ -38,6 +38,9 @@ public class mixinKeyBindingPowerIncrease {
         if (!isKeyDown && this.wasKeyDown) {
             NarutoFix.PACKET_HANDLER.sendToServer(new PacketNarutofixSusanooUpgrade());
         }
+
+        // Cancel original processKeyBind to prevent narutomod triggering other actions
+        ci.cancel();
     }
 
     @Inject(method = "onKeyInput",at= @At(value = "INVOKE", target = "Lnet/narutomod/keybind/KeyBindingPowerIncrease;processKeyBind()V"),remap = false)
