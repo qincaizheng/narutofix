@@ -5,10 +5,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.narutomod.item.ItemAsuraCanon;
 import net.narutomod.item.ItemAsuraPathArmor;
+import net.narutomod.item.ItemDojutsu;
 import net.narutomod.item.ItemRinnegan;
 import net.narutomod.item.ItemTenseigan;
 import net.narutomod.procedure.ProcedureAnimalPath;
@@ -37,6 +37,12 @@ public abstract class MixinProcedureSpecialJutsu2OnKeyPressed {
         }
         EntityPlayer player = (EntityPlayer) entity;
         boolean is_pressed = (boolean) pressed;
+
+        // Only intercept for virtual Rinnegan/Tenseigan when head slot is empty or non-do-jutsu
+        ItemStack headSlot = player.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+        if (headSlot.getItem() instanceof ItemDojutsu.Base) {
+            return; // head slot has a dojutsu — let original procedure handle it
+        }
 
         ItemStack virtualEye = DojutsuEyeHelper.getVirtualEye(player);
         if (virtualEye.isEmpty()) return;

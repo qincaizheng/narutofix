@@ -5,10 +5,12 @@ import com.qdd.narutofix.items.SixTomoeRinneganLogic;
 import com.qdd.narutofix.util.DojutsuEyeHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.narutomod.item.ItemDojutsu;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemRinnegan;
 import net.narutomod.item.ItemTenseigan;
@@ -48,7 +50,12 @@ public abstract class MixinProcedurePowerIncreaseOnKeyPressed {
             }
         }
 
-        // Virtual vanilla Rinnegan/Tenseigan which_path cycling
+        // Only intercept for virtual Rinnegan/Tenseigan when head slot is empty or non-do-jutsu
+        ItemStack headSlot = player.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+        if (headSlot.getItem() instanceof ItemDojutsu.Base) {
+            return; // head slot has a dojutsu — let original procedure handle it
+        }
+
         ItemStack virtualEye = DojutsuEyeHelper.getVirtualEye(player);
         if (virtualEye.isEmpty()) return;
         if (virtualEye.getItem() != ItemRinnegan.helmet && virtualEye.getItem() != ItemTenseigan.helmet) return;
