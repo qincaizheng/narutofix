@@ -9,6 +9,9 @@ import net.minecraft.world.World;
 import net.narutomod.item.ItemAsuraCanon;
 import net.narutomod.item.ItemAsuraPathArmor;
 import net.narutomod.item.ItemDojutsu;
+import net.narutomod.item.ItemMangekyoSharingan;
+import net.narutomod.item.ItemMangekyoSharinganEternal;
+import net.narutomod.item.ItemMangekyoSharinganObito;
 import net.narutomod.item.ItemRinnegan;
 import net.narutomod.item.ItemTenseigan;
 import net.narutomod.procedure.ProcedureAnimalPath;
@@ -38,89 +41,97 @@ public abstract class MixinProcedureSpecialJutsu2OnKeyPressed {
         EntityPlayer player = (EntityPlayer) entity;
         boolean is_pressed = (boolean) pressed;
 
-        // Only intercept for virtual eye when head slot is empty or non-do-jutsu
+        // If head slot has a dojutsu, let original procedure handle everything
         ItemStack headSlot = player.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
         if (headSlot.getItem() instanceof ItemDojutsu.Base) {
-            return; // head slot has a dojutsu — let original procedure handle it
+            return;
         }
 
         ItemStack virtualEye = DojutsuEyeHelper.getVirtualEye(player);
         if (virtualEye.isEmpty()) return;
 
-        // Mangekyo / Eternal / Obito in virtual slot -> summon/upgrade susanoo
-        if (!is_pressed && DojutsuEyeHelper.isSusanooCompatibleEye(virtualEye)) {
-            com.qdd.narutofix.entity.susanoo.SusanooSummonHandler.summonSusanoo(player);
+        // Six-tomoe has its own key bind system (R/V/X/H via EyeKeyHandler),
+        // so skill 2 key should NOT trigger anything for six-tomoe
+        if (virtualEye.getItem() == com.qdd.narutofix.items.ModItems.SIX_TOMOE_RINNEGAN) {
             ci.cancel();
             return;
         }
 
-        // Six-path routing for virtual Rinnegan/Tenseigan
-        if (virtualEye.getItem() != ItemRinnegan.helmet && virtualEye.getItem() != ItemTenseigan.helmet) return;
+        // Virtual Rinnegan / Tenseigan -> six-path routing
+        if (virtualEye.getItem() == ItemRinnegan.helmet || virtualEye.getItem() == ItemTenseigan.helmet) {
+            if (!is_pressed) {
+                double which_path = virtualEye.hasTagCompound()
+                        ? virtualEye.getTagCompound().getDouble("which_path") : -1;
+                World world = (World) dependencies.get("world");
+                int x = (int) dependencies.get("x");
+                int y = (int) dependencies.get("y");
+                int z = (int) dependencies.get("z");
 
-        if (is_pressed) {
-            ci.cancel();
-            return;
-        }
+                if (which_path == 1) {
+                    if (player.inventory.armorInventory.get(2).getItem() != ItemAsuraPathArmor.body) {
+                        ProcedureUtils.swapItemToSlot(player, EntityEquipmentSlot.CHEST, new ItemStack(ItemAsuraPathArmor.body));
+                        ProcedureUtils.swapItemToSlot(player, EntityEquipmentSlot.OFFHAND, new ItemStack(ItemAsuraCanon.block));
+                    }
+                } else {
+                    player.inventory.clearMatchingItems(ItemAsuraPathArmor.body, -1, -1, null);
+                    player.inventory.clearMatchingItems(ItemAsuraCanon.block, -1, -1, null);
+                }
 
-        double which_path = virtualEye.hasTagCompound()
-                ? virtualEye.getTagCompound().getDouble("which_path") : -1;
-        World world = (World) dependencies.get("world");
-        int x = (int) dependencies.get("x");
-        int y = (int) dependencies.get("y");
-        int z = (int) dependencies.get("z");
-
-        // Handle Asura Path (which_path == 1) — equip/clear armor
-        if (which_path == 1) {
-            if (player.inventory.armorInventory.get(2).getItem() != ItemAsuraPathArmor.body) {
-                ProcedureUtils.swapItemToSlot(player, EntityEquipmentSlot.CHEST, new ItemStack(ItemAsuraPathArmor.body));
-                ProcedureUtils.swapItemToSlot(player, EntityEquipmentSlot.OFFHAND, new ItemStack(ItemAsuraCanon.block));
+                Map<String, Object> pathDeps;
+                switch ((int) which_path) {
+                    case 4:
+                        pathDeps = new HashMap<>();
+                        pathDeps.put("entity", entity);
+                        pathDeps.put("world", world);
+                        ProcedureNarakaPath.executeProcedure(pathDeps);
+                        break;
+                    case 3:
+                        pathDeps = new HashMap<>();
+                        pathDeps.put("entity", entity);
+                        pathDeps.put("world", world);
+                        ProcedurePretaPath.executeProcedure(pathDeps);
+                        break;
+                    case 2:
+                        pathDeps = new HashMap<>();
+                        pathDeps.put("entity", entity);
+                        pathDeps.put("world", world);
+                        ProcedureAnimalPath.executeProcedure(pathDeps);
+                        break;
+                    case 5:
+                        pathDeps = new HashMap<>();
+                        pathDeps.put("is_pressed", false);
+                        pathDeps.put("entity", entity);
+                        pathDeps.put("world", world);
+                        pathDeps.put("x", x);
+                        pathDeps.put("y", y);
+                        pathDeps.put("z", z);
+                        ProcedureOuterPath.executeProcedure(pathDeps);
+                        break;
+                    case 0:
+                        pathDeps = new HashMap<>();
+                        pathDeps.put("is_pressed", false);
+                        pathDeps.put("entity", entity);
+                        pathDeps.put("world", world);
+                        pathDeps.put("x", x);
+                        pathDeps.put("y", y);
+                        pathDeps.put("z", z);
+                        ProcedureChibakuTenseiOnKeyPressed.executeProcedure(pathDeps);
+                        break;
+                }
             }
-        } else {
-            player.inventory.clearMatchingItems(ItemAsuraPathArmor.body, -1, -1, null);
-            player.inventory.clearMatchingItems(ItemAsuraCanon.block, -1, -1, null);
+            ci.cancel();
+            return;
         }
 
-        Map<String, Object> pathDeps;
-        switch ((int) which_path) {
-            case 4: // Naraka Path
-                pathDeps = new HashMap<>();
-                pathDeps.put("entity", entity);
-                pathDeps.put("world", world);
-                ProcedureNarakaPath.executeProcedure(pathDeps);
-                break;
-            case 3: // Preta Path
-                pathDeps = new HashMap<>();
-                pathDeps.put("entity", entity);
-                pathDeps.put("world", world);
-                ProcedurePretaPath.executeProcedure(pathDeps);
-                break;
-            case 2: // Animal Path
-                pathDeps = new HashMap<>();
-                pathDeps.put("entity", entity);
-                pathDeps.put("world", world);
-                ProcedureAnimalPath.executeProcedure(pathDeps);
-                break;
-            case 5: // Outer Path
-                pathDeps = new HashMap<>();
-                pathDeps.put("is_pressed", false);
-                pathDeps.put("entity", entity);
-                pathDeps.put("world", world);
-                pathDeps.put("x", x);
-                pathDeps.put("y", y);
-                pathDeps.put("z", z);
-                ProcedureOuterPath.executeProcedure(pathDeps);
-                break;
-            case 0: // Chibaku Tensei
-                pathDeps = new HashMap<>();
-                pathDeps.put("is_pressed", false);
-                pathDeps.put("entity", entity);
-                pathDeps.put("world", world);
-                pathDeps.put("x", x);
-                pathDeps.put("y", y);
-                pathDeps.put("z", z);
-                ProcedureChibakuTenseiOnKeyPressed.executeProcedure(pathDeps);
-                break;
+        // Virtual Mangekyo / Eternal / Obito -> summon susanoo
+        if (virtualEye.getItem() == ItemMangekyoSharingan.helmet
+                || virtualEye.getItem() == ItemMangekyoSharinganObito.helmet
+                || virtualEye.getItem() == ItemMangekyoSharinganEternal.helmet) {
+            if (!is_pressed) {
+                com.qdd.narutofix.entity.susanoo.SusanooSummonHandler.summonSusanoo(player);
+            }
+            ci.cancel();
+            return;
         }
-        ci.cancel();
     }
 }

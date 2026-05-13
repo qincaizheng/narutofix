@@ -204,13 +204,8 @@ public abstract class SusanooEntityBase extends EntityCreature implements IRange
     @Override
     public boolean processInteract(EntityPlayer player, EnumHand hand) {
         super.processInteract(player, hand);
-        if (!this.world.isRemote && player.equals(this.getOwnerPlayer())) {
-            if (player.isRiding()) {
-                // Already riding → fire the held weapon
-                this.fireHeldWeapon();
-            } else {
-                player.startRiding(this);
-            }
+        if (!this.world.isRemote && player.equals(this.getOwnerPlayer()) && !player.isRiding()) {
+            player.startRiding(this);
             return true;
         }
         return false;
