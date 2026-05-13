@@ -1007,3 +1007,25 @@
 - 需要在 `runClient` 中确认 `/addchakra` 指令正常执行、查克拉果实吃后 soul/body 增加。
 - 当前分支独立性好，可在验证通过后合回 `2836`。
 
+## 2026-05-13 — 须佐召唤 + 虚拟眼三项修复
+
+### 角色
+主代理：按用户报告修复须佐重新上车误发射、虚拟眼假须佐、六勾玉 Skill2 被须佐接管三项问题。
+
+### 问题定位
+- `SusanooEntityBase.processInteract()` 当前 `2836` 基线已经只在 owner 未骑乘时执行 `startRiding`，不再调用 `fireHeldWeapon()`；右键发射仍由 `SusanooMouseFireHandler` / `PacketNarutofixSusanooFire` 和 `ObsidianChokuto` 显式入口处理。
+- `ProcedureSpecialJutsu2OnKeyPressed` 的原版按键类会先客户端本地调用 `pressAction`，再发包到服务端；原版代码在 `world.isRemote` 时会提前返回，但 mixin 的 HEAD 注入在原版 return 前执行，导致虚拟须佐眼在客户端也执行召唤，产生幽灵/假须佐。
+- 六勾玉轮回眼被 `DojutsuEyeHelper.isSusanooCompatibleEye` 命中后，Skill2 提前进入须佐召唤分支，绕过了六勾玉自己的轮回眼技能组逻辑。
+
+### 变更
+- `MixinProcedureSpecialJutsu2OnKeyPressed` 增加六勾玉优先路由：只要头盔或虚拟槽存在 `ModItems.SIX_TOMOE_RINNEGAN`，Skill2 调用 `SixTomoeRinneganLogic.handleCustomKeyK`，并取消原版过程。
+- 对普通虚拟轮回眼 / 转生眼保留现有六道路径路由，但实际施法只在服务端执行。
+- 对虚拟万花筒 / 永恒万花筒 / Obito 以及其他兼容须佐眼，继续调用 `SusanooSummonHandler.summonSusanoo`，同时服务端限定避免客户端假实体。
+
+### 验证
+- 本地 `./gradlew compileJava --stacktrace --rerun-tasks`：BUILD SUCCESSFUL。
+- 本会话没有暴露 IDEA MCP 资源或工具，未能按项目强制约束执行 IDEA MCP 文件检查 / 编译；已记录为验证限制。
+
+### 与产品上线关系
+- 代码层已修正虚拟眼假须佐和六勾玉 Skill2 路由问题；Bug 1 的 `processInteract` 误发射点在当前基线已处于修复状态。
+- 上线前仍需 `runClient` 实机确认：下须佐后重新上车不自动发射；虚拟万花筒开须佐只生成一个真实须佐；六勾玉 Skill2 正常执行轮回眼技能组，Skill4 才开关须佐。

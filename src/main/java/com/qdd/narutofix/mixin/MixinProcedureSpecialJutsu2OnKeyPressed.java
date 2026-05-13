@@ -1,6 +1,8 @@
 package com.qdd.narutofix.mixin;
 
 import com.qdd.narutofix.util.DojutsuEyeHelper;
+import com.qdd.narutofix.items.ModItems;
+import com.qdd.narutofix.items.SixTomoeRinneganLogic;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -9,9 +11,6 @@ import net.minecraft.world.World;
 import net.narutomod.item.ItemAsuraCanon;
 import net.narutomod.item.ItemAsuraPathArmor;
 import net.narutomod.item.ItemDojutsu;
-import net.narutomod.item.ItemMangekyoSharingan;
-import net.narutomod.item.ItemMangekyoSharinganEternal;
-import net.narutomod.item.ItemMangekyoSharinganObito;
 import net.narutomod.item.ItemRinnegan;
 import net.narutomod.item.ItemTenseigan;
 import net.narutomod.procedure.ProcedureAnimalPath;
@@ -41,6 +40,13 @@ public abstract class MixinProcedureSpecialJutsu2OnKeyPressed {
         EntityPlayer player = (EntityPlayer) entity;
         boolean is_pressed = (boolean) pressed;
 
+        ItemStack sixTomoe = DojutsuEyeHelper.getMatchingEye(player, ModItems.SIX_TOMOE_RINNEGAN);
+        if (!sixTomoe.isEmpty()) {
+            SixTomoeRinneganLogic.handleCustomKeyK(is_pressed, sixTomoe, player);
+            ci.cancel();
+            return;
+        }
+
         // If head slot has a dojutsu, let original procedure handle everything
         ItemStack headSlot = player.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
         if (headSlot.getItem() instanceof ItemDojutsu.Base) {
@@ -50,19 +56,18 @@ public abstract class MixinProcedureSpecialJutsu2OnKeyPressed {
         ItemStack virtualEye = DojutsuEyeHelper.getVirtualEye(player);
         if (virtualEye.isEmpty()) return;
 
-        // Six-tomoe has its own key bind system (R/V/X/H via EyeKeyHandler),
-        // so skill 2 key should NOT trigger anything for six-tomoe
-        if (virtualEye.getItem() == com.qdd.narutofix.items.ModItems.SIX_TOMOE_RINNEGAN) {
-            ci.cancel();
+        Object worldObject = dependencies.get("world");
+        if (!(worldObject instanceof World)) {
             return;
         }
+        World world = (World) worldObject;
+        if (world.isRemote) return;
 
         // Virtual Rinnegan / Tenseigan -> six-path routing
         if (virtualEye.getItem() == ItemRinnegan.helmet || virtualEye.getItem() == ItemTenseigan.helmet) {
             if (!is_pressed) {
                 double which_path = virtualEye.hasTagCompound()
                         ? virtualEye.getTagCompound().getDouble("which_path") : -1;
-                World world = (World) dependencies.get("world");
                 int x = (int) dependencies.get("x");
                 int y = (int) dependencies.get("y");
                 int z = (int) dependencies.get("z");
@@ -123,10 +128,8 @@ public abstract class MixinProcedureSpecialJutsu2OnKeyPressed {
             return;
         }
 
-        // Virtual Mangekyo / Eternal / Obito -> summon susanoo
-        if (virtualEye.getItem() == ItemMangekyoSharingan.helmet
-                || virtualEye.getItem() == ItemMangekyoSharinganObito.helmet
-                || virtualEye.getItem() == ItemMangekyoSharinganEternal.helmet) {
+        // Virtual Mangekyo / Eternal / Obito and compatible custom eyes -> summon susanoo
+        if (DojutsuEyeHelper.isSusanooCompatibleEye(virtualEye)) {
             if (!is_pressed) {
                 com.qdd.narutofix.entity.susanoo.SusanooSummonHandler.summonSusanoo(player);
             }
