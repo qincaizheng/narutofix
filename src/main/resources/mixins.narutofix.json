@@ -5,6 +5,7 @@
   "mixins": [
     "MixinChakraPlayerHookOnDeath",
     "MixinEntityHakkeshoKeiten",
+    "MixinEntityKamuiShuriken",
     "MixinEntityPretaShield",
     "MixinItemBlackReceiverRangedItem",
     "MixinItemByakugan",

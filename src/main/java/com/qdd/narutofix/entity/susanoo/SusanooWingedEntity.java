@@ -275,31 +275,27 @@ public class SusanooWingedEntity extends SusanooEntityBase {
     protected void fireHeldWeapon() {
         EntityLivingBase owner = this.getOwnerPlayer();
         if (owner == null) return;
-        int chargeTicks = this.getEntityData().getInteger("narutofix_chargeTicks");
-
         Vec3d look = owner.getLookVec();
         Vec3d spawn = this.getWeaponSpawnPosition(look);
         if (this.isUsingKamuiWeapon()) {
-            // Charge-based power scaling: charge up to 400 ticks (~20s) for max power
-            float chargePower = Math.min(1.0F, chargeTicks / 200.0F);
-            float speed = 0.5F + chargePower * 1.5F;
-            float damageScale = 0.5F + chargePower * 2.5F;
-
             net.narutomod.item.ItemKamuiShuriken.EntityKamuiShuriken shuriken =
                 new net.narutomod.item.ItemKamuiShuriken.EntityKamuiShuriken(this.world, owner);
-            shuriken.setScale((float) this.getEntityData().getDouble("entityModelScale") * (0.5F + chargePower * 0.5F));
+            shuriken.setScale((float) this.getEntityData().getDouble("entityModelScale"));
             shuriken.setPosition(spawn.x, spawn.y, spawn.z);
             shuriken.ignoreEntity = this;
             shuriken.getEntityData().setInteger("narutofix_susanoo_owner", this.getEntityId());
-            shuriken.shoot(look.x, look.y, look.z, speed, 0.0F);
+            shuriken.shoot(look.x, look.y, look.z, 1.0F, 0.0F);
+            // Boost kamui shuriken damage by overriding its damage calculation
+            shuriken.getEntityData().setDouble("narutofix_kamui_damage_mult", 5.0D);
             this.world.spawnEntity(shuriken);
         } else {
-            // Charge scaling for kagutsuchi: more fireballs
-            int count = chargeTicks > 80 ? 5 : (chargeTicks > 20 ? 3 : 1);
             Vec3d origin = new Vec3d(this.posX, spawn.y, this.posZ);
-            for (int i = 0; i < count; ++i) {
-                float yawOffset = (i - (count - 1) / 2.0F) * 15.0F;
-                Vec3d target = origin.add(Vec3d.fromPitchYaw(owner.rotationPitch, owner.rotationYaw + yawOffset).scale(40.0D));
+            Vec3d[] targets = new Vec3d[] {
+                    origin.add(look.scale(40.0D)),
+                    origin.add(Vec3d.fromPitchYaw(owner.rotationPitch, owner.rotationYaw - 20.0F).scale(40.0D)),
+                    origin.add(Vec3d.fromPitchYaw(owner.rotationPitch, owner.rotationYaw + 20.0F).scale(40.0D))
+            };
+            for (Vec3d target : targets) {
                 net.narutomod.item.ItemKagutsuchiSwordRanged.EntityBigBlackFireball fireball =
                         new net.narutomod.item.ItemKagutsuchiSwordRanged.EntityBigBlackFireball(
                                 this.world, this, target.x - spawn.x, target.y - spawn.y, target.z - spawn.z);
