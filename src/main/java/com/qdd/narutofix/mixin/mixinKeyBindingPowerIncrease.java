@@ -39,12 +39,20 @@ public class mixinKeyBindingPowerIncrease {
             NarutoFix.PACKET_HANDLER.sendToServer(new PacketNarutofixSusanooUpgrade());
         }
 
+        // Update wasKeyDown here since ci.cancel() prevents the original from doing it
+        this.wasKeyDown = isKeyDown;
+
         // Cancel original processKeyBind to prevent narutomod triggering other actions
         ci.cancel();
     }
 
     @Inject(method = "onKeyInput",at= @At(value = "INVOKE", target = "Lnet/narutomod/keybind/KeyBindingPowerIncrease;processKeyBind()V"),remap = false)
     private void processKeyBind( CallbackInfo ci) {
+        // Don't trigger jutsu switch when riding narutofix susanoo
+        EntityPlayer player = Minecraft.getMinecraft().player;
+        if (player != null && player.getRidingEntity() instanceof SusanooEntityBase) {
+            return;
+        }
         if (keys.isPressed()) {
             JutsuHandler.onKeyEvent();
         }
