@@ -104,12 +104,19 @@ public final class DojutsuEyeHelper {
         return !stack.isEmpty() && stack.getItem() instanceof ItemDojutsu.Base;
     }
 
+    public static boolean isSusanooCompatibleEye(ItemStack stack) {
+        return isSusanooCompatible(stack);
+    }
+
     public static ItemStack getCompatibleSusanooEye(EntityLivingBase entity) {
         ItemStack head = getHeadEye(entity);
         if (isSusanooCompatible(head)) {
             return head;
         }
-        ItemStack virtual = getVirtualEye(entity);
+        if (!(entity instanceof EntityPlayer)) {
+            return ItemStack.EMPTY;
+        }
+        ItemStack virtual = getVirtualEye((EntityPlayer) entity);
         if (isSusanooCompatible(virtual)) {
             return virtual;
         }

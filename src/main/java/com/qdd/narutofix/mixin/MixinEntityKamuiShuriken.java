@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ItemKamuiShuriken.EntityKamuiShuriken.class)
 public abstract class MixinEntityKamuiShuriken {
 
-    @Shadow
+    @Shadow(remap = false)
     public abstract float getScale();
 
     @Inject(method = "onImpact", at = @At("HEAD"), cancellable = true, remap = false)

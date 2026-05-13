@@ -38,7 +38,7 @@ public abstract class MixinProcedureSpecialJutsu2OnKeyPressed {
         EntityPlayer player = (EntityPlayer) entity;
         boolean is_pressed = (boolean) pressed;
 
-        // Only intercept for virtual Rinnegan/Tenseigan when head slot is empty or non-do-jutsu
+        // Only intercept for virtual eye when head slot is empty or non-do-jutsu
         ItemStack headSlot = player.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
         if (headSlot.getItem() instanceof ItemDojutsu.Base) {
             return; // head slot has a dojutsu — let original procedure handle it
@@ -46,6 +46,15 @@ public abstract class MixinProcedureSpecialJutsu2OnKeyPressed {
 
         ItemStack virtualEye = DojutsuEyeHelper.getVirtualEye(player);
         if (virtualEye.isEmpty()) return;
+
+        // Mangekyo / Eternal / Obito in virtual slot -> summon/upgrade susanoo
+        if (!is_pressed && DojutsuEyeHelper.isSusanooCompatibleEye(virtualEye)) {
+            com.qdd.narutofix.entity.susanoo.SusanooSummonHandler.summonSusanoo(player);
+            ci.cancel();
+            return;
+        }
+
+        // Six-path routing for virtual Rinnegan/Tenseigan
         if (virtualEye.getItem() != ItemRinnegan.helmet && virtualEye.getItem() != ItemTenseigan.helmet) return;
 
         if (is_pressed) {
