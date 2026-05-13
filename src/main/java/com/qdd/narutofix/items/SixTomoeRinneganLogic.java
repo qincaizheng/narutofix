@@ -123,6 +123,10 @@ public final class SixTomoeRinneganLogic {
             return true;
         }
 
+        if (player.getRidingEntity() instanceof com.qdd.narutofix.entity.susanoo.SusanooEntityBase) {
+            com.qdd.narutofix.entity.susanoo.SusanooSummonHandler.upgradeSusanoo(player);
+            return true;
+        }
         if (player.getRidingEntity() instanceof EntitySusanooBase) {
             ProcedureSusanoo.upgrade(player);
             return true;
