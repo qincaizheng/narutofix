@@ -22,6 +22,8 @@ g.bat
 eclipse
 run
 logs
+docs
+AGENTS.md
 
 # Files from Forge MDK
 forge*changelog.txt
