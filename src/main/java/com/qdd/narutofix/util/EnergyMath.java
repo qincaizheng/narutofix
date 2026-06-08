@@ -23,15 +23,45 @@ public final class EnergyMath {
     }
 
     public static double chakraGrowthMultiplier(EntityPlayer player) {
-        return soulMultiplier(player, Configs.soul.chakraGrowthMultiplierPerSoul);
+        return 100.0D * soulLogMultiplier(player) * Configs.soul.chakraGrowthMultiplierPerSoul;
     }
 
     public static double jutsuXpMultiplier(EntityPlayer player) {
-        return soulMultiplier(player, Configs.soul.jutsuXpMultiplierPerSoul);
+        return soulJutsuXpMultiplier(player);
+    }
+
+    public static double soulJutsuXpMultiplier(EntityPlayer player) {
+        ISoulEnergyData data = SoulEnergyDataProvider.get(player);
+        if (data == null) {
+            return 1.0D;
+        }
+        double current = Math.max(1.0D, data.getCurrent());
+        double logResult = Math.log(current / 100.0D) / Math.log(Configs.soul.jutsuXpLogBase);
+        return Math.max(1.0D, Math.min(Configs.soul.jutsuXpMaxMultiplier, logResult));
     }
 
     public static double jutsuChargeMultiplier(EntityPlayer player) {
-        return soulMultiplier(player, Configs.soul.jutsuChargeMultiplierPerSoul);
+        return 100.0D * soulLogMultiplier(player) * Configs.soul.jutsuChargeMultiplierPerSoul;
+    }
+
+    public static double soulLogMultiplier(EntityPlayer player) {
+        ISoulEnergyData data = SoulEnergyDataProvider.get(player);
+        if (data == null) {
+            return 0.0D;
+        }
+        double current = Math.max(1.0D, data.getCurrent());
+        double logResult = Math.log(current / 100.0D) / Math.log(Configs.soul.jutsuXpLogBase);
+        return Math.max(0.0D, Math.min(Configs.soul.jutsuXpMaxMultiplier, logResult));
+    }
+
+    public static double bodyMultiplier(EntityPlayer player) {
+        IBodyEnergyData data = BodyEnergyDataProvider.get(player);
+        if (data == null) {
+            return 1.0D;
+        }
+        double max = Math.max(100.0D, data.getMax());
+        double logResult = Math.log(max / 100.0D) / Math.log(Configs.body.bodyLogBase);
+        return Math.max(0.0D, Math.min(Configs.body.bodyLogMaxMultiplier, logResult));
     }
 
     /**

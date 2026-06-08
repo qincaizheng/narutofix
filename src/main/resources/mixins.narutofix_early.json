@@ -5,10 +5,9 @@
   "refmap": "refmap.narutofix.json",
   "target": "@env(DEFAULT)",
   "mixins": [
-    "mixinImpl"
+    "MixinContainerPlayer"
   ],
   "client": [
-    "MixinContainerPlayer",
     "MixinGuiInventory"
   ],
   "injectors": {

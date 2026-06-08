@@ -24,7 +24,8 @@ import net.narutomod.item.ItemJutsu;
 
 import java.util.Objects;
 
-@Mod.EventBusSubscriber
+@SideOnly(Side.CLIENT)
+@Mod.EventBusSubscriber(value = Side.CLIENT, modid = NarutoFix.MODID)
 public class onOverlayEvent {
     private static final ResourceLocation DEFUALT = new ResourceLocation(NarutoFix.MODID,"textures/gui/default.png");
     private static final ResourceLocation ENERGY_HUD = new ResourceLocation(NarutoFix.MODID, "textures/gui/hud.png");

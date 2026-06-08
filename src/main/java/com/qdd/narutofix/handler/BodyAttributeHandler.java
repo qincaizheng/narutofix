@@ -3,6 +3,7 @@ package com.qdd.narutofix.handler;
 import com.qdd.narutofix.Configs;
 import com.qdd.narutofix.cap.body.BodyEnergyDataProvider;
 import com.qdd.narutofix.cap.body.IBodyEnergyData;
+import com.qdd.narutofix.util.EnergyMath;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
@@ -39,7 +40,7 @@ public class BodyAttributeHandler {
     }
 
     private void applyBodyAttributes(EntityPlayer player, IBodyEnergyData data) {
-        double body = Math.max(0.0D, data.getMax());
+        double body = 100.0D * EnergyMath.bodyMultiplier(player);
         this.applyModifier(player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH),
                 HEALTH_MODIFIER_ID, "narutofix.body.max_health",
                 body * Configs.body.hpMultiplierPerBody, 2);
@@ -75,7 +76,7 @@ public class BodyAttributeHandler {
         if (player.getHealth() >= player.getMaxHealth()) {
             return;
         }
-        float heal = (float) (Math.max(0.0D, data.getMax()) * Configs.body.hpRegenPerBody);
+        float heal = (float) (100.0D * EnergyMath.bodyMultiplier(player) * Configs.body.hpRegenPerBody);
         if (heal > 0.0F) {
             player.heal(heal);
         }

@@ -6,6 +6,8 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.World;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.util.text.translation.I18n;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.narutomod.Chakra;
 import net.narutomod.item.ItemMilitaryRationsPill;
 import net.narutomod.item.ItemMilitaryRationsPillGold;
@@ -34,6 +36,7 @@ public class MixinItemMilitaryRationsPillFood {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     @Inject(method = "addInformation", at = @At("TAIL"))
     private void narutofix$appendMilitaryRationsPillTooltip(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn, CallbackInfo ci) {
         tooltip.remove(I18n.translateToLocal("tooltip.mrp.browntip"));

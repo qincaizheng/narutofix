@@ -148,8 +148,11 @@ narutofix.config.chakraCrouchExchange.insufficientPolicy=Insufficient Policy
 
 # P3: Sleep Recovery
 narutofix.config.sleep=Sleep Recovery Settings
-narutofix.config.sleep.soulRecoveryPercent=Soul Recovery Percent
-narutofix.config.sleep.bodyRecoveryPercent=Body Recovery Percent
+narutofix.config.sleep.soulRecoveryPercent=Soul Recovery Percent (Legacy)
+narutofix.config.sleep.bodyRecoveryPercent=Body Recovery Percent (Legacy)
+narutofix.config.sleep.soulRecoveryPercentPerTick=Soul Recovery Percent Per Tick
+narutofix.config.sleep.bodyRecoveryPercentPerTick=Body Recovery Percent Per Tick
+narutofix.config.sleep.maxRecoveryTicks=Max Recovery Ticks
 
 # P4: Chakra Command + Chakra Fruit
 narutofix.command.addchakra.usage=/addchakra <player> <amount> [soulRatio]
@@ -157,3 +160,7 @@ narutofix.command.addchakra.done=§aChakra added: +%s soul, +%s body
 narutofix.config.chakraFruit=Chakra Fruit Settings
 narutofix.config.chakraFruit.soulAmount=Fruit Soul Amount
 narutofix.config.chakraFruit.bodyAmount=Fruit Body Amount
+
+
+# Tailed Beast coordinate broadcast
+chattext.tailbeast.coordinates=[%s] Position: %d, %d, %d

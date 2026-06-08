@@ -23,4 +23,6 @@ dependencies {
     }
 
     implementation rfg.deobf('curse.maven:ahznbs-naruto-mod-831157:5967126')
+
+    testImplementation 'junit:junit:4.13.2'
 }

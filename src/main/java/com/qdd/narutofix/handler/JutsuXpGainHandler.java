@@ -34,7 +34,7 @@ public class JutsuXpGainHandler {
             return;
         }
 
-        int xp = Math.max(1, (int) Math.ceil(damage * EnergyMath.jutsuXpMultiplier(player)));
+        int xp = Math.max(1, (int) Math.ceil(EnergyMath.soulJutsuXpMultiplier(player)));
         boolean granted = this.tryGrantHeldItemXp(player, player.getHeldItemMainhand(), xp)
                 | this.tryGrantHeldItemXp(player, player.getHeldItemOffhand(), xp);
         if (granted) {

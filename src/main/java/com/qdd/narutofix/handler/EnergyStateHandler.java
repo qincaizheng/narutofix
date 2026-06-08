@@ -13,6 +13,7 @@ import com.qdd.narutofix.util.BloodlineEnergyBonusApplier;
 import com.qdd.narutofix.util.ChakraSyncHelper;
 import com.qdd.narutofix.util.EnergyRecoveryCalculator;
 import com.qdd.narutofix.util.EnergyRecoverySnapshot;
+import com.qdd.narutofix.util.SleepRecoveryRules;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -22,6 +23,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -37,6 +39,9 @@ public class EnergyStateHandler {
     private static final String LAST_Z = "narutofixEnergyLastZ";
     private static final String POSITION_INITIALIZED = "narutofixEnergyPositionInitialized";
     private static final String STATIONARY_TICKS = "narutofixEnergyStationaryTicks";
+    private static final String SLEEP_RECOVERY_ACTIVE = "narutofixSleepRecoveryActive";
+    private static final String SLEEP_RECOVERY_STARTED_AT_NIGHT = "narutofixSleepRecoveryStartedAtNight";
+    private static final String SLEEP_RECOVERY_START_WORLD_TIME = "narutofixSleepRecoveryStartWorldTime";
 
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
@@ -54,6 +59,7 @@ public class EnergyStateHandler {
 
         this.applyBloodlineInitialEnergy(player);
         int stationaryTicks = this.updateStationaryTicks(player);
+        this.trackSleepRecoverySession(player);
         Chakra.Pathway<?> pathway = Chakra.pathway(player);
         EnergyRecoverySnapshot snapshot = EnergyRecoveryCalculator.calculate(player, awakening, soul, body, pathway, stationaryTicks);
 
@@ -197,15 +203,40 @@ public class EnergyStateHandler {
     }
 
     @SubscribeEvent
+    public void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
+        EntityPlayer player = event.getEntityPlayer();
+        if (player.world.isRemote || !(player instanceof EntityPlayerMP)) {
+            return;
+        }
+
+        if (!player.world.isDaytime()) {
+            this.recordSleepRecoverySession(player, true);
+        }
+    }
+
+    @SubscribeEvent
     public void onPlayerWakeUp(PlayerWakeUpEvent event) {
         EntityPlayer player = event.getEntityPlayer();
         if (player.world.isRemote || !(player instanceof EntityPlayerMP)) {
             return;
         }
 
-        // wakeImmediately=true means canceled sleep (right-click/ESC).
-        // wakeImmediately=false means natural wake-up after a full night.
-        if (event.wakeImmediately()) {
+        NBTTagCompound data = player.getEntityData();
+        boolean hadSleepSession = data.getBoolean(SLEEP_RECOVERY_ACTIVE);
+        boolean startedAtNight = data.getBoolean(SLEEP_RECOVERY_STARTED_AT_NIGHT);
+        long startWorldTime = data.getLong(SLEEP_RECOVERY_START_WORLD_TIME);
+        this.clearSleepRecoverySession(data);
+
+        long currentWorldTime = player.world.getWorldTime();
+        if (!hadSleepSession || !SleepRecoveryRules.shouldApplyRecovery(startedAtNight,
+                SleepRecoveryRules.isVanillaDaytime(currentWorldTime),
+                startWorldTime, currentWorldTime)) {
+            return;
+        }
+
+        int effectiveSleepTicks = SleepRecoveryRules.effectiveSleepTicks(startWorldTime, currentWorldTime,
+                Configs.sleep.maxRecoveryTicks);
+        if (effectiveSleepTicks <= 0) {
             return;
         }
 
@@ -216,20 +247,18 @@ public class EnergyStateHandler {
         double soulRestore = 0.0D;
         double bodyRestore = 0.0D;
 
-        if (Configs.sleep.soulRecoveryPercent > 0.0D && soul != null && soul.getMax() > 0.0D) {
-            double rawSoul = soul.getMax() * Configs.sleep.soulRecoveryPercent;
-            double soulRoom = Math.max(0.0D, soul.getMax() - soul.getCurrent());
-            soulRestore = Math.min(rawSoul, soulRoom);
+        if (Configs.sleep.soulRecoveryPercentPerTick > 0.0D && soul != null && soul.getMax() > 0.0D) {
+            soulRestore = SleepRecoveryRules.calculateRecovery(soul.getMax(), soul.getCurrent(),
+                    Configs.sleep.soulRecoveryPercentPerTick, effectiveSleepTicks);
             if (soulRestore > 0.0D) {
                 soul.addCurrent(soulRestore);
                 PacketSyncSoulEnergy.sync(mp);
             }
         }
 
-        if (Configs.sleep.bodyRecoveryPercent > 0.0D && body != null && body.getMax() > 0.0D) {
-            double rawBody = body.getMax() * Configs.sleep.bodyRecoveryPercent;
-            double bodyRoom = Math.max(0.0D, body.getMax() - body.getCurrent());
-            bodyRestore = Math.min(rawBody, bodyRoom);
+        if (Configs.sleep.bodyRecoveryPercentPerTick > 0.0D && body != null && body.getMax() > 0.0D) {
+            bodyRestore = SleepRecoveryRules.calculateRecovery(body.getMax(), body.getCurrent(),
+                    Configs.sleep.bodyRecoveryPercentPerTick, effectiveSleepTicks);
             if (bodyRestore > 0.0D) {
                 body.addCurrent(bodyRestore);
                 PacketSyncBodyEnergy.sync(mp);
@@ -239,6 +268,35 @@ public class EnergyStateHandler {
         if (soulRestore > 0.0D || bodyRestore > 0.0D) {
             ChakraSyncHelper.refresh(mp);
         }
+    }
+
+    private void trackSleepRecoverySession(EntityPlayerMP player) {
+        NBTTagCompound data = player.getEntityData();
+        if (!player.isPlayerSleeping()) {
+            if (data.getBoolean(SLEEP_RECOVERY_ACTIVE)) {
+                this.clearSleepRecoverySession(data);
+            }
+            return;
+        }
+
+        if (data.getBoolean(SLEEP_RECOVERY_ACTIVE)) {
+            return;
+        }
+
+        this.recordSleepRecoverySession(player, !player.world.isDaytime());
+    }
+
+    private void recordSleepRecoverySession(EntityPlayer player, boolean startedAtNight) {
+        NBTTagCompound data = player.getEntityData();
+        data.setBoolean(SLEEP_RECOVERY_ACTIVE, true);
+        data.setBoolean(SLEEP_RECOVERY_STARTED_AT_NIGHT, startedAtNight);
+        data.setLong(SLEEP_RECOVERY_START_WORLD_TIME, player.world.getWorldTime());
+    }
+
+    private void clearSleepRecoverySession(NBTTagCompound data) {
+        data.removeTag(SLEEP_RECOVERY_ACTIVE);
+        data.removeTag(SLEEP_RECOVERY_STARTED_AT_NIGHT);
+        data.removeTag(SLEEP_RECOVERY_START_WORLD_TIME);
     }
 
     private int updateStationaryTicks(EntityPlayer player) {
@@ -281,7 +339,7 @@ public class EnergyStateHandler {
         float saturation = stats.getSaturationLevel();
         if (saturation > 0.0F) {
             float saturationCost = (float) Math.min(saturation, remaining);
-            stats.setFoodSaturationLevel(saturation - saturationCost);
+            this.setServerFoodSaturationLevel(stats, saturation - saturationCost);
             remaining -= saturationCost;
         }
 
@@ -295,6 +353,13 @@ public class EnergyStateHandler {
                 stats.setFoodLevel(foodLevel - foodCost);
             }
         }
+    }
+
+    private void setServerFoodSaturationLevel(FoodStats stats, float saturation) {
+        NBTTagCompound foodData = new NBTTagCompound();
+        stats.writeNBT(foodData);
+        foodData.setFloat("foodSaturationLevel", Math.max(0.0F, saturation));
+        stats.readNBT(foodData);
     }
 
 }

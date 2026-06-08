@@ -224,6 +224,16 @@ public class Configs {
         @Config.RangeDouble(min = 0.0, max = 1.0)
         public double jutsuXpMultiplierPerSoul = 0.001;
 
+        @Config.Name("Jutsu XP Log Base")
+        @Config.Comment("灵魂能量→忍术经验倍率的对数底数。数值越大，前期增长越慢。默认 e（自然对数）。")
+        @Config.RangeDouble(min = 1.01, max = 10000.0)
+        public double jutsuXpLogBase = 2.718281828459045;
+
+        @Config.Name("Jutsu XP Max Multiplier")
+        @Config.Comment("灵魂能量→忍术经验倍率的上限封顶值。")
+        @Config.RangeDouble(min = 1.0, max = 100000.0)
+        public double jutsuXpMaxMultiplier = 5.0;
+
         @Config.Name("Jutsu Charge Per Soul")
         @Config.Comment("每 1 点灵魂能量提供的忍术蓄力速度倍率。")
         @Config.RangeDouble(min = 0.0, max = 1.0)
@@ -278,6 +288,30 @@ public class Configs {
         @Config.Comment("拥有因陀罗血脉时，灵魂能量恢复速度倍率。")
         @Config.RangeDouble(min = 0.0, max = 1000.0)
         public double indraSoulRecoveryMultiplier = 2.0;
+    }
+
+    @Config.Name("Soul Environment Recovery Settings")
+    @Config.Comment("玩家站在特定方块上时自动恢复灵魂能量的配置。")
+    public static final SoulEnvironmentConfig soulEnvironment = new SoulEnvironmentConfig();
+
+    public static class SoulEnvironmentConfig {
+        @Config.Name("Enabled")
+        @Config.Comment("启用环境灵魂恢复。")
+        public boolean enabled = true;
+
+        @Config.Name("Recovery Blocks")
+        @Config.Comment("触发恢复的方块注册名列表。默认仅 minecraft:soul_sand。")
+        public String[] recoveryBlocks = new String[]{"minecraft:soul_sand"};
+
+        @Config.Name("Recovery Percent Per Second")
+        @Config.Comment("每秒恢复灵魂能量上限的百分比（0~1 表示 0%~100%）。")
+        @Config.RangeDouble(min = 0.0, max = 1.0)
+        public double recoveryPercentPerSecond = 0.01;
+
+        @Config.Name("Check Interval Ticks")
+        @Config.Comment("每次检测之间的游戏刻间隔。默认 20 tick = 1 秒。")
+        @Config.RangeInt(min = 1, max = 72000)
+        public int checkIntervalTicks = 20;
     }
 
     @Config.Name("Body Energy Settings")
@@ -374,6 +408,16 @@ public class Configs {
         @Config.Comment("肉体能量提供的攻击速度倍率上限。")
         @Config.RangeDouble(min = 0.0, max = 100.0)
         public double maxAttackSpeedMultiplier = 3.0;
+        @Config.Name("Body Log Base")
+        @Config.Comment("肉体能量→属性增幅的对数底数。数值越大，越晚进入衰减。默认 e（自然对数）。")
+        @Config.RangeDouble(min = 1.01, max = 10000.0)
+        public double bodyLogBase = 2.718281828459045;
+
+        @Config.Name("Body Log Max Multiplier")
+        @Config.Comment("肉体能量→属性增幅的对数倍率上限封顶值。")
+        @Config.RangeDouble(min = 1.0, max = 100000.0)
+        public double bodyLogMaxMultiplier = 10.0;
+
 
         @Config.Name("Body Low Threshold")
         @Config.Comment("当前肉体能量低于上限的该比例时触发负面效果和饱食度转化。")
@@ -429,6 +473,23 @@ public class Configs {
         public boolean enableCompactHealthBar = true;
     }
 
+
+
+    @Config.Name("Tailed Beast Boss Bar Settings")
+    @Config.Comment("尾兽 Boss 条显示与坐标播报配置。")
+    public static final TailsConfig tails = new TailsConfig();
+
+    public static class TailsConfig {
+        @Config.Name("Boss Bar Range")
+        @Config.Comment("尾兽 Boss 条可见范围（方块）。玩家在此距离内才显示 Boss 条，超出则隐藏。")
+        @Config.RangeInt(min = 1, max = 10000)
+        public int bossBarRange = 100;
+
+        @Config.Name("Coordinate Broadcast Interval")
+        @Config.Comment("尾兽坐标聊天栏播报间隔（游戏刻）。默认 600 = 30 秒。")
+        @Config.RangeInt(min = 1, max = 72000)
+        public int coordinateBroadcastInterval = 600;
+    }
 
     @Config.Name("Crouch Chakra Exchange Settings")
     @Config.Comment("玩家静止下蹲时消耗灵魂/肉体能量恢复查克拉的配置。替换旧版无成本静止查克拉自然恢复。")
@@ -488,6 +549,20 @@ public class Configs {
         @Config.Comment("睡觉醒来时恢复的肉体能量百分比（基于上限）。0 表示不恢复。")
         @Config.RangeDouble(min = 0.0, max = 1.0)
         public double bodyRecoveryPercent = 0.10;
+        @Config.Name("Soul Recovery Percent Per Tick")
+        @Config.Comment("睡觉从夜晚持续到白天后，每个有效睡眠游戏刻恢复的灵魂能量百分比（基于上限）。")
+        @Config.RangeDouble(min = 0.0, max = 1.0)
+        public double soulRecoveryPercentPerTick = 0.003;
+
+        @Config.Name("Body Recovery Percent Per Tick")
+        @Config.Comment("睡觉从夜晚持续到白天后，每个有效睡眠游戏刻恢复的肉体能量百分比（基于上限）。")
+        @Config.RangeDouble(min = 0.0, max = 1.0)
+        public double bodyRecoveryPercentPerTick = 0.001;
+
+        @Config.Name("Max Recovery Ticks")
+        @Config.Comment("单次睡觉最多结算多少个有效睡眠游戏刻，防止多人服务器等待其他玩家时累计过高。")
+        @Config.RangeInt(min = 0, max = 24000)
+        public int maxRecoveryTicks = 100;
 
     }
 
