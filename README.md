@@ -1,3 +1,5 @@
+Here is the link to my Afadian homepage.
+https://ifdian.net/a/narutofix
 # NarutoFix
 
 NarutoFix is a Minecraft Forge 1.12.2 addon for NarutoMod. It fixes and extends gameplay around dojutsu, Susanoo, chakra/body/soul energy, jutsu controls, and related NarutoMod systems.
